@@ -1,7 +1,7 @@
 # Activity 1: Spring Boot Setup and Maven
 
-## Part 1:
-## Screenshots
+### Part 1:
+### Screenshots
 
 ### VS Code About
 ![VS Code About](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic1-SpringBoot/screenshots/SpringBootAbout.png)

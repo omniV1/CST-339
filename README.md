@@ -10,10 +10,10 @@
 </div>
 
 ## Course Information
-- **Student:** Owen Lindsey
-- **University:** Grand Canyon University
-- **Professor:** Professor Robert Estey
-- **Course:** Java 3
+- Owen Lindsey
+- Grand Canyon University
+- Professor Robert Estey
+- Java 3
 
 ## Course Overview
 This repository contains assignments and projects for the Java 3 course, focusing on Enterprise Software Development using Spring Framework and related technologies.
@@ -46,14 +46,26 @@ Culminating project implementing enterprise-level web applications using all lea
 
 ## Repository Structure
 ```
-├── Topic1-SpringBoot
-├── Topic2-SpringMVC
-├── Topic3-SpringCore
-├── Topic4-SpringDataJDBC
-├── Topic5-SpringDataMongoDB
-├── Topic6-SpringSecurity
-├── Topic7-Microservices
-└── Topic8-EnterpriseApp
+├── documentation
+│   ├── Milestone
+│   ├── Topic1-SpringBoot
+│   ├── Topic2-SpringMVC
+│   ├── Topic3-SpringCore
+│   ├── Topic4-SpringDataJDBC
+│   ├── Topic5-SpringDataMongoDB
+│   ├── Topic6-SpringSecurity
+│   ├── Topic7-Microservices
+│   └── Topic8-EnterpriseApp
+└── src
+    ├── Milestone
+    ├── Topic1-SpringBoot
+    ├── Topic2-SpringMVC
+    ├── Topic3-SpringCore
+    ├── Topic4-SpringDataJDBC
+    ├── Topic5-SpringDataMongoDB
+    ├── Topic6-SpringSecurity
+    ├── Topic7-Microservices
+    └── Topic8-EnterpriseApp
 ```
 
 ## Technologies Used

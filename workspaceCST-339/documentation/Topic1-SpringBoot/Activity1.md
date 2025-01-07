@@ -1,4 +1,6 @@
 # Activity 1: Spring Boot Setup and Maven
+
+## Part 1:
 ## Screenshots
 
 ### VS Code About

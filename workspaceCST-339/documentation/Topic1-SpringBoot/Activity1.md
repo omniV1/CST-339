@@ -1,6 +1,10 @@
 # Activity 1: Spring Boot Setup and Maven
-## Screenshots
+CST-339: Java III
+January 7, 2025
+Owen Lindsey
 
+## Part 1: Tools Installation and Validation
+### Screenshots
 ### VS Code About
 ![VS Code About](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic1-SpringBoot/screenshots/SpringBootAbout.png)
 
@@ -21,7 +25,8 @@
 
 - ***Whitelabel Error Page***: Shows the default Spring Boot error page when accessing localhost:8080 before the index.html was created, displaying a 404 error and stack trace.
 
-## Part 2
+## Part 2: Maven Implementation
+### Screenshots 
 
 ### JAR Console Output
 ![JAR Console](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic1-SpringBoot/screenshots/jar%20console%20output.png)

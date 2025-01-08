@@ -23,7 +23,7 @@ Owen Lindsey
 ### index.html File
 ![index.html](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic1-SpringBoot/screenshots/index.html.png)
 
--HTML source code showing basic structure with title and heading.
+- ***HTML source code***: showing basic structure with title and heading.
 
 ### Whitelabel Error
 ![Whitelabel](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic1-SpringBoot/screenshots/LocalHost-WhiteLabelError.png)

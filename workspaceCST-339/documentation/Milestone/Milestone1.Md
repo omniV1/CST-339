@@ -396,42 +396,24 @@ Our risk management strategy focuses on identifying, assessing, and mitigating p
 
 | Component | Description | Deliverables | Validation Criteria |
 |-----------|-------------|--------------|-------------------|
-| Spring Boot Setup | Basic application configuration | - Project structure- Security framework- Basic endpoints | - Application runs\n- Endpoints respond- Security works |
-| Database Design | Initial schema and migrations | - Schema design- Migration scriptt- Base repositories | - Schema validates\n- Migrations run\n- CRUD works |
+| Spring Boot Setup | Basic application configuration | - Project structure- Security framework- Basic endpoints | - Application runs- Endpoints respond- Security works |
+| Database Design | Initial schema and migrations | - Schema design- Migration scriptt- Base repositories | - Schema validates- Migrations run- CRUD works |
 | Authentication | User management and security | - Login system- Role management- User interfaces | - Users can login- Roles work- Interface functions |
 
-### Phase 2: Business Logic Implementation
+### Phase 2: Business Logic Implementation (Weeks 5-8)
 
-The second phase implements core business functionality:
+| Component              | Description                  | Deliverables                                      | Validation Criteria                               |
+|------------------------|------------------------------|--------------------------------------------------|-------------------------------------------------|
+| Gate Management        | Manage gate operations       | - Gate CRUD operations<br>- Gate status<br>- Maintenance scheduling | - Gates can be added, edited, deleted<br>- Status updates work<br>- Maintenance schedules save |
+| Flight Management      | Manage flight operations     | - Flight CRUD operations<br>- Flight status tracking<br>- Real-time updates | - Flights can be added, edited, deleted<br>- Status updates work<br>- Updates reflect in real time |
+| Assignment Management  | Allocate gates to flights    | - Assignment algorithms<br>- Conflict detection<br>- Notification system | - Assignments are accurate<br>- Conflicts are detected<br>- Notifications are sent |
 
-1. Gate Management
-   - Implement gate CRUD operations
-   - Create gate status management
-   - Set up maintenance scheduling
+### Phase 3: Interface and Integration (Weeks 9-12)
 
-2. Flight Management
-   - Implement flight CRUD operations
-   - Create flight status tracking
-   - Set up real-time updates
-
-3. Assignment Management
-   - Implement assignment algorithms
-   - Create conflict detection
-   - Set up notification system
-
-### Phase 3: Interface and Integration
-
-The final phase focuses on user interface and system integration:
-
-1. User Interface Development
-   - Create responsive dashboard
-   - Implement interactive gate map
-   - Develop reporting interfaces
-
-2. System Integration
-   - Implement real-time updates
-   - Create API endpoints
-   - Set up external system interfaces
+| Component              | Description                  | Deliverables                                      | Validation Criteria                               |
+|------------------------|------------------------------|--------------------------------------------------|-------------------------------------------------|
+| User Interface Development | Build user-friendly UI      | - Responsive dashboard<br>- Interactive gate map<br>- Reporting interfaces | - UI is responsive<br>- Gate map is interactive<br>- Reports generate accurately |
+| System Integration     | Connect systems seamlessly   | - Real-time updates<br>- API endpoints<br>- External system interfaces | - Updates are real-time<br>- APIs respond correctly<br>- External integrations function |
 
 
 

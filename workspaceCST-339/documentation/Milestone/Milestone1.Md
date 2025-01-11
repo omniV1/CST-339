@@ -16,9 +16,9 @@ The Airport Gate Management System (AGMS) addresses the complex challenges faced
 ### Public/Customer Access
 
 As an airline passenger or airport visitor, I need to quickly find my flight and gate information to ensure I arrive at the right location on time:
-```
+
 "I need to easily look up my flight by flight number or destination to find the correct terminal and gate. I should be able to see real-time updates about my flight's status, gate changes, and boarding times. The information should be clear and accessible from both mobile and desktop devices, with the option to receive notifications about changes affecting my flight."
-```
+
 Key Requirements:
 - Simple, intuitive flight search
 - Clear gate and terminal information
@@ -34,9 +34,9 @@ This public interface will be separate from the administrative system but will c
 ### Airport Operations Staff
 
 As an airport operations manager, I need to efficiently manage gate assignments so that I can maximize airport resource utilization and minimize delays. This includes:
-```
+
 "I need to see a real-time dashboard of all gate assignments and their current status. When a flight is delayed, I need to be able to quickly identify available gates and reassign flights to minimize disruption to the overall schedule. The system should automatically check for conflicts and alert me before I make an invalid assignment."
-```
+
 ***Key Requirements:***
 - Real-time visibility of gate status
 - Drag-and-drop interface for quick reassignments
@@ -46,9 +46,9 @@ As an airport operations manager, I need to efficiently manage gate assignments 
 ### Gate Managers
 
 As a gate manager, I need to monitor and update the status of gates under my responsibility to ensure smooth operations. Their story:
-```
+
 "I need to be able to quickly mark gates as available, occupied, or under maintenance. When maintenance is scheduled, I need to block out that time in advance so no flights get assigned to that gate. I also need to record any issues or special conditions that might affect gate usage."
-```
+
 Key Requirements:
 - Quick status updates
 - Maintenance scheduling
@@ -58,9 +58,9 @@ Key Requirements:
 ### Airline Staff
 
 As an airline staff member, I need to view gate assignments for my airline's flights and request changes when necessary:
-```
+
 "I need to see all upcoming gate assignments for my airline's flights. When operational requirements change, I need to be able to request gate reassignments and receive quick approval or denial from airport operations. I also need to be notified immediately of any changes affecting our flights."
-```
+
 Key Requirements:
 - Airline-specific view of assignments
 - Gate change request system

@@ -179,8 +179,7 @@ classDiagram
         +Boolean isActive()
         +void setActive(Boolean active)
     }
-```
-```mermaid
+
     class Flight {
         -Long id
         -String flightNumber
@@ -202,8 +201,7 @@ classDiagram
         +void updateTimes(FlightTimeUpdate update)
         +boolean isDelayed()
     }
-```
-```mermaid
+
     class Gate {
         -Long id
         -String gateNumber
@@ -219,9 +217,7 @@ classDiagram
         +Boolean isCompatible(AircraftType type)
         +List~GateFeature~ getFeatures()
     }
-```
 
-```mermaid
     class Assignment {
         -Long id
         -Flight flight
@@ -237,8 +233,7 @@ classDiagram
         +void updateTimes(TimeSlot newSlot)
         +boolean isActive()
     }
-```
-```mermaid
+
     class AuditLog {
         -Long id
         -User user
@@ -252,8 +247,7 @@ classDiagram
         +String getAction()
         +LocalDateTime getTimestamp()
     }
-```
-```mermaid
+
     class Notification {
         -Long id
         -String message
@@ -266,8 +260,7 @@ classDiagram
         +void markAsRead()
         +List~User~ getRecipients()
     }
-```
-```mermaid
+
     %% Enumerations
     class UserRole {
         <<enumeration>>
@@ -276,8 +269,7 @@ classDiagram
         GATE_MANAGER
         AIRLINE_STAFF
     }
-```
-```mermaid
+
     class FlightStatus {
         <<enumeration>>
         SCHEDULED
@@ -287,8 +279,7 @@ classDiagram
         CANCELLED
         DELAYED
     }
-```
-```mermaid
+
     class GateStatus {
         <<enumeration>>
         AVAILABLE
@@ -304,8 +295,7 @@ classDiagram
         COMPLETED
         CANCELLED
     }
-```
-```mermaid
+
     %% Relationships
     User "1" -- "*" Assignment : creates
     User "1" -- "*" AuditLog : generates

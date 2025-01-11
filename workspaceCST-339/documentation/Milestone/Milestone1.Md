@@ -421,23 +421,35 @@ Our risk management strategy focuses on identifying, assessing, and mitigating p
 
 Our testing approach ensures comprehensive coverage across all system components:
 
-Unit Testing:
-- Service layer tests
-- Repository layer tests
-- Utility class tests
-- Controller tests
+### Unit testing
 
-Integration Testing:
-- API endpoint tests
-- Database interaction tests
-- Security integration tests
-- WebSocket functionality tests
+| **Testing Type**         | **Description**                                                        |
+|---------------------------|------------------------------------------------------------------------|
+| Unit Testing              | Tests individual components to ensure they work as expected.          |
+| Service Layer Tests       | Verifies the functionality of business logic services.                |
+| Repository Layer Tests    | Validates data access operations for accuracy and robustness.         |
+| Utility Class Tests       | Checks helper methods and reusable utility functions for correctness. |
+| Controller Tests          | Confirms that API controllers process and respond to requests appropriately. |
 
-End-to-End Testing:
-- User workflow tests
-- Performance tests
-- Security penetration tests
-- Browser compatibility tests
+### Integration testing 
+
+| **Testing Type**              | **Description**                                                                 |
+|--------------------------------|---------------------------------------------------------------------------------|
+| Integration Testing            | Ensures system components work together seamlessly.                            |
+| API Endpoint Tests             | Validates that API endpoints return the correct responses.                     |
+| Database Interaction Tests     | Tests that the application interacts with the database as intended.            |
+| Security Integration Tests     | Verifies that authentication and authorization mechanisms are robust.          |
+| WebSocket Functionality Tests  | Confirms real-time features operate without errors.                            |
+
+### End-to-End Testing
+| **Testing Type**          | **Description**                                                        |
+|---------------------------|------------------------------------------------------------------------|
+| End-to-End Testing        | Simulates real-world user scenarios to test the system end-to-end.    |
+| User Workflow Tests       | Ensures users can complete typical tasks successfully.               |
+| Performance Tests         | Measures application speed, scalability, and responsiveness.         |
+| Security Penetration Tests| Identifies vulnerabilities in the system's security.                |
+| Browser Compatibility Tests | Verifies the application works correctly across different browsers. |
+
 
 ## Success Criteria
 

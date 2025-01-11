@@ -396,9 +396,9 @@ Our risk management strategy focuses on identifying, assessing, and mitigating p
 
 | Component | Description | Deliverables | Validation Criteria |
 |-----------|-------------|--------------|-------------------|
-| Spring Boot Setup | Basic application configuration | - Project structure- Security framework- Basic endpoints | - Application runs- Endpoints respond- Security works |
-| Database Design | Initial schema and migrations | - Schema design- Migration scriptt- Base repositories | - Schema validates- Migrations run- CRUD works |
-| Authentication | User management and security | - Login system- Role management- User interfaces | - Users can login- Roles work- Interface functions |
+| Spring Boot Setup | Basic application configuration | - Project structure<br>- Security framework<br>- Basic endpoints | - Application runs<br>- Endpoints respond<br>- Security works |
+| Database Design | Initial schema and migrations | - Schema design<br>- Migration scriptt<br>- Base repositories | - Schema validates<br>- Migrations run<br>- CRUD works |
+| Authentication | User management and security | - Login system<br>- Role management<br>- User interfaces | - Users can login<br>- Roles work<br>- Interface functions |
 
 ### Phase 2: Business Logic Implementation (Weeks 5-8)
 

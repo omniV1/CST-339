@@ -70,87 +70,19 @@ Key Requirements:
 ## Technical Architecture
 
 ### Data Model Description
+Our system's data model handles the relationships between flights, gates, and assignments in a straightforward way that keeps data accurate and easy to query. Here are the main components:
 
-Our system's data model is designed to capture the complex relationships between flights, gates, and assignments while maintaining data integrity and supporting efficient queries.
+### User Entity
+The User keeps track of who can access the system and what they can do. It stores each user's unique ID, login credentials, and what roles they have in the system. It also records when user accounts were created and last updated, and keeps track of their login sessions for security.
 
-The User represents system users with different roles and permissions. Each user has:
-- A unique identifier
-- Authentication credentials
-- Role assignments
-- Audit information including creation and last update timestamps
-- Session management data
+### Flight Entity
+The Flight stores all the key information about each flight. This includes the flight number and airline code, when the flight is scheduled to arrive and depart, what type of aircraft is being used, and how big it is. It tracks the flight's current status, any delays, and keeps a history of which gates it has been assigned to.
 
-The Flight captures all necessary flight information:
-- Flight number with airline code
-- Scheduled arrival and departure times
-- Aircraft type and size requirements
-- Current status and any delay information
-- Gate assignment history
+### Gate Entity
+The Gate manages information about each physical gate at the airport. Each gate has its own ID and location within a specific terminal. The system knows which types and sizes of aircraft can use each gate, whether the gate is currently available, and keeps records of past and scheduled maintenance.
 
-The Gate maintains detailed information about each gate:
-- Unique gate identifier
-- Terminal location
-- Size and aircraft type compatibility
-- Current status and availability
-- Maintenance history and scheduled maintenance
-
-The Assignment manages the relationship between flights and gates:
-- Time period for the assignment
-- Assignment status and history
-- Conflict checking data
-- Created by and last modified information
-
-### Business Logic Layer
-
-The business layer implements complex rules for gate assignments, including:
-
-Aircraft Compatibility Verification:
-```java
-public interface GateCompatibilityService {
-    /**
-     * Verifies if a gate can accommodate a specific aircraft type
-     * considering physical dimensions and service requirements.
-     *
-     * @param gate The gate to verify
-     * @param aircraftType The type of aircraft to check
-     * @return A compatibility result with details
-     */
-    CompatibilityResult verifyCompatibility(Gate gate, AircraftType aircraftType);
-}
-```
-
-Conflict Detection:
-```java
-public interface ConflictDetectionService {
-    /**
-     * Analyzes potential conflicts for a proposed gate assignment
-     * considering existing assignments and maintenance schedules.
-     *
-     * @param proposedAssignment The assignment to verify
-     * @return List of detected conflicts with details
-     */
-    List<Conflict> detectConflicts(Assignment proposedAssignment);
-}
-```
-
-### User Roles and Permissions
-
-| Feature/Action | Admin | Operations Manager | Gate Manager | Airline Staff | Public |
-|----------------|-------|-------------------|--------------|---------------|---------|
-| View Public Flight Info | ✓ | ✓ | ✓ | ✓ | ✓ |
-| View Public Gate Info | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Search Flights | ✓ | ✓ | ✓ | ✓ | ✓ |
-| View Admin Dashboard | ✓ | ✓ | ✓ | ✓ | - |
-| View Detailed Reports | ✓ | ✓ | ✓ | ✓ | - |
-| Generate Reports | ✓ | ✓ | ✓ | ✓ | - |
-| Create Assignments | ✓ | ✓ | - | - | - |
-| Modify Assignments | ✓ | ✓ | - | - | - |
-| Delete Assignments | ✓ | ✓ | - | - | - |
-| Manage Gates | ✓ | ✓ | ✓ | - | - |
-| Manage Flights | ✓ | ✓ | - | ✓ | - |
-| User Management | ✓ | - | - | - | - |
-| System Settings | ✓ | - | - | - | - |
-| View Audit Logs | ✓ | ✓ | - | - | - |
+### Assignment Entity
+The Assignment connects flights to gates. It records the time period a gate is assigned to a flight, tracks the status of that assignment, and checks for any scheduling conflicts. Each assignment record shows who created it and when it was last changed, helping us track how gates are being used.
 
 ## System Architecture and Design
 
@@ -308,6 +240,59 @@ classDiagram
     Assignment "*" -- "1" AssignmentStatus : has
     User "*" -- "1" UserRole : has
 ```
+
+### Business Logic Layer
+
+The business layer implements rules for gate assignments, including:
+
+Aircraft Compatibility Verification:
+```java
+public interface GateCompatibilityService {
+    /**
+     * Verifies if a gate can accommodate a specific aircraft type
+     * considering physical dimensions and service requirements.
+     *
+     * @param gate The gate to verify
+     * @param aircraftType The type of aircraft to check
+     * @return A compatibility result with details
+     */
+    CompatibilityResult verifyCompatibility(Gate gate, AircraftType aircraftType);
+}
+```
+
+Conflict Detection:
+```java
+public interface ConflictDetectionService {
+    /**
+     * Analyzes potential conflicts for a proposed gate assignment
+     * considering existing assignments and maintenance schedules.
+     *
+     * @param proposedAssignment The assignment to verify
+     * @return List of detected conflicts with details
+     */
+    List<Conflict> detectConflicts(Assignment proposedAssignment);
+}
+```
+
+### User Roles and Permissions
+
+| Feature/Action | Admin | Operations Manager | Gate Manager | Airline Staff | Public |
+|----------------|-------|-------------------|--------------|---------------|---------|
+| View Public Flight Info | ✓ | ✓ | ✓ | ✓ | ✓ |
+| View Public Gate Info | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Search Flights | ✓ | ✓ | ✓ | ✓ | ✓ |
+| View Admin Dashboard | ✓ | ✓ | ✓ | ✓ | - |
+| View Detailed Reports | ✓ | ✓ | ✓ | ✓ | - |
+| Generate Reports | ✓ | ✓ | ✓ | ✓ | - |
+| Create Assignments | ✓ | ✓ | - | - | - |
+| Modify Assignments | ✓ | ✓ | - | - | - |
+| Delete Assignments | ✓ | ✓ | - | - | - |
+| Manage Gates | ✓ | ✓ | ✓ | - | - |
+| Manage Flights | ✓ | ✓ | - | ✓ | - |
+| User Management | ✓ | - | - | - | - |
+| System Settings | ✓ | - | - | - | - |
+| View Audit Logs | ✓ | ✓ | - | - | - |
+
 
 ### Application Sitemap
 [To be created in draw.io]

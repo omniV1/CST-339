@@ -293,14 +293,62 @@ public interface ConflictDetectionService {
 | View Audit Logs | ✓ | ✓ | - | - | - |
 
 
-### TODO: Application Sitemap
-[To be created in draw.io]
+## Application Sitemap
 
-The sitemap will illustrate the complete navigation structure of both the public and administrative interfaces, showing:
-- Hierarchical page organization
-- User flow paths
-- Access restrictions
-- Integration points
+```mermaid
+graph TD
+    A[Homepage] --> B[Public Area]
+    A --> C[Secure Portal]
+    
+    B --> D[Flight Search]
+    B --> E[Gate Map]
+    B --> F[Flight Status Board]
+    
+    D --> G[Flight Details]
+    G --> H[Gate Information]
+    
+    C --> I[Login]
+    I --> J[Admin Dashboard]
+    
+    J --> K[Gate Management]
+    J --> L[Flight Management]
+    J --> M[Assignment Management]
+    J --> N[Reports]
+    
+    K --> O[Gate Status]
+    K --> P[Gate Maintenance]
+    
+    L --> Q[Flight Schedule]
+    L --> R[Flight Updates]
+    
+    M --> S[New Assignment]
+    M --> T[Assignment Calendar]
+    
+    N --> U[Performance Reports]
+    N --> V[Audit Logs]
+
+```
+### Overview
+The interface design will focus on three core areas, each serving distinct user needs and workflows:
+
+### Public Interface Design 
+The public interface will prioritize ease of use and clear information display. The Flight Search page will feature a prominent search area at the top, followed by a results section with clear flight information cards. The Gate Map will provide an interactive visualization of the airport layout, while the Flight Status Board will display real-time updates in a grid format.
+
+### Administrative Dashboard
+The dashboard interface will be divided into three main sections:
+
+### 1. Top Section
+Contains user information, system-wide alerts, and a quick search bar. This area provides immediate access to critical notifications and common actions.
+
+### 2. Main Content Area
+Features an interactive gate map showing real-time status and a timeline view of upcoming assignments. This central section serves as the primary workspace for operators.
+
+### 3. Bottom Section
+Displays the recent activity log, key performance metrics, and quick access tools for common tasks. This area helps maintain awareness of system activities and performance.
+
+### Gate Management Interface
+The gate management screen will provide a comprehensive view of all gates. This interface incorporates an interactive map showing real-time gate status alongside a detailed information panel for the selected gate. Quick action buttons facilitate common gate management tasks, while a maintenance schedule overview helps track scheduled maintenance activities. The interface utilizes space efficiently to display essential gate information and control elements in an organized manner.
+
 
 ### TODO: Wireframe Designs
 [To be created in draw.io]

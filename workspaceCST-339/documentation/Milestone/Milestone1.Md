@@ -19,11 +19,10 @@ As an airline passenger or airport visitor, I need to quickly find my flight and
 
 "I need to easily look up my flight by flight number or destination to find the correct terminal and gate. I should be able to see real-time updates about my flight's status, gate changes, and boarding times. The information should be clear and accessible from both mobile and desktop devices, with the option to receive notifications about changes affecting my flight."
 
-Key Requirements:
+***Key Requirements:***
 - Simple, intuitive flight search
 - Clear gate and terminal information
 - Real-time flight status updates
-- Mobile-responsive design
 - Gate location wayfinding
 - Boarding time information
 - Gate change notifications
@@ -49,7 +48,7 @@ As a gate manager, I need to monitor and update the status of gates under my res
 
 "I need to be able to quickly mark gates as available, occupied, or under maintenance. When maintenance is scheduled, I need to block out that time in advance so no flights get assigned to that gate. I also need to record any issues or special conditions that might affect gate usage."
 
-Key Requirements:
+***Key Requirements:***
 - Quick status updates
 - Maintenance scheduling
 - Issue reporting
@@ -61,7 +60,7 @@ As an airline staff member, I need to view gate assignments for my airline's fli
 
 "I need to see all upcoming gate assignments for my airline's flights. When operational requirements change, I need to be able to request gate reassignments and receive quick approval or denial from airport operations. I also need to be notified immediately of any changes affecting our flights."
 
-Key Requirements:
+***Key Requirements:***
 - Airline-specific view of assignments
 - Gate change request system
 - Real-time notifications

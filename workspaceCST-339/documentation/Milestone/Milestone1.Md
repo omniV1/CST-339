@@ -1,11 +1,11 @@
 # Airport Gate Management System - Design Report
 ## CST-339: Programming in Java III
 
-**Topic:** Topic 1 - Introduction to Spring Boot  
+**Topic:** Milestone 1
 **Date:** January 11, 2025  
 **Revision:** 1.0  
 **Team:** Owen Lindsey  
-**Src code GIT URL:** 
+**Src code GIT URL:** https://github.com/omniV1/CST-339/tree/main/workspaceCST-339/src/Milestone
 
 ## Domain Overview
 
@@ -71,16 +71,16 @@ As an airline staff member, I need to view gate assignments for my airline's fli
 ### Data Model Description
 Our system's data model handles the relationships between flights, gates, and assignments in a straightforward way that keeps data accurate and easy to query. Here are the main components:
 
-### User Entity
+### User 
 The User keeps track of who can access the system and what they can do. It stores each user's unique ID, login credentials, and what roles they have in the system. It also records when user accounts were created and last updated, and keeps track of their login sessions for security.
 
-### Flight Entity
+### Flight 
 The Flight stores all the key information about each flight. This includes the flight number and airline code, when the flight is scheduled to arrive and depart, what type of aircraft is being used, and how big it is. It tracks the flight's current status, any delays, and keeps a history of which gates it has been assigned to.
 
-### Gate Entity
+### Gate 
 The Gate manages information about each physical gate at the airport. Each gate has its own ID and location within a specific terminal. The system knows which types and sizes of aircraft can use each gate, whether the gate is currently available, and keeps records of past and scheduled maintenance.
 
-### Assignment Entity
+### Assignment 
 The Assignment connects flights to gates. It records the time period a gate is assigned to a flight, tracks the status of that assignment, and checks for any scheduling conflicts. Each assignment record shows who created it and when it was last changed, helping us track how gates are being used.
 
 ## System Architecture and Design
@@ -293,7 +293,7 @@ public interface ConflictDetectionService {
 | View Audit Logs | ✓ | ✓ | - | - | - |
 
 
-### Application Sitemap
+### TODO: Application Sitemap
 [To be created in draw.io]
 
 The sitemap will illustrate the complete navigation structure of both the public and administrative interfaces, showing:
@@ -302,7 +302,7 @@ The sitemap will illustrate the complete navigation structure of both the public
 - Access restrictions
 - Integration points
 
-### Wireframe Designs
+### TODO: Wireframe Designs
 [To be created in draw.io]
 
 #### Public Interface Wireframes
@@ -331,25 +331,25 @@ The following screens will be designed:
 
 The user interface is designed to provide immediate access to critical information while maintaining simplicity and usability. Each screen is crafted to support specific user stories and workflows.
 
-***Dashboard View Description:***
+***TODO: Dashboard View Description:***
 The main dashboard provides an immediate overview of airport operations. The layout is divided into three main sections:
 
-***Top Section:***
+***TODO: Top Section:***
 - User information and quick actions
 - System-wide alerts and notifications
 - Quick search functionality
 
-***Middle Section:***
+***TODO: Middle Section:***
 - Interactive gate map showing current status
 - Timeline view of upcoming assignments
 - Real-time flight status updates
 
-***Bottom Section:***
+***TODO: Bottom Section:***
 - Recent activity log
 - Performance metrics
 - Quick access to common tasks
 
-***The interface uses color coding to indicate status:***
+***TODO: The interface uses color coding to indicate status:***
 - Green: Available/On Time
 - Yellow: Warning/Potential Conflict
 - Red: Unavailable/Critical Issue
@@ -370,15 +370,35 @@ The main dashboard provides an immediate overview of airport operations. The lay
 | Reporting | P2 | Medium | All Core Features | Week 9-10 | Not Started |
 | API Integration | P3 | Medium | All Features | Week 11-12 | Not Started |
 
+## Risk Management
+
+Our risk management strategy focuses on identifying, assessing, and mitigating potential issues before they impact development or operations.
+
+| Risk Area | Severity (1-5) | Likelihood (1-5) | Impact Score | Mitigation Strategy | Testing & Validation | Grade Impact |
+|-----------|----------------|------------------|--------------|---------------------|---------------------|--------------|
+| Development Timeline | 4 | 3 | 12 | Weekly milestone tracking with core feature prioritization | Regular requirement validation and progress assessment | Critical |
+| Integration Complexity | 3 | 4 | 12 | component testing approach with detailed interface specifications | Integration test suite with user flow validation | High |
+| Security Implementation | 3 | 3 | 9 | Spring Security framework with basic role management | Security unit tests and access control verification | High |
+| Code Quality | 4 | 2 | 8 | Consistent code review process with documentation standards | JUnit coverage requirements and style validation | Critical |
+| Real-time Updates | 2 | 3 | 6 | websocket implementation with polling fallback | Feature-specific unit testing and manual verification | Moderate |
+| Database Design | 2 | 2 | 4 | schema with basic optimization | Performance testing with sample datasets | Low |
+
+***Impact Score = Severity × Likelihood***
+
+***Scoring Scale: Critical (>10), High (7-10), Moderate (4-6), Low (1-3)***
+
+***Timeline Impact: Measured in expected development weeks***
+
+***Grade Impact: Critical, High, Moderate, Low based on assignment rubric weighting***
 ### Development Phases
 
 #### Phase 1: Core Infrastructure (Weeks 1-4)
 
 | Component | Description | Deliverables | Validation Criteria |
 |-----------|-------------|--------------|-------------------|
-| Spring Boot Setup | Basic application configuration | - Project structure\n- Security framework\n- Basic endpoints | - Application runs\n- Endpoints respond\n- Security works |
-| Database Design | Initial schema and migrations | - Schema design\n- Migration scripts\n- Base repositories | - Schema validates\n- Migrations run\n- CRUD works |
-| Authentication | User management and security | - Login system\n- Role management\n- User interfaces | - Users can login\n- Roles work\n- Interface functions |
+| Spring Boot Setup | Basic application configuration | - Project structure- Security framework- Basic endpoints | - Application runs\n- Endpoints respond- Security works |
+| Database Design | Initial schema and migrations | - Schema design- Migration scriptt- Base repositories | - Schema validates\n- Migrations run\n- CRUD works |
+| Authentication | User management and security | - Login system- Role management- User interfaces | - Users can login- Roles work- Interface functions |
 
 ### Phase 2: Business Logic Implementation
 
@@ -413,32 +433,7 @@ The final phase focuses on user interface and system integration:
    - Create API endpoints
    - Set up external system interfaces
 
-## Risk Management
 
-Our risk management strategy focuses on identifying, assessing, and mitigating potential issues before they impact development or operations.
-
-Technical Risks:
-
-Real-time Data Synchronization:
-The system requires real-time updates across multiple users and interfaces. To mitigate this risk, we will:
-- Implement WebSocket connections for live updates
-- Use optimistic locking for concurrent modifications
-- Implement a robust caching strategy
-- Create fallback mechanisms for offline operation
-
-Database Performance:
-With multiple users and frequent updates, database performance is crucial. Our mitigation strategy includes:
-- Implementing proper indexing strategies
-- Using caching where appropriate
-- Regular performance monitoring
-- Query optimization
-
-Security Concerns:
-Given the sensitive nature of airport operations, security is paramount. We will:
-- Implement comprehensive authentication
-- Regular security audits
-- Encrypted data transmission
-- Detailed audit logging
 
 ## Testing Strategy
 
@@ -482,4 +477,4 @@ The project's success will be measured against these specific criteria:
    - Test coverage above 80%
    - No critical security vulnerabilities
    - All major browsers supported
-   - Mobile responsiveness achieved
+  

@@ -331,73 +331,53 @@ graph TD
 ### Overview
 The interface design will focus on three core areas, each serving distinct user needs and workflows:
 
-### Public Interface Design 
-The public interface will prioritize ease of use and clear information display. The Flight Search page will feature a prominent search area at the top, followed by a results section with clear flight information cards. The Gate Map will provide an interactive visualization of the airport layout, while the Flight Status Board will display real-time updates in a grid format.
+## Interface Wireframes
 
-### Administrative Dashboard
-The dashboard interface will be divided into three main sections:
+### Public Interface Wireframes
 
-### 1. Top Section
-Contains user information, system-wide alerts, and a quick search bar. This area provides immediate access to critical notifications and common actions.
+#### Flight Search Interface
+![Public Flight Search](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Milestone/Screenshots/publicUserPage.drawio(2).drawio.png)
 
-### 2. Main Content Area
-Features an interactive gate map showing real-time status and a timeline view of upcoming assignments. This central section serves as the primary workspace for operators.
+The flight search interface prioritizes ease of use and intuitive flight information access for public users.
 
-### 3. Bottom Section
-Displays the recent activity log, key performance metrics, and quick access tools for common tasks. This area helps maintain awareness of system activities and performance.
+#### Gate Map Display
+![Gate Map](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Milestone/Screenshots/GateMap.drawio.png)
 
-### Gate Management Interface
-The gate management screen will provide a comprehensive view of all gates. This interface incorporates an interactive map showing real-time gate status alongside a detailed information panel for the selected gate. Quick action buttons facilitate common gate management tasks, while a maintenance schedule overview helps track scheduled maintenance activities. The interface utilizes space efficiently to display essential gate information and control elements in an organized manner.
+The gate map provides a clear visual representation of all terminal gates and their current status.
 
+#### Status Board
+![Status Board](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Milestone/Screenshots/StatusBoard.drawio.png)
 
-### TODO: Wireframe Designs
-[To be created in draw.io]
+The status board presents real-time flight information in an easily scannable format.
 
-#### Public Interface Wireframes
-The following screens will be designed:
-1. Flight Search Page
-2. Flight Details View
-3. Gate Information Display
-4. Real-time Status Board
+### Administrative Interface Wireframes
 
-#### Administrative Interface Wireframes
-The following screens will be designed:
-1. Dashboard
-2. Gate Management Interface
-3. Flight Management Screen
-4. Assignment Creation/Edit
-5. Reports Interface
+#### Operations Dashboard
+![Operations Dashboard](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Milestone/Screenshots/Operations%20dashboard.drawio(1).png)
 
-***Note:*** Wireframes will be created in draw.io and will include:
-- Layout structure
-- Component placement
-- Navigation elements
-- Key functionality indicators
-- Data display formats
-- Interactive elements
-- Mobile responsive considerations
+The operations dashboard serves as the central control center for airport operations staff.
 
-The user interface is designed to provide immediate access to critical information while maintaining simplicity and usability. Each screen is crafted to support specific user stories and workflows.
+#### Gate Management Interface
+![Gate Management](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Milestone/Screenshots/GateManagement.drawio.png)
 
-***TODO: Dashboard View Description:***
-The main dashboard provides an immediate overview of airport operations. The layout is divided into three main sections:
+The gate management interface provides comprehensive control over gate operations and maintenance.
 
-***TODO: Top Section:***
-- User information and quick actions
-- System-wide alerts and notifications
-- Quick search functionality
+#### Flight Management Interface
+![Flight Management](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Milestone/Screenshots/FlightManagement.drawio.png)
 
-***TODO: Middle Section:***
-- Interactive gate map showing current status
-- Timeline view of upcoming assignments
-- Real-time flight status updates
+The flight management interface enables detailed control over flight operations and assignments.
 
-***TODO: Bottom Section:***
-- Recent activity log
-- Performance metrics
-- Quick access to common tasks
+#### Reports Interface
+![Operations Reports](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Milestone/Screenshots/OperationsReports.drawio.png)
 
-***TODO: The interface uses color coding to indicate status:***
+The reports interface provides detailed analytics and performance metrics for system monitoring.
+
+#### Authentication Interface
+![User Authentication](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Milestone/Screenshots/UserAuthdrawio.drawio(1).png)
+
+The authentication interface ensures secure access to administrative functions.
+
+Each interface maintains consistent design patterns including clear navigation, status indicators, and intuitive controls. The system uses color coding to indicate status:
 - Green: Available/On Time
 - Yellow: Warning/Potential Conflict
 - Red: Unavailable/Critical Issue

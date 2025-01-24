@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/defaultTemplate">
+    <!-- The layout:decorate attribute tells Thymeleaf to use our defaultTemplate as the base -->
+<div layout:fragment="content">
+    <!-- This content will be inserted into the "content" section of our template -->
+    <form action="#" th:action="@{doLogin}" th:object="${loginModel}" method="post">
+        <table>
+            <tr>
+                <td>Username:</td>
+                <td><input type="text" th:field="*{username}"></td>
+                <td><h5 style="color:red"
+                        th:if="${#fields.hasErrors('username')}" th:errors="*{username}">Username Error</h5></td>
+            </tr>
+            <tr>
+                <td>Password:</td>
+                <td><input type="password" th:field="*{password}"></td>
+                <td><h5 style="color:red"
+                        th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password Error</h5></td>
+            </tr>
+            <tr>
+                <td colspan="2"><input type="submit" value="Submit" /></td>
+            </tr>
+        </table>
+       
+        <br>
+        <!-- Display any validation errors -->
+        <div th:if="${#fields.hasErrors('*')}">List of Errors</div>
+        <div th:each="err : ${#fields.errors('*')}">
+            <span style="color:red" th:text="${err}" class="fieldError"></span>
+        </div>
+    </form>
+</div>
+</html>

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/MainLayout :: layout(~{::div})}">
+<body>
+    <div th:fragment="content">
+        <div class="container-fluid">
+            <h1>Operations Dashboard</h1>
+            <p>Welcome to the Operations Management Interface</p>
+            
+            <!-- Just to verify our session data -->
+            <div class="alert alert-info">
+                <p>Logged in as: <span th:text="${session.userRole}">Role</span></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

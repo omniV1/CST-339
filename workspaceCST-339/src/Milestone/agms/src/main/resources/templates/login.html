@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/MainLayout :: layout(~{::div})}">
+<body>
+    <div th:fragment="content">
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow">
+                        <div class="card-header bg-primary text-white">
+                            <h2 class="h4 mb-0">Login</h2>
+                        </div>
+                        <div class="card-body">
+                            <!-- Show any error messages -->
+                            <div th:if="${error}" class="alert alert-danger" role="alert">
+                                <span th:text="${error}">Error message here</span>
+                            </div>
+                            
+                            <!-- Show any success messages -->
+                            <div th:if="${successMessage}" class="alert alert-success" role="alert">
+                                <span th:text="${successMessage}">Success message here</span>
+                            </div>
+
+                            <!-- Login Form -->
+                            <form th:action="@{/doLogin}" th:object="${loginModel}" method="post">
+                                <!-- Username Field -->
+                                <div class="mb-3">
+                                    <label for="username" class="form-label">Username</label>
+                                    <input type="text" 
+                                           class="form-control" 
+                                           id="username" 
+                                           th:field="*{username}"
+                                           required>
+                                </div>
+
+                                <!-- Password Field -->
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Password</label>
+                                    <input type="password" 
+                                           class="form-control" 
+                                           id="password" 
+                                           th:field="*{password}"
+                                           required>
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">Login</button>
+                                </div>
+                            </form>
+
+                            <!-- Registration Link -->
+                            <div class="text-center mt-3">
+                                <p>Don't have an account? <a th:href="@{/register}">Register here</a></p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Test Account Information (Remove in production) -->
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Test Accounts</h5>
+                        </div>
+                        <div class="card-body">
+                            <small class="text-muted">
+                                <p class="mb-1">Admin: admin / Admin123!</p>
+                                <p class="mb-1">Operations: operations / Ops123!</p>
+                                <p class="mb-1">Gate Manager: gate / Gate123!</p>
+                                <p class="mb-1">Airline Staff: airline / Air123!</p>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

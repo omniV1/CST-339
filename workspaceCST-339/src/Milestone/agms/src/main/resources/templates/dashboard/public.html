@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/MainLayout :: layout(~{::div})}">
+<body>
+    <div th:fragment="content">
+        <div class="container-fluid">
+            <!-- Flight Search Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3>Flight Search</h3>
+                                <div class="btn-group">
+                                    <button class="btn btn-primary">Flight Search</button>
+                                    <button class="btn btn-outline-primary">Gate Map</button>
+                                    <button class="btn btn-outline-primary">Status Board</button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <!-- Flight Status Cards (Grid Layout) -->
+                                <div class="col-md-4 mb-3" th:each="i : ${#numbers.sequence(1, 6)}">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between">
+                                                <span class="badge bg-success">ON TIME</span>
+                                                <i class="fas fa-plane"></i>
+                                            </div>
+                                            <h5 class="card-title mt-2">Flight AA123</h5>
+                                            <p class="card-text">Gate A1</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gate Map Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3>Gate Map</h3>
+                            <div class="gate-map">
+                                <!-- Terminal Grid -->
+                                <div class="row g-2">
+                                    <div class="col-12" th:each="terminal : ${#numbers.sequence(1, 4)}">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                Terminal [[${terminal}]]
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between">
+                                                    <div class="gate-slot" th:each="gate : ${#numbers.sequence(1, 5)}">
+                                                        <div class="gate-box text-center p-2 border" 
+                                                             th:classappend="${gate % 3 == 0 ? 'bg-success' : 
+                                                                            (gate % 3 == 1 ? 'bg-warning' : 'bg-danger')}">
+                                                            Gate [[${terminal}]][[${gate}]]
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Board -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h3>Status Board</h3>
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Flight</th>
+                                            <th>Origin</th>
+                                            <th>Destination</th>
+                                            <th>Gate</th>
+                                            <th>Time</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <!-- Sample flight data -->
+                                        <tr th:each="i : ${#numbers.sequence(1, 10)}">
+                                            <td>AA[[${i}]]23</td>
+                                            <td>PHX</td>
+                                            <td>LAX</td>
+                                            <td>A[[${i}]]</td>
+                                            <td>10:[[${i}]]0</td>
+                                            <td><span class="badge bg-success">On Time</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

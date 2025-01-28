@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/MainLayout :: layout(~{::div})}">
+<body>
+    <div th:fragment="content">
+        <!-- Hero Section with Improved Styling -->
+        <section class="bg-light rounded-3 p-5 mb-5 text-center">
+            <div class="container">
+                <h1 class="display-4 fw-bold text-primary mb-3" th:text="${welcomeMessage}">
+                    Welcome to the Airport Gate Management System
+                </h1>
+                <p class="lead mb-4 text-secondary">
+                    Efficient airport gate management for modern aviation
+                </p>
+                <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                    <a th:href="@{/register}" class="btn btn-primary btn-lg px-4 gap-3">
+                        Get Started
+                    </a>
+                    <a th:href="@{/about}" class="btn btn-outline-secondary btn-lg px-4">
+                        Learn More
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feature Cards Section -->
+        <section class="container px-4 py-5">
+            <div class="row g-4 row-cols-1 row-cols-md-3">
+                <!-- Flight Tracking Card -->
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon bg-primary bg-gradient text-white rounded-circle mb-3 mx-auto" 
+                                 style="width: 60px; height: 60px;">
+                                <i class="fas fa-plane-departure fs-3 lh-60"></i>
+                            </div>
+                            <h5 class="card-title mb-3">Real-time Flight Tracking</h5>
+                            <p class="card-text text-muted">
+                                Monitor flight schedules and gate assignments in real-time for efficient operations.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gate Management Card -->
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon bg-primary bg-gradient text-white rounded-circle mb-3 mx-auto" 
+                                 style="width: 60px; height: 60px;">
+                                <i class="fas fa-door-open fs-3 lh-60"></i>
+                            </div>
+                            <h5 class="card-title mb-3">Gate Management</h5>
+                            <p class="card-text text-muted">
+                                Optimize gate assignments and handle schedule changes with ease.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Card -->
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body text-center p-4">
+                            <div class="feature-icon bg-primary bg-gradient text-white rounded-circle mb-3 mx-auto" 
+                                 style="width: 60px; height: 60px;">
+                                <i class="fas fa-chart-line fs-3 lh-60"></i>
+                            </div>
+                            <h5 class="card-title mb-3">Performance Analytics</h5>
+                            <p class="card-text text-muted">
+                                Track and analyze gate utilization and operational efficiency.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

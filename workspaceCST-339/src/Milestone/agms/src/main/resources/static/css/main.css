@@ -1,0 +1,54 @@
+:root {
+    --agms-primary: #004B8D;
+    --agms-secondary: #2C3E50;
+    --agms-accent: #3498DB;
+}
+
+/* Typography Enhancements */
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: var(--agms-secondary);
+}
+
+.display-4 {
+    font-weight: 600;
+    color: var(--agms-primary);
+}
+
+/* Feature Icons */
+.feature-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.lh-60 {
+    line-height: 60px;
+}
+
+/* Card Enhancements */
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+/* Button Styling */
+.btn-primary {
+    background-color: var(--agms-primary);
+    border-color: var(--agms-primary);
+}
+
+.btn-primary:hover {
+    background-color: var(--agms-accent);
+    border-color: var(--agms-accent);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2.5rem;
+    }
+}

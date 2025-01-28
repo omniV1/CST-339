@@ -58,7 +58,7 @@ public String doLogin(@Valid LoginModel loginModel,
             // Store base user information
             session.setAttribute("user", user);
             
-            // Using modern switch expression for role assignment and routing
+            // Using switch expression for role assignment and routing
             String username = loginModel.getUsername().toLowerCase();
             String redirectUrl = switch(username) {
                 case "admin" -> {

@@ -34,6 +34,7 @@ public class UserService {
         user.setPassword(password);
         user.setRole(role);
         users.add(user);
+        System.out.println("Test user created: " + user.getUsername());
     }
 
     public Optional<UserModel> findByUsername(String username) {
@@ -51,5 +52,10 @@ public class UserService {
     public UserModel registerUser(UserModel user) {
         users.add(user);
         return user;
+    }
+
+    // Optional: Method to retrieve all users for debugging
+    public List<UserModel> getAllUsers() {
+        return new ArrayList<>(users); // Return a copy of the user list
     }
 }

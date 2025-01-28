@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/MainLayout :: layout(~{::div})}">
+<head>
+    <!-- Include Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .hero {
+            background-color: #007bff;
+            color: white;
+            padding: 50px 0;
+        }
+        .hero h1 {
+            font-size: 2.5rem;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Airport Gate Management</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse"
+                data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Contact</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero text-center">
+        <h1>About the Airport Gate Management System</h1>
+    </div>
+
+    <div th:fragment="content" class="container mt-5">
+        <div class="card">
+            <div class="card-body">
+                <p class="lead">
+                    The Airport Gate Management System is a web application designed to
+                    streamline the process of managing airport gates and flight schedules.
+                    The system provides real-time flight tracking, gate management, and
+                    schedule optimization features to help airport staff efficiently manage
+                    gate assignments and handle schedule changes.
+                </p>
+                <p>
+                    The system is designed to be user-friendly and intuitive, with a clean
+                    and modern interface that makes it easy to navigate and use. It is built
+                    using the latest web technologies and best practices to ensure a fast
+                    and responsive user experience.
+                </p>
+                <p>
+                    Whether you are an airport manager, gate agent, or airline staff member,
+                    the Airport Gate Management System is designed to help you work more
+                    efficiently and effectively. With real-time flight tracking, gate
+                    management, and schedule optimization features, the system provides the
+                    tools you need to manage airport gates and flight schedules with ease.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Bootstrap JS and dependencies (optional) -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

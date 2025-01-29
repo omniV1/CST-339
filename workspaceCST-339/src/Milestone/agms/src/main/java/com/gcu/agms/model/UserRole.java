@@ -1,5 +1,9 @@
 package com.gcu.agms.model;
 
+/**
+ * Enum representing different user roles within the system.
+ * Each role has a display name associated with it.
+ */
 public enum UserRole {
     ADMIN("Administrator"),
     OPERATIONS_MANAGER("Operations Manager"),

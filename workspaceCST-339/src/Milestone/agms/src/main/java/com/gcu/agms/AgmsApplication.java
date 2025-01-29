@@ -9,6 +9,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication
 public class AgmsApplication {
+    
+    /** 
+     * @param args
+     */
     public static void main(String[] args) {
         SpringApplication.run(AgmsApplication.class, args);
     }

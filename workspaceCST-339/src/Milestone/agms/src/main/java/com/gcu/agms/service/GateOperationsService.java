@@ -45,11 +45,19 @@ public class GateOperationsService {
         }
     }
 
+    
+    /** 
+     * @return Map<String, GateStatus>
+     */
     // These are the two methods our controller needs to call
     public Map<String, GateStatus> getAllGateStatuses() {
         return new HashMap<>(gateStatuses);
     }
 
+    
+    /** 
+     * @return Map<String, Integer>
+     */
     public Map<String, Integer> getStatistics() {
         Map<String, Integer> stats = new HashMap<>();
         stats.put("totalGates", gateStatuses.size());

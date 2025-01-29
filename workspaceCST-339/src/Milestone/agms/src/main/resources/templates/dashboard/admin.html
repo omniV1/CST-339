@@ -1,3 +1,22 @@
+<!--
+
+This HTML file represents the admin dashboard template for the application. It uses Thymeleaf for server-side rendering and includes the following sections:
+
+1. Quick Actions:
+    - A card with buttons for adding a user, accessing system settings, and exporting logs.
+
+2. Statistics Cards:
+    - Total Users: Displays the total number of users and the percentage increase this month.
+    - System Health: Shows the overall system health percentage and operational status.
+    - Active Sessions: Indicates the number of active sessions in the last 24 hours.
+    - System Alerts: Displays the number of active alerts requiring attention.
+
+3. Recent Activity and System Status:
+    - Recent System Activity: A table listing recent events, users involved, time of occurrence, and status.
+    - System Health Details: Detailed health metrics for various system components such as Database, API Services, Storage, and Memory Usage.
+
+Each section is styled using Bootstrap classes for layout and design, and FontAwesome icons are used for visual indicators.
+-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="~{layouts/MainLayout :: layout(~{::div})}">

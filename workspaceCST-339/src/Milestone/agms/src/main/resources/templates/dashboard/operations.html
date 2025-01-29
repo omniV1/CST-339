@@ -1,3 +1,21 @@
+<!--
+
+This HTML file is a Thymeleaf template for the operations dashboard of an airport gate management system. It includes the following sections:
+
+1. Statistics Overview:
+    - Displays total gates, available gates, occupied gates, and gates under maintenance.
+    - Each statistic is shown in a card with an icon and a dynamic value fetched from the `statistics` object.
+
+2. Gate Status Overview:
+    - A table that lists the status of each gate, including the current and next flights.
+    - Each row includes actions to edit or mark the gate for maintenance.
+
+3. Terminal Map:
+    - A visual representation of the terminals and gates.
+    - Each gate is displayed with its status color-coded based on the `gateStatuses` object.
+
+Thymeleaf attributes (`th:text`, `th:each`, `th:classappend`, etc.) are used to dynamically populate the content based on the data provided by the server.
+-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="~{layouts/MainLayout :: layout(~{::div})}">

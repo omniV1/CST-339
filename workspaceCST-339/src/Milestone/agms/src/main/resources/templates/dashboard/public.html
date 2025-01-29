@@ -1,3 +1,27 @@
+<!-- 
+
+This HTML file is a Thymeleaf template for a dashboard that includes three main sections: Flight Search, Gate Map, and Status Board. 
+It uses Thymeleaf's templating features to dynamically generate content.
+
+1. Flight Search Section:
+    - Contains a header with a title and a button group for navigation.
+    - Displays a grid of flight status cards, each showing the flight number, gate, and status.
+
+2. Gate Map Section:
+    - Displays a map of gates organized by terminals.
+    - Each terminal contains a grid of gates, with different background colors based on the gate number.
+
+3. Status Board Section:
+    - Displays a table of flight statuses.
+    - Each row in the table shows flight details such as flight number, origin, destination, gate, time, and status.
+
+Thymeleaf Directives:
+- `th:replace`: Used to include a layout template.
+- `th:fragment`: Defines a fragment of the template.
+- `th:each`: Iterates over a sequence to generate repeated elements.
+- `th:classappend`: Conditionally appends classes to elements.
+- `th:text` and `th:utext`: Used to set text content dynamically.
+-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="~{layouts/MainLayout :: layout(~{::div})}">

@@ -57,6 +57,16 @@ public class UserService {
                       "Airline", "Staff", "+1234567893", UserRole.AIRLINE_STAFF);
     }
 
+    
+    /** 
+     * @param username
+     * @param password
+     * @param email
+     * @param firstName
+     * @param lastName
+     * @param phone
+     * @param role
+     */
     private void createTestUser(String username, String password, String email, 
                               String firstName, String lastName, String phone, 
                               UserRole role) {
@@ -71,6 +81,11 @@ public class UserService {
         users.add(user);
     }
 
+    
+    /** 
+     * @param newUser
+     * @return boolean
+     */
     public boolean registerUser(UserModel newUser) {
         System.out.println("Attempting to register new user:");
         System.out.println("Username: " + newUser.getUsername());

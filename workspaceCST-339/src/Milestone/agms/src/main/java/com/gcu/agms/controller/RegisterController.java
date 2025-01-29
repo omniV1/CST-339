@@ -8,12 +8,47 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import com.gcu.agms.model.UserModel;
 import com.gcu.agms.model.UserRole;
-import com.gcu.agms.service.UserService;
 import com.gcu.agms.service.AuthorizationCodeService;
+import com.gcu.agms.service.UserService;
+
 import jakarta.validation.Valid;
 
+/**
+ * RegisterController handles the registration process for new users.
+ * It provides endpoints to display the registration form and process the form submission.
+ * 
+ * Dependencies:
+ * - UserService: Handles user-related operations such as registration.
+ * - AuthorizationCodeService: Validates authorization codes for roles requiring special permissions.
+ * 
+ * Endpoints:
+ * - GET /register: Displays the registration page.
+ * - POST /doRegister: Processes the registration form submission.
+ * 
+ * Methods:
+ * - showRegisterPage(Model model): Initializes and displays the registration form.
+ * - processRegistration(UserModel userModel, BindingResult bindingResult, RedirectAttributes redirectAttributes):
+ *   Validates the registration form, checks authorization codes for certain roles, and attempts to register the user.
+ * 
+ * Validation:
+ * - Ensures that the authorization code is valid for roles such as ADMIN and OPERATIONS_MANAGER.
+ * - Checks for validation errors in the UserModel.
+ * 
+ * Role Handling:
+ * - Sets a default role of PUBLIC if no role is selected.
+ * - Provides role-specific success messages upon successful registration.
+ * 
+ * Error Handling:
+ * - Handles validation errors and displays appropriate messages.
+ * - Checks for duplicate usernames and provides feedback if the username already exists.
+ * 
+ * Redirects:
+ * - Redirects to the login page upon successful registration.
+ * - Redirects back to the registration page with error messages if registration fails.
+ */
 @Controller
 public class RegisterController {
     

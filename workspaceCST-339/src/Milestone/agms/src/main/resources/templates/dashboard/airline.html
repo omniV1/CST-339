@@ -1,3 +1,24 @@
+<!--
+
+This HTML file is a Thymeleaf template for the airline dashboard. It includes the following sections:
+
+1. Quick Actions:
+    - Add Flight
+    - Request Gate Change
+    - View Schedule
+
+2. Flight Status Overview:
+    - Today's Flights: Displays the number of flights completed and scheduled for today.
+    - On-Time Performance: Shows the percentage of flights that are on time.
+    - Gate Changes: Indicates the number of gate changes in the last 24 hours.
+    - Active Alerts: Displays the number of active alerts that require attention.
+
+3. Flight Schedule and Gate Info:
+    - Flight Schedule: A table listing today's flight schedule with details such as flight number, route, gate, departure time, status, and actions.
+    - Gate Information and Alerts: A list of gate alerts and updates, including gate change notices, weather alerts, and updates on gate operations.
+
+The template uses Bootstrap for styling and Font Awesome for icons.
+-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="~{layouts/MainLayout :: layout(~{::div})}">

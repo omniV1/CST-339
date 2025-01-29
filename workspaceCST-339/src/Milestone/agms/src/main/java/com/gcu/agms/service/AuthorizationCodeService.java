@@ -7,6 +7,32 @@ import org.springframework.stereotype.Service;
 
 import com.gcu.agms.model.UserRole;
 
+/**
+ * Service for handling authorization codes and validating them against user roles.
+ * 
+ * This service maintains a set of predefined authorization codes mapped to specific user roles.
+ * It provides functionality to validate if a given authorization code is valid for a requested role.
+ * 
+ * <p>Note: In a real-world application, authorization codes should be stored securely in a database
+ * rather than hardcoded in the application.</p>
+ * 
+ * <p>Example usage:</p>
+ * <pre>
+ * {@code
+ * AuthorizationCodeService authService = new AuthorizationCodeService();
+ * boolean isValid = authService.isValidAuthCode("ADMIN2025", UserRole.ADMIN);
+ * }
+ * </pre>
+ * 
+ * <p>Dependencies:</p>
+ * <ul>
+ *   <li>{@link java.util.Map}</li>
+ *   <li>{@link java.util.HashMap}</li>
+ *   <li>{@link com.gcu.agms.model.UserRole}</li>
+ * </ul>
+ * 
+ * @see com.gcu.agms.model.UserRole
+ */
 @Service
 public class AuthorizationCodeService {
     // We store our authorization codes in a Map where the key is the code and the value is the role it authorizes

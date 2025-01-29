@@ -15,6 +15,38 @@ import com.gcu.agms.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
+/**
+ * LoginController handles the login, authentication, and logout processes for the application.
+ * 
+ * This controller provides endpoints for displaying the login form, processing login form submissions,
+ * and handling user logout. It interacts with the UserService to authenticate users and manage session data.
+ * 
+ * Endpoints:
+ * - GET /login: Displays the login form.
+ * - POST /doLogin: Processes the login form submission, authenticates the user, and redirects based on user role.
+ * - GET /logout: Logs out the user by invalidating the session and redirects to the login page.
+ * 
+ * Dependencies:
+ * - UserService: Service for user-related operations such as finding users and authenticating credentials.
+ * 
+ * Session Attributes:
+ * - "user": The authenticated user's details.
+ * - "userRole": The role of the authenticated user.
+ * 
+ * Flash Attributes:
+ * - "error": Error message to be displayed on the login page.
+ * - "successMessage": Success message to be displayed on the login page after logout.
+ * 
+ * Model Attributes:
+ * - "loginModel": The login form model.
+ * - "pageTitle": The title of the login page.
+ * 
+ * Exception Handling:
+ * - RuntimeException: Catches exceptions during user lookup and authentication, providing a generic error message.
+ * 
+ * Role-based Routing:
+ * - Redirects users to different dashboards based on their role (ADMIN, OPERATIONS_MANAGER, GATE_MANAGER, AIRLINE_STAFF, PUBLIC).
+ */
 @Controller
 public class LoginController {
     

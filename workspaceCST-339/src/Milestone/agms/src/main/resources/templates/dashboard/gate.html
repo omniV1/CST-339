@@ -1,3 +1,20 @@
+<!-- 
+
+This HTML file represents a dashboard for managing gate assignments, statuses, and maintenance schedules at an airport. 
+It uses Thymeleaf for templating and Bootstrap for styling.
+
+Sections:
+1. Quick Actions: Provides buttons for creating new assignments, scheduling maintenance, and printing schedules.
+2. Gate Status Overview: Displays the current status of gates, including available, occupied, under maintenance, and reported issues.
+3. Current Assignments and Issues: 
+    - Gate Assignments: A table listing current gate assignments with flight details and actions to edit or remove assignments.
+    - Maintenance Schedule: A list of gates under maintenance with details about the maintenance tasks and their statuses.
+
+Dependencies:
+- Thymeleaf: For server-side rendering of the HTML.
+- Bootstrap: For responsive design and styling.
+- Font Awesome: For icons used in buttons and status indicators.
+-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="~{layouts/MainLayout :: layout(~{::div})}">

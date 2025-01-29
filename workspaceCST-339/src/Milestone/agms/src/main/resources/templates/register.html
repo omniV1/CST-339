@@ -1,3 +1,30 @@
+<!-- 
+
+This HTML file is a Thymeleaf template for a user registration form. It includes the following key sections:
+
+1. JavaScript:
+    - A script that listens for changes to the role selection dropdown and toggles the visibility of the authorization code field based on the selected role.
+    - The script ensures that the authorization code field is required for specific roles (ADMIN and OPERATIONS_MANAGER).
+
+2. Main Registration Form:
+    - A form that collects user information such as first name, last name, email, phone number, username, and password.
+    - The form includes validation error messages for each field.
+    - The password field includes a hint about the required password format.
+
+3. Role Selection:
+    - A dropdown menu for selecting the user's role.
+    - The dropdown includes options for public users, airline staff, gate managers, system administrators, and operations managers.
+    - The role selection triggers the JavaScript function to show or hide the authorization code field.
+
+4. Authorization Code Section:
+    - A hidden section that becomes visible when specific roles are selected.
+    - This section includes an input field for the authorization code and a hint about contacting system administration for access.
+
+5. Submit Button:
+    - A button to submit the registration form.
+
+The template uses Thymeleaf attributes (e.g., th:field, th:if, th:errors) to bind form fields to a user model and display validation errors.
+-->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/MainLayout :: layout(~{::div})}">
 

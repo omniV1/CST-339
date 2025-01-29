@@ -1,122 +1,176 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layouts/MainLayout :: layout(~{::div})}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/MainLayout :: layout(~{::div})}">
+
 <body>
     <div th:fragment="content">
-        <div class="container py-5">
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const roleSelect = document.getElementById('role');
+                
+                function toggleAuthCodeField() {
+                    const authCodeSection = document.getElementById('authCodeSection');
+                    const selectedRole = roleSelect.value;
+                    
+                    // Debug the selected value
+                    console.log('Selected role:', selectedRole);
+                    
+                    // Match the exact enum values from UserRole
+                    if (selectedRole === 'ADMIN' || selectedRole === 'OPERATIONS_MANAGER') {
+                        authCodeSection.style.display = 'block';
+                        // Add a required attribute to the auth code input when it's visible
+                        document.getElementById('authCode').required = true;
+                        console.log('Showing auth code field');
+                    } else {
+                        authCodeSection.style.display = 'none';
+                        // Remove the required attribute when hidden
+                        document.getElementById('authCode').required = false;
+                        console.log('Hiding auth code field');
+                    }
+                }
+                
+                // Add event listener for role select changes
+                roleSelect.addEventListener('change', toggleAuthCodeField);
+                
+                // Initial check
+                toggleAuthCodeField();
+            });
+        </script>
+
+        <div class="container">
             <div class="row justify-content-center">
-                <div class="col-md-8 col-lg-6">
-                    <div class="card shadow">
-                        <div class="card-header bg-primary text-white">
-                            <h2 class="h4 mb-0">Create an Account</h2>
+                <div class="col-md-6">
+                    <!-- Main Registration Card -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Register</h2>
                         </div>
                         <div class="card-body">
+                            <!-- Error Message Display -->
+                            <div th:if="${error}" class="alert alert-danger">
+                                <p th:text="${error}">Error message here</p>
+                            </div>
+
                             <!-- Registration Form -->
-                            <form th:action="@{/doRegister}" th:object="${userModel}" method="post" class="needs-validation" novalidate>
+                            <form th:action="@{/doRegister}" th:object="${userModel}" method="post">
                                 <!-- First Name Field -->
                                 <div class="mb-3">
                                     <label for="firstName" class="form-label">First Name</label>
-                                    <input type="text" 
-                                           class="form-control" 
-                                           id="firstName" 
-                                           th:field="*{firstName}"
-                                           th:classappend="${#fields.hasErrors('firstName')} ? 'is-invalid' : ''"
-                                           required>
-                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('firstName')}" 
-                                         th:errors="*{firstName}">
-                                        Please provide your first name.
+                                    <input type="text" class="form-control" id="firstName" th:field="*{firstName}"
+                                        required>
+                                    <div class="text-danger" th:if="${#fields.hasErrors('firstName')}"
+                                        th:errors="*{firstName}">
                                     </div>
                                 </div>
 
                                 <!-- Last Name Field -->
                                 <div class="mb-3">
                                     <label for="lastName" class="form-label">Last Name</label>
-                                    <input type="text" 
-                                           class="form-control" 
-                                           id="lastName" 
-                                           th:field="*{lastName}"
-                                           th:classappend="${#fields.hasErrors('lastName')} ? 'is-invalid' : ''"
-                                           required>
-                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('lastName')}" 
-                                         th:errors="*{lastName}">
-                                        Please provide your last name.
+                                    <input type="text" class="form-control" id="lastName" th:field="*{lastName}"
+                                        required>
+                                    <div class="text-danger" th:if="${#fields.hasErrors('lastName')}"
+                                        th:errors="*{lastName}">
                                     </div>
                                 </div>
 
                                 <!-- Email Field -->
                                 <div class="mb-3">
-                                    <label for="email" class="form-label">Email Address</label>
-                                    <input type="email" 
-                                           class="form-control" 
-                                           id="email" 
-                                           th:field="*{email}"
-                                           th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''"
-                                           required>
-                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" 
-                                         th:errors="*{email}">
-                                        Please provide a valid email address.
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                                    <div class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">
                                     </div>
                                 </div>
 
                                 <!-- Phone Number Field -->
                                 <div class="mb-3">
                                     <label for="phoneNumber" class="form-label">Phone Number</label>
-                                    <input type="tel" 
-                                           class="form-control" 
-                                           id="phoneNumber" 
-                                           th:field="*{phoneNumber}"
-                                           th:classappend="${#fields.hasErrors('phoneNumber')} ? 'is-invalid' : ''"
-                                           required>
-                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('phoneNumber')}" 
-                                         th:errors="*{phoneNumber}">
-                                        Please provide a valid phone number.
+                                    <input type="tel" class="form-control" id="phoneNumber" th:field="*{phoneNumber}"
+                                        required>
+                                    <div class="text-danger" th:if="${#fields.hasErrors('phoneNumber')}"
+                                        th:errors="*{phoneNumber}">
                                     </div>
                                 </div>
 
                                 <!-- Username Field -->
                                 <div class="mb-3">
                                     <label for="username" class="form-label">Username</label>
-                                    <input type="text" 
-                                           class="form-control" 
-                                           id="username" 
-                                           th:field="*{username}"
-                                           th:classappend="${#fields.hasErrors('username')} ? 'is-invalid' : ''"
-                                           required>
-                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}" 
-                                         th:errors="*{username}">
-                                        Please choose a username.
+                                    <input type="text" class="form-control" id="username" th:field="*{username}"
+                                        required>
+                                    <div class="text-danger" th:if="${#fields.hasErrors('username')}"
+                                        th:errors="*{username}">
                                     </div>
                                 </div>
 
                                 <!-- Password Field -->
                                 <div class="mb-3">
                                     <label for="password" class="form-label">Password</label>
-                                    <input type="password" 
-                                           class="form-control" 
-                                           id="password" 
-                                           th:field="*{password}"
-                                           th:classappend="${#fields.hasErrors('password')} ? 'is-invalid' : ''"
-                                           required>
-                                    <div class="invalid-feedback" th:if="${#fields.hasErrors('password')}" 
-                                         th:errors="*{password}">
-                                        Please create a password.
+                                    <input type="password" class="form-control" id="password" th:field="*{password}"
+                                        required>
+                                    <div class="text-danger" th:if="${#fields.hasErrors('password')}"
+                                        th:errors="*{password}">
                                     </div>
+                                    <small class="form-text text-muted">
+                                        Password must contain at least 8 characters, including uppercase,
+                                        lowercase, numbers, and special characters.
+                                    </small>
+                                </div>
+
+                                <!-- Role Selection -->
+                                <div class="mb-3">
+                                    <label for="role" class="form-label">Account Type</label>
+                                    <select class="form-select" id="role" th:field="*{role}"
+                                        onchange="toggleAuthCodeField()" required>
+                                        <option value="" selected>Select your role</option>
+
+                                        <!-- Public/Customer Role -->
+                                        <option th:value="${T(com.gcu.agms.model.UserRole).PUBLIC}">
+                                            Customer/Public User
+                                        </option>
+
+                                        <!-- Standard Staff Roles -->
+                                        <optgroup label="Airport Staff">
+                                            <option th:value="${T(com.gcu.agms.model.UserRole).AIRLINE_STAFF}">
+                                                Airline Staff
+                                            </option>
+                                            <option th:value="${T(com.gcu.agms.model.UserRole).GATE_MANAGER}">
+                                                Gate Manager
+                                            </option>
+                                        </optgroup>
+
+                                        <!-- Administrative Roles -->
+                                        <optgroup label="Administrative Roles">
+                                            <option th:value="${T(com.gcu.agms.model.UserRole).ADMIN}">
+                                                System Administrator
+                                            </option>
+                                            <option th:value="${T(com.gcu.agms.model.UserRole).OPERATIONS_MANAGER}">
+                                                Operations Manager
+                                            </option>
+                                        </optgroup>
+                                    </select>
+                                    <div class="text-danger" th:if="${#fields.hasErrors('role')}" th:errors="*{role}">
+                                    </div>
+                                    <small class="form-text text-muted">
+                                        Select the type of account that best matches your role.
+                                        Administrative roles require special authorization.
+                                    </small>
+                                </div>
+
+                                <!-- Authorization Code Section -->
+                                <div class="mb-3" id="authCodeSection" style="display: none;">
+                                    <label for="authCode" class="form-label">Authorization Code</label>
+                                    <input type="text" class="form-control" id="authCode" th:field="*{authCode}">
                                     <div class="form-text">
-                                        Password must be at least 8 characters long and contain at least one uppercase letter, 
-                                        one lowercase letter, one number, and one special character.
+                                        <i class="fas fa-info-circle"></i>
+                                        Administrative roles require an authorization code.
+                                        Please contact system administration if you need access.
                                     </div>
                                 </div>
 
                                 <!-- Submit Button -->
-                                <div class="d-grid gap-2">
-                                    <button type="submit" class="btn btn-primary">Create Account</button>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary">Register</button>
                                 </div>
                             </form>
-
-                            <!-- Login Link -->
-                            <div class="text-center mt-3">
-                                <p>Already have an account? <a th:href="@{/login}">Login here</a></p>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -124,4 +178,5 @@
         </div>
     </div>
 </body>
+
 </html>

@@ -40,59 +40,54 @@ public class LoginController {
      * Handles authentication and role-based routing
      */
     @PostMapping("/doLogin")
-public String doLogin(@Valid LoginModel loginModel,
-                     BindingResult bindingResult,
-                     HttpSession session,
-                     RedirectAttributes redirectAttributes) {
-    
-    if (bindingResult.hasErrors()) {
-        redirectAttributes.addFlashAttribute("error", "Please fill in all required fields");
-        return "redirect:/login";
-    }
-    
-    try {
-        UserModel user = userService.findByUsername(loginModel.getUsername())
-            .orElseThrow(() -> new RuntimeException("User not found"));
+    public String doLogin(@Valid LoginModel loginModel,
+                         BindingResult bindingResult,
+                         HttpSession session,
+                         RedirectAttributes redirectAttributes) {
         
-        if (userService.authenticate(loginModel.getUsername(), loginModel.getPassword())) {
-            // Store base user information
-            session.setAttribute("user", user);
-            
-            // Using switch expression for role assignment and routing
-            String username = loginModel.getUsername().toLowerCase();
-            String redirectUrl = switch(username) {
-                case "admin" -> {
-                    session.setAttribute("userRole", "ADMIN");
-                    yield "redirect:/admin/dashboard";
-                }
-                case "operations" -> {
-                    session.setAttribute("userRole", "OPERATIONS_MANAGER");
-                    yield "redirect:/operations/dashboard";
-                }
-                case "gate" -> {
-                    session.setAttribute("userRole", "GATE_MANAGER");
-                    yield "redirect:/gates/dashboard";
-                }
-                case "airline" -> {
-                    session.setAttribute("userRole", "AIRLINE_STAFF");
-                    yield "redirect:/airline/dashboard";
-                }
-                default -> {
-                    session.setAttribute("userRole", "PUBLIC");
-                    yield "redirect:/dashboard";
-                }
-            };
-            
-            return redirectUrl;
+        System.out.println("Login attempt received:");
+        System.out.println("Username: " + loginModel.getUsername());
+        
+        if (bindingResult.hasErrors()) {
+            System.out.println("Validation errors found");
+            bindingResult.getAllErrors().forEach(error -> 
+                System.out.println(error.getDefaultMessage())
+            );
+            redirectAttributes.addFlashAttribute("error", "Please fill in all required fields");
+            return "redirect:/login";
         }
         
-        redirectAttributes.addFlashAttribute("error", "Invalid username or password");
-        return "redirect:/login";
-    } catch (RuntimeException e) {
-        redirectAttributes.addFlashAttribute("error", "Invalid username or password");
-        return "redirect:/login";
+        try {
+            System.out.println("Looking up user in service...");
+            UserModel user = userService.findByUsername(loginModel.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+            
+            System.out.println("User found, attempting authentication...");
+            if (userService.authenticate(loginModel.getUsername(), loginModel.getPassword())) {
+                System.out.println("Authentication successful");
+                session.setAttribute("user", user);
+                session.setAttribute("userRole", user.getRole().name());
+                
+                String redirectUrl = switch(user.getRole()) {
+                    case ADMIN -> "/admin/dashboard";
+                    case OPERATIONS_MANAGER -> "/operations/dashboard";
+                    case GATE_MANAGER -> "/gates/dashboard";
+                    case AIRLINE_STAFF -> "/airline/dashboard";
+                    case PUBLIC -> "/dashboard";
+                };
+                System.out.println("Redirecting to: " + redirectUrl);
+                return "redirect:" + redirectUrl;
+            }
+            
+            System.out.println("Authentication failed");
+            redirectAttributes.addFlashAttribute("error", "Invalid username or password");
+            return "redirect:/login";
+        } catch (RuntimeException e) {
+            System.out.println("Exception during login: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("error", "Invalid username or password");
+            return "redirect:/login";
+        }
     }
-}
     
     /**
      * Handles user logout

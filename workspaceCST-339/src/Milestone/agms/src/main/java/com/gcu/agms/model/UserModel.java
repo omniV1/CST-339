@@ -13,6 +13,9 @@ import lombok.Data;
  */
 @Data
 public class UserModel {
+
+    private String authCode;
+
     @NotEmpty(message = "First name is required")
     @Size(min = 2, max = 32, message = "First name must be between 2 and 32 characters")
     private String firstName;
@@ -40,9 +43,15 @@ public class UserModel {
     private String password;
 
     @NotNull(message = "User role is required")
-    private UserRole role;
+    private UserRole role = UserRole.PUBLIC;  // Set default value
 
-    // Getters and Setters (if Lombok is not working)
+    public void setAuthCode(String authCode) {
+        this.authCode = authCode;
+    }
+    
+    public String getAuthCode() {
+        return authCode;
+    }
     public String getFirstName() {
         return firstName;
     }

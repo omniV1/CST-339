@@ -64,7 +64,7 @@
 - **GitHub Repository:** https://github.com/omniV1/CST-339/tree/main/workspaceCST-339/src/Milestone
 - **Screencast Demo:** https://youtu.be/22S6Tcf-W64
 - **Javadoc:** https://github.com/omniV1/CST-339/tree/main/workspaceCST-339/src/Milestone/agms/docs/apidocs
-- **Testing**https://github.com/omniV1/CST-339/tree/main/workspaceCST-339/src/Milestone/agms/src/test/java/com/gcu/agms/service
+- **Testing** https://github.com/omniV1/CST-339/tree/main/workspaceCST-339/src/Milestone/agms/src/test/java/com/gcu/agms/service
 ## Technical Requirements
 - Java 17
 - Spring Boot 3.x

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/MainLayout :: layout(~{::div})}">
+<body>
+    <div th:fragment="content">
+        <!-- Quick Actions -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <h5 class="card-title mb-0">Quick Actions</h5>
+                            <div class="btn-group">
+                                <button class="btn btn-primary">
+                                    <i class="fas fa-user-plus me-2"></i>Add User
+                                </button>
+                                <button class="btn btn-outline-primary">
+                                    <i class="fas fa-cog me-2"></i>System Settings
+                                </button>
+                                <button class="btn btn-outline-primary">
+                                    <i class="fas fa-download me-2"></i>Export Logs
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row g-4 mb-4">
+            <!-- User Statistics -->
+            <div class="col-sm-6 col-xl-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start justify-content-between">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-muted">Total Users</h6>
+                                <h2 class="card-title mb-0">248</h2>
+                                <small class="text-success">
+                                    <i class="fas fa-arrow-up"></i> 12% this month
+                                </small>
+                            </div>
+                            <div class="p-2 bg-primary bg-opacity-10 rounded">
+                                <i class="fas fa-users text-primary fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Health -->
+            <div class="col-sm-6 col-xl-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start justify-content-between">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-muted">System Health</h6>
+                                <h2 class="card-title mb-0">98%</h2>
+                                <small class="text-success">
+                                    <i class="fas fa-check"></i> All systems operational
+                                </small>
+                            </div>
+                            <div class="p-2 bg-success bg-opacity-10 rounded">
+                                <i class="fas fa-server text-success fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Sessions -->
+            <div class="col-sm-6 col-xl-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start justify-content-between">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-muted">Active Sessions</h6>
+                                <h2 class="card-title mb-0">42</h2>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock"></i> Last 24 hours
+                                </small>
+                            </div>
+                            <div class="p-2 bg-info bg-opacity-10 rounded">
+                                <i class="fas fa-user-clock text-info fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Alerts -->
+            <div class="col-sm-6 col-xl-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start justify-content-between">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-muted">Active Alerts</h6>
+                                <h2 class="card-title mb-0">3</h2>
+                                <small class="text-warning">
+                                    <i class="fas fa-exclamation-triangle"></i> Requires attention
+                                </small>
+                            </div>
+                            <div class="p-2 bg-warning bg-opacity-10 rounded">
+                                <i class="fas fa-bell text-warning fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity and System Status -->
+        <div class="row">
+            <!-- Recent Activity -->
+            <div class="col-12 col-xl-8 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Recent System Activity</h5>
+                        <button class="btn btn-sm btn-primary">View All</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Event</th>
+                                        <th>User</th>
+                                        <th>Time</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>New user registration</td>
+                                        <td>john.doe</td>
+                                        <td>5 mins ago</td>
+                                        <td><span class="badge bg-success">Completed</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Gate assignment update</td>
+                                        <td>ops.manager</td>
+                                        <td>15 mins ago</td>
+                                        <td><span class="badge bg-warning">Pending</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>System backup</td>
+                                        <td>system</td>
+                                        <td>1 hour ago</td>
+                                        <td><span class="badge bg-success">Completed</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Configuration change</td>
+                                        <td>admin</td>
+                                        <td>2 hours ago</td>
+                                        <td><span class="badge bg-info">Reviewed</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Health Details -->
+            <div class="col-12 col-xl-4 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">System Health</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Database</span>
+                                <span class="text-success">98%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 98%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>API Services</span>
+                                <span class="text-success">100%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Storage</span>
+                                <span class="text-warning">76%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: 76%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Memory Usage</span>
+                                <span class="text-success">62%</span>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 62%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

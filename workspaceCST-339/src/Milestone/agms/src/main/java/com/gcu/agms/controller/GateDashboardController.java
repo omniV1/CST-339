@@ -12,6 +12,6 @@ public class GateDashboardController {
     @GetMapping("/dashboard")
     public String showDashboard(Model model) {
         model.addAttribute("pageTitle", "Gate Management Dashboard - AGMS");
-        return "dashboard/gates";
+        return "dashboard/gate";  
     }
 }

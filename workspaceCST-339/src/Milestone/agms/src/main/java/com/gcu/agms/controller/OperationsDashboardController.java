@@ -8,24 +8,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.gcu.agms.service.GateOperationsService;
 
+import jakarta.servlet.http.HttpSession;
+
 @Controller
 @RequestMapping("/operations")
 public class OperationsDashboardController {
     
-    // Inject our gate operations service
     @Autowired
     private GateOperationsService gateOperationsService;
     
     @GetMapping("/dashboard")
-    public String showDashboard(Model model) {
-        // Add the page title for our view
+    public String showDashboard(Model model, HttpSession session) {
+        // Verify user role
+        String userRole = (String) session.getAttribute("userRole");
+        if (!"OPERATIONS_MANAGER".equals(userRole)) {
+            return "redirect:/login";
+        }
+        
+        // Add the page title
         model.addAttribute("pageTitle", "Operations Dashboard - AGMS");
         
-        // Add gate status data and statistics to our model
-        // These method names now match exactly with what's in our service
+        // Add gate status data and statistics
         model.addAttribute("gateStatuses", gateOperationsService.getAllGateStatuses());
         model.addAttribute("statistics", gateOperationsService.getStatistics());
         
+        // Return the dashboard view
         return "dashboard/operations";
     }
 }

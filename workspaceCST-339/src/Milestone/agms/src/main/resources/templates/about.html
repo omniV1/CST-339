@@ -1,87 +1,154 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="~{layouts/MainLayout :: layout(~{::div})}">
-<head>
-    <!-- Include Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .hero {
-            background-color: #007bff;
-            color: white;
-            padding: 50px 0;
-        }
-        .hero h1 {
-            font-size: 2.5rem;
-        }
-        .card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
-    </style>
-</head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">Airport Gate Management</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse"
-                data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
-                aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">About</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Contact</a>
-                </li>
-            </ul>
+    <div th:fragment="content">
+        <!-- Hero Section -->
+        <div class="bg-primary bg-gradient text-white py-5 mb-5">
+            <div class="container">
+                <h1 class="display-4 fw-bold">About AGMS</h1>
+                <p class="lead">Revolutionizing Airport Gate Management</p>
+            </div>
         </div>
-    </nav>
 
-    <!-- Hero Section -->
-    <div class="hero text-center">
-        <h1>About the Airport Gate Management System</h1>
-    </div>
+        <div class="container">
+            <!-- Overview Section -->
+            <div class="row mb-5">
+                <div class="col-md-8">
+                    <h2 class="mb-4">Overview</h2>
+                    <p class="lead text-muted">The Airport Gate Management System (AGMS) is a comprehensive web application designed to streamline the process of managing airport gates and flight schedules.</p>
+                    <p>Our system provides real-time flight tracking, gate management, and schedule optimization features to help airport staff efficiently manage gate assignments and handle schedule changes. With an intuitive interface and powerful features, AGMS helps airports operate more efficiently.</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <i class="fas fa-plane-departure text-primary" style="font-size: 8rem;"></i>
+                </div>
+            </div>
 
-    <div th:fragment="content" class="container mt-5">
-        <div class="card">
-            <div class="card-body">
-                <p class="lead">
-                    The Airport Gate Management System is a web application designed to
-                    streamline the process of managing airport gates and flight schedules.
-                    The system provides real-time flight tracking, gate management, and
-                    schedule optimization features to help airport staff efficiently manage
-                    gate assignments and handle schedule changes.
-                </p>
-                <p>
-                    The system is designed to be user-friendly and intuitive, with a clean
-                    and modern interface that makes it easy to navigate and use. It is built
-                    using the latest web technologies and best practices to ensure a fast
-                    and responsive user experience.
-                </p>
-                <p>
-                    Whether you are an airport manager, gate agent, or airline staff member,
-                    the Airport Gate Management System is designed to help you work more
-                    efficiently and effectively. With real-time flight tracking, gate
-                    management, and schedule optimization features, the system provides the
-                    tools you need to manage airport gates and flight schedules with ease.
-                </p>
+            <!-- Key Features Section -->
+            <div class="row mb-5">
+                <h2 class="mb-4">Key Features</h2>
+                
+                <!-- Feature Cards -->
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="feature-icon bg-primary bg-gradient text-white rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                <i class="fas fa-clock fa-2x"></i>
+                            </div>
+                            <h4 class="card-title">Real-Time Updates</h4>
+                            <p class="card-text">Monitor gate status, flight schedules, and assignments in real-time, ensuring everyone has the latest information.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="feature-icon bg-success bg-gradient text-white rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                <i class="fas fa-tasks fa-2x"></i>
+                            </div>
+                            <h4 class="card-title">Smart Assignment</h4>
+                            <p class="card-text">Intelligent gate assignment system that optimizes resource utilization and prevents scheduling conflicts.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="feature-icon bg-info bg-gradient text-white rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                <i class="fas fa-chart-line fa-2x"></i>
+                            </div>
+                            <h4 class="card-title">Analytics</h4>
+                            <p class="card-text">Comprehensive reporting and analytics tools to track performance and identify optimization opportunities.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Roles Section -->
+            <div class="row mb-5">
+                <h2 class="mb-4">Who Uses AGMS?</h2>
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <h4><i class="fas fa-user-tie text-primary me-2"></i>Airport Administrators</h4>
+                            <p>Complete system oversight and management capabilities for airport operations.</p>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i>System configuration</li>
+                                <li><i class="fas fa-check text-success me-2"></i>User management</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Performance monitoring</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <h4><i class="fas fa-users-cog text-primary me-2"></i>Operations Managers</h4>
+                            <p>Daily operational control and resource management.</p>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i>Gate assignments</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Schedule management</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Resource allocation</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Technology Stack -->
+            <div class="row mb-5">
+                <h2 class="mb-4">Built with Modern Technology</h2>
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-md-3 mb-3">
+                                    <div class="p-3">
+                                        <i class="fab fa-java fa-3x text-primary mb-3"></i>
+                                        <h5>Java</h5>
+                                        <p class="text-muted">Enterprise-grade backend</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="p-3">
+                                        <i class="fas fa-leaf fa-3x text-success mb-3"></i>
+                                        <h5>Spring Boot</h5>
+                                        <p class="text-muted">Powerful framework</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="p-3">
+                                        <i class="fas fa-database fa-3x text-info mb-3"></i>
+                                        <h5>MongoDB</h5>
+                                        <p class="text-muted">Flexible data storage</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="p-3">
+                                        <i class="fab fa-bootstrap fa-3x text-primary mb-3"></i>
+                                        <h5>Bootstrap</h5>
+                                        <p class="text-muted">Modern UI design</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Section -->
+            <div class="row mb-5">
+                <div class="col-12 text-center">
+                    <h2 class="mb-4">Need More Information?</h2>
+                    <p class="lead">Contact our support team for detailed information about AGMS</p>
+                    <a href="#" class="btn btn-primary btn-lg">
+                        <i class="fas fa-envelope me-2"></i>Contact Support
+                    </a>
+                </div>
             </div>
         </div>
     </div>
-
-    <!-- Include Bootstrap JS and dependencies (optional) -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

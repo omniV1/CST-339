@@ -51,21 +51,20 @@
 - ✅ Created common layout system
 - ✅ Set up Spring Boot configuration
 - ✅ Integrated Bootstrap framework
-- ✅ Implemented responsive design
 - ✅ Created error handling system
 
 ### Documentation
 - ✅ Updated class diagrams
 - ✅ Created ER diagrams
-- ✅ Generated DDL scripts
 - ✅ Updated technical documentation
 - ✅ Added installation instructions
 - ✅ Created user guides
 
 ## Project Links
 - **GitHub Repository:** https://github.com/omniV1/CST-339/tree/main/workspaceCST-339/src/Milestone
-- **Screencast Demo:** [Link to be added]
-
+- **Screencast Demo:** https://youtu.be/22S6Tcf-W64
+- **Javadoc:**https://github.com/omniV1/CST-339/tree/main/workspaceCST-339/src/Milestone/agms/docs/apidocs
+- **Testing**https://github.com/omniV1/CST-339/tree/main/workspaceCST-339/src/Milestone/agms/src/test/java/com/gcu/agms/service
 ## Technical Requirements
 - Java 17
 - Spring Boot 3.x

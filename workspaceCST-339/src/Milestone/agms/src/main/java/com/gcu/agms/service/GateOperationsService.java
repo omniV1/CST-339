@@ -1,20 +1,19 @@
 package com.gcu.agms.service;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
-import org.springframework.stereotype.Service;
-
-import jakarta.annotation.PostConstruct;
-
-@Service
-public class GateOperationsService {
-    // We store our gate statuses in a Map, where the key is the gate ID and the value is its status
-    private final Map<String, GateStatus> gateStatuses = new HashMap<>();
-    
-    // This enum defines all possible states a gate can be in
-    public enum GateStatus {
+/**
+ * Defines the core operations for managing airport gates in the AGMS system.
+ * This interface provides methods to track gate statuses and retrieve operational statistics.
+ * The GateStatus enum is part of the interface as it defines the fundamental states
+ * that any implementation must support.
+ */
+public interface GateOperationsService {
+    /**
+     * Represents the possible states a gate can be in.
+     * Each status includes a human-readable label and a CSS class for UI display.
+     */
+    enum GateStatus {
         AVAILABLE("Available", "success"),
         OCCUPIED("Occupied", "warning"),
         MAINTENANCE("Maintenance", "danger");
@@ -31,47 +30,15 @@ public class GateOperationsService {
         public String getCssClass() { return cssClass; }
     }
 
-    // This method runs when the service is created and sets up our initial gate data
-    @PostConstruct
-    public void initializeData() {
-        // Create sample gates for each terminal
-        for (int terminal = 1; terminal <= 4; terminal++) {
-            for (int gate = 1; gate <= 5; gate++) {
-                String gateId = String.format("T%dG%d", terminal, gate);
-                // Randomly assign an initial status to each gate
-                int random = new Random().nextInt(3);
-                gateStatuses.put(gateId, GateStatus.values()[random]);
-            }
-        }
-    }
-
-    
-    /** 
-     * @return Map<String, GateStatus>
+    /**
+     * Retrieves the current status of all gates in the system.
+     * @return A map where the key is the gate ID and the value is its current status
      */
-    // These are the two methods our controller needs to call
-    public Map<String, GateStatus> getAllGateStatuses() {
-        return new HashMap<>(gateStatuses);
-    }
+    Map<String, GateStatus> getAllGateStatuses();
 
-    
-    /** 
-     * @return Map<String, Integer>
+    /**
+     * Generates statistical information about gate usage.
+     * @return A map containing various statistics like total gates, available gates, etc.
      */
-    public Map<String, Integer> getStatistics() {
-        Map<String, Integer> stats = new HashMap<>();
-        stats.put("totalGates", gateStatuses.size());
-        stats.put("availableGates", countGatesByStatus(GateStatus.AVAILABLE));
-        stats.put("occupiedGates", countGatesByStatus(GateStatus.OCCUPIED));
-        stats.put("maintenanceGates", countGatesByStatus(GateStatus.MAINTENANCE));
-        return stats;
-    }
-
-    // Helper method to count gates by their status
-    private int countGatesByStatus(GateStatus status) {
-        return (int) gateStatuses.values()
-                .stream()
-                .filter(s -> s == status)
-                .count();
-    }
+    Map<String, Integer> getStatistics();
 }

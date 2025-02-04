@@ -19,7 +19,7 @@ import com.gcu.agms.model.UserRole;
  */
 @DisplayName("User Service Tests")
 public class UserServiceTest {
-    private UserService userService;
+    private InMemoryUserService userService;
 
     /**
      * Sets up a new UserService instance and initializes test users before each test.
@@ -28,7 +28,7 @@ public class UserServiceTest {
     @BeforeEach
     @DisplayName("Initialize User Service with Test Data")
     void setUp() {
-        userService = new UserService();
+        userService = new InMemoryUserService();
         userService.initializeTestUsers();
     }
 

@@ -15,7 +15,7 @@ import com.gcu.agms.model.UserRole;
  */
 @DisplayName("Authorization Code Service Tests")
 public class AuthorizationCodeServiceTest {
-    private AuthorizationCodeService authService;
+    private StaticAuthorizationCodeService authService;
 
     /**
      * Sets up a new AuthorizationCodeService instance before each test.
@@ -25,7 +25,7 @@ public class AuthorizationCodeServiceTest {
     @BeforeEach
     @DisplayName("Initialize Authorization Service")
     void setUp() {
-        authService = new AuthorizationCodeService();
+        authService = new StaticAuthorizationCodeService();
     }
 
     /**

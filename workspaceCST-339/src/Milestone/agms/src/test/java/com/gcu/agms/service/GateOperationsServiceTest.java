@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
  */
 @DisplayName("Gate Operations Service Tests")
 public class GateOperationsServiceTest {
-    private GateOperationsService gateService;
+    private InMemoryGateOperationsService gateService;
 
     /**
      * Sets up a new GateOperationsService instance and initializes test data before each test.
@@ -26,7 +26,7 @@ public class GateOperationsServiceTest {
     @BeforeEach
     @DisplayName("Initialize Gate Operations Service")
     void setUp() {
-        gateService = new GateOperationsService();
+        gateService = new InMemoryGateOperationsService();
         gateService.initializeData();
     }
 

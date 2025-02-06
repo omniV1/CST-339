@@ -1,53 +1,42 @@
-<!--
-
-This HTML file is a Thymeleaf template for the operations dashboard of an airport gate management system. It includes the following sections:
-
-1. Statistics Overview:
-    - Displays total gates, available gates, occupied gates, and gates under maintenance.
-    - Each statistic is shown in a card with an icon and a dynamic value fetched from the `statistics` object.
-
-2. Gate Status Overview:
-    - A table that lists the status of each gate, including the current and next flights.
-    - Each row includes actions to edit or mark the gate for maintenance.
-
-3. Terminal Map:
-    - A visual representation of the terminals and gates.
-    - Each gate is displayed with its status color-coded based on the `gateStatuses` object.
-
-Thymeleaf attributes (`th:text`, `th:each`, `th:classappend`, etc.) are used to dynamically populate the content based on the data provided by the server.
--->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="~{layouts/MainLayout :: layout(~{::div})}">
 <body>
     <div th:fragment="content">
-        <!-- Statistics Overview -->
-        <div class="row g-4 mb-4">
-            <!-- Total Gates -->
-            <div class="col-md-6 col-lg-3">
-                <div class="card h-100">
+        <!-- Flight Operations Action Bar -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
                     <div class="card-body">
-                        <div class="d-flex align-items-start justify-content-between">
-                            <div>
-                                <h6 class="card-subtitle mb-2 text-muted">Total Gates</h6>
-                                <h2 class="card-title mb-0" th:text="${statistics.totalGates}">0</h2>
-                            </div>
-                            <div class="p-2 bg-primary bg-opacity-10 rounded">
-                                <i class="fas fa-door-open text-primary fs-4"></i>
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <h5 class="card-title mb-0">Flight Operations</h5>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newGateModal">
+                                    <i class="fas fa-plus me-2"></i>New Gate
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#gateChangeModal">
+                                    <i class="fas fa-exchange-alt me-2"></i>Request Gate Change
+                                </button>
+                                <button type="button" class="btn btn-outline-primary" id="viewScheduleBtn">
+                                    <i class="fas fa-calendar me-2"></i>View Schedule
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
+        <!-- Statistics Cards -->
+        <div class="row g-4 mb-4">
             <!-- Available Gates -->
-            <div class="col-md-6 col-lg-3">
+            <div class="col-md-6 col-xl-3">
                 <div class="card h-100">
                     <div class="card-body">
                         <div class="d-flex align-items-start justify-content-between">
                             <div>
                                 <h6 class="card-subtitle mb-2 text-muted">Available Gates</h6>
-                                <h2 class="card-title mb-0 text-success" th:text="${statistics.availableGates}">0</h2>
+                                <h2 class="card-title mb-0" th:text="${statistics.get('availableGates')}">5</h2>
                             </div>
                             <div class="p-2 bg-success bg-opacity-10 rounded">
                                 <i class="fas fa-check-circle text-success fs-4"></i>
@@ -57,34 +46,51 @@ Thymeleaf attributes (`th:text`, `th:each`, `th:classappend`, etc.) are used to 
                 </div>
             </div>
 
-            <!-- Occupied Gates -->
-            <div class="col-md-6 col-lg-3">
+            <!-- Maintenance Gates -->
+            <div class="col-md-6 col-xl-3">
                 <div class="card h-100">
                     <div class="card-body">
                         <div class="d-flex align-items-start justify-content-between">
                             <div>
-                                <h6 class="card-subtitle mb-2 text-muted">Occupied Gates</h6>
-                                <h2 class="card-title mb-0 text-warning" th:text="${statistics.occupiedGates}">0</h2>
+                                <h6 class="card-subtitle mb-2 text-muted">Maintenance Gates</h6>
+                                <h2 class="card-title mb-0" th:text="${statistics.get('maintenanceGates')}">3</h2>
                             </div>
                             <div class="p-2 bg-warning bg-opacity-10 rounded">
-                                <i class="fas fa-plane text-warning fs-4"></i>
+                                <i class="fas fa-tools text-warning fs-4"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Gates Under Maintenance -->
-            <div class="col-md-6 col-lg-3">
+            <!-- Occupied Gates -->
+            <div class="col-md-6 col-xl-3">
                 <div class="card h-100">
                     <div class="card-body">
                         <div class="d-flex align-items-start justify-content-between">
                             <div>
-                                <h6 class="card-subtitle mb-2 text-muted">Under Maintenance</h6>
-                                <h2 class="card-title mb-0 text-danger" th:text="${statistics.maintenanceGates}">0</h2>
+                                <h6 class="card-subtitle mb-2 text-muted">Occupied Gates</h6>
+                                <h2 class="card-title mb-0" th:text="${statistics.get('occupiedGates')}">12</h2>
                             </div>
-                            <div class="p-2 bg-danger bg-opacity-10 rounded">
-                                <i class="fas fa-tools text-danger fs-4"></i>
+                            <div class="p-2 bg-primary bg-opacity-10 rounded">
+                                <i class="fas fa-plane text-primary fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Gates -->
+            <div class="col-md-6 col-xl-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start justify-content-between">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-muted">Total Gates</h6>
+                                <h2 class="card-title mb-0" th:text="${statistics.get('totalGates')}">20</h2>
+                            </div>
+                            <div class="p-2 bg-info bg-opacity-10 rounded">
+                                <i class="fas fa-door-open text-info fs-4"></i>
                             </div>
                         </div>
                     </div>
@@ -93,16 +99,13 @@ Thymeleaf attributes (`th:text`, `th:each`, `th:classappend`, etc.) are used to 
         </div>
 
         <!-- Gate Status Overview -->
-        <div class="card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Gate Status Overview</h5>
-                <button class="btn btn-primary btn-sm">
-                    <i class="fas fa-sync-alt me-1"></i> Refresh
-                </button>
-            </div>
+<div class="row">
+    <div class="col-12 col-xl-8 mb-4">
+        <div class="card">
+            <!-- Header remains the same -->
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table">
                         <thead>
                             <tr>
                                 <th>Gate</th>
@@ -113,22 +116,23 @@ Thymeleaf attributes (`th:text`, `th:each`, `th:classappend`, etc.) are used to 
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="entry : ${gateStatuses}">
-                                <td th:text="${entry.key}">Gate ID</td>
+                            <!-- Change the iteration to use gateStatuses -->
+                            <tr th:each="gateStatus : ${gateUtilization.gateStatuses}">
+                                <td th:text="${gateStatus.gate}">Gate ID</td>
                                 <td>
                                     <span class="badge" 
-                                          th:classappend="${'bg-' + entry.value.cssClass}"
-                                          th:text="${entry.value.label}">Status</span>
+                                          th:classappend="${'bg-' + gateStatus.status.cssClass}"
+                                          th:text="${gateStatus.status.label}">
+                                        Status
+                                    </span>
                                 </td>
-                                <td>AA123</td>
-                                <td>UA456</td>
+                                <td th:text="${gateStatus.currentFlight}">-</td>
+                                <td th:text="${gateStatus.nextFlight}">-</td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
-                                        <button class="btn btn-outline-primary">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-outline-danger">
-                                            <i class="fas fa-tools"></i>
+                                        <button class="btn btn-outline-primary gate-details-btn" 
+                                                th:data-gate-id="${gateStatus.gate}">
+                                            <i class="fas fa-info-circle"></i>
                                         </button>
                                     </div>
                                 </td>
@@ -138,29 +142,103 @@ Thymeleaf attributes (`th:text`, `th:each`, `th:classappend`, etc.) are used to 
                 </div>
             </div>
         </div>
+    </div>
+</div>
 
-        <!-- Terminal Map -->
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">Terminal Map</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-12 mb-4" th:each="terminal : ${#numbers.sequence(1, 4)}">
-                        <h6 th:text="'Terminal ' + ${terminal}">Terminal</h6>
-                        <div class="d-flex gap-2">
-                            <div th:each="gate : ${#numbers.sequence(1, 5)}" 
-                                 class="p-3 rounded border text-center"
-                                 th:with="gateId='T' + ${terminal} + 'G' + ${gate},
-                                         status=${gateStatuses.get(gateId)}"
-                                 th:classappend="${status != null ? 'bg-' + status.cssClass + ' bg-opacity-25' : 'bg-secondary bg-opacity-25'}">
-                                <strong th:text="${gateId}">Gate</strong>
-                            </div>
+<!-- Temporary Debug Section -->
+<div th:if="${@environment.getProperty('spring.profiles.active') == 'dev'}" 
+     class="alert alert-info">
+    <h4>Debug Information:</h4>
+    <p>Gate Utilization Data:</p>
+    <pre th:text="${gateUtilization}"></pre>
+    <p>Statistics:</p>
+    <pre th:text="${statistics}"></pre>
+</div>
+            <!-- Gate Alerts & Updates -->
+            <div class="col-12 col-xl-4 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Gate Alerts & Updates</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="alertsList" class="list-group">
+                            <!-- Alerts will be populated dynamically -->
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- New Gate Modal -->
+        <div class="modal fade" id="newGateModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Create New Gate</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="newGateForm">
+                            <div class="mb-3">
+                                <label for="terminal" class="form-label">Terminal</label>
+                                <select class="form-select" id="terminal" required>
+                                    <option value="">Select Terminal</option>
+                                    <option value="1">Terminal 1</option>
+                                    <option value="2">Terminal 2</option>
+                                    <option value="3">Terminal 3</option>
+                                    <option value="4">Terminal 4</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="gateNumber" class="form-label">Gate Number</label>
+                                <input type="text" class="form-control" id="gateNumber" required>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Create Gate</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gate Change Request Modal -->
+        <div class="modal fade" id="gateChangeModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Request Gate Change</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="gateChangeForm">
+                            <div class="mb-3">
+                                <label for="flightNumber" class="form-label">Flight Number</label>
+                                <input type="text" class="form-control" id="flightNumber" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="currentGate" class="form-label">Current Gate</label>
+                                <input type="text" class="form-control" id="currentGate" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="requestedGate" class="form-label">Requested Gate</label>
+                                <input type="text" class="form-control" id="requestedGate" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="changeReason" class="form-label">Reason for Change</label>
+                                <textarea class="form-control" id="changeReason" rows="3" required></textarea>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary">Submit Request</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Include the operations.js script -->
+    <script th:src="@{/js/operations.js}"></script>
 </body>
 </html>

@@ -1,15 +1,17 @@
 package com.gcu.agms.model;
 
 /**
- * Enum representing different user roles within the system.
- * Each role has a display name associated with it.
+ * Enum defining the different user roles in the system.
+ * Each role represents a specific access level and set of permissions.
+ * The roles are hierarchical, with PUBLIC being the base role and
+ * ADMIN having the highest level of access.
  */
 public enum UserRole {
-    ADMIN("Administrator"),
-    OPERATIONS_MANAGER("Operations Manager"),
-    GATE_MANAGER("Gate Manager"),
+    PUBLIC("Public User"),
     AIRLINE_STAFF("Airline Staff"),
-    PUBLIC("Public User");
+    GATE_MANAGER("Gate Manager"),
+    OPERATIONS_MANAGER("Operations Manager"),
+    ADMIN("Administrator");
 
     private final String displayName;
 

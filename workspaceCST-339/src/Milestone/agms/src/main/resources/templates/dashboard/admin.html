@@ -2,6 +2,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="~{layouts/MainLayout :: layout(~{::div})}">
+      <head>
+        <title>Admin Dashboard - AGMS</title>
+    </head>
 <body>
     <div th:fragment="content">
         <!-- Quick Actions Section - Enhanced with Gate Management -->
@@ -30,7 +33,7 @@
                 </div>
             </div>
         </div>
-
+ 
         <!-- Statistics Cards - Enhanced with Gate Metrics -->
         <div class="row g-4 mb-4">
             <!-- User Statistics (Preserved) -->
@@ -117,8 +120,7 @@
 
         <!-- Gate Management and System Activity -->
         <div class="row">
-            <!-- Gate Management Table -->
-            <div class="col-12 col-xl-8 mb-4">
+            <div class="col-12 mb-4">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="card-title mb-0">Gate Management</h5>
@@ -159,11 +161,11 @@
                                         <td>
                                             <div class="btn-group btn-group-sm">
                                                 <button class="btn btn-outline-primary" 
-                                                        th:onclick="'editGate(\'' + ${gate.gateId} + '\')'">
+                                                        th:attr="data-gate-id=${gate.gateId}">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
                                                 <button class="btn btn-outline-danger"
-                                                        th:onclick="'deleteGate(\'' + ${gate.gateId} + '\')'">
+                                                        th:attr="data-gate-id=${gate.gateId}">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </div>
@@ -175,6 +177,7 @@
                     </div>
                 </div>
             </div>
+        </div>
 
             <!-- System Health Details (Preserved) -->
             <div class="col-12 col-xl-4 mb-4">
@@ -265,23 +268,35 @@
         </div>
     </div>
 
-    <!-- JavaScript for Gate Management -->
     <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Edit button handler
+            document.querySelectorAll('.btn-outline-primary').forEach(button => {
+                button.addEventListener('click', function() {
+                    const gateId = this.getAttribute('data-gate-id');
+                    editGate(gateId);
+                });
+            });
+    
+            // Delete button handler
+            document.querySelectorAll('.btn-outline-danger').forEach(button => {
+                button.addEventListener('click', function() {
+                    const gateId = this.getAttribute('data-gate-id');
+                    deleteGate(gateId);
+                });
+            });
+        });
+    
         function editGate(gateId) {
-            // Implementation for editing gate
             console.log('Editing gate:', gateId);
+            window.location.href = '/admin/gates/edit/' + gateId;
         }
-
+    
         function deleteGate(gateId) {
             if (confirm('Are you sure you want to delete gate ' + gateId + '?')) {
-                // Implementation for deleting gate
                 console.log('Deleting gate:', gateId);
+                // Add DELETE request implementation
             }
-        }
-
-        function refreshGateData() {
-            // Implementation for refreshing gate data
-            location.reload();
         }
     </script>
 </body>

@@ -1,9 +1,19 @@
+<!--
+    Operations Dashboard Template
+    Main interface for flight operations management
+    Uses Thymeleaf templating engine and Bootstrap 5
+-->
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layouts/MainLayout :: layout(~{::div})}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/MainLayout :: layout(~{::div})}">
 <body>
     <div th:fragment="content">
-        <!-- Flight Operations Action Bar -->
+        <!-- Error Alert Section - Displays error messages -->
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Error!</strong> <span th:text="${error}">Error message here</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <!-- Flight Operations Action Bar - Main controls for flight operations -->
         <div class="row mb-4">
             <div class="col-12">
                 <div class="card">
@@ -11,13 +21,13 @@
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                             <h5 class="card-title mb-0">Flight Operations</h5>
                             <div class="btn-group">
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newGateModal">
-                                    <i class="fas fa-plus me-2"></i>New Gate
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newFlightModal">
+                                    <i class="fas fa-plane me-2"></i>New Flight
                                 </button>
-                                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#gateChangeModal">
-                                    <i class="fas fa-exchange-alt me-2"></i>Request Gate Change
+                                <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#maintenanceModal">
+                                    <i class="fas fa-tools me-2"></i>Schedule Maintenance
                                 </button>
-                                <button type="button" class="btn btn-outline-primary" id="viewScheduleBtn">
+                                <button type="button" id="viewScheduleBtn" class="btn btn-outline-primary">
                                     <i class="fas fa-calendar me-2"></i>View Schedule
                                 </button>
                             </div>
@@ -27,33 +37,53 @@
             </div>
         </div>
 
-        <!-- Statistics Cards -->
+        <!-- Statistics Cards Section - Real-time operational metrics -->
         <div class="row g-4 mb-4">
-            <!-- Available Gates -->
+            <!-- Active Flights Card - Shows current flights in operation -->
             <div class="col-md-6 col-xl-3">
                 <div class="card h-100">
                     <div class="card-body">
                         <div class="d-flex align-items-start justify-content-between">
                             <div>
-                                <h6 class="card-subtitle mb-2 text-muted">Available Gates</h6>
-                                <h2 class="card-title mb-0" th:text="${statistics.get('availableGates')}">5</h2>
+                                <h6 class="card-subtitle mb-2 text-muted">Active Flights</h6>
+                                <h2 class="card-title mb-0" th:text="${statistics.get('activeFlights')}">12</h2>
+                                <small class="text-success">Currently in operation</small>
                             </div>
                             <div class="p-2 bg-success bg-opacity-10 rounded">
-                                <i class="fas fa-check-circle text-success fs-4"></i>
+                                <i class="fas fa-plane text-success fs-4"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Maintenance Gates -->
+            <!-- Available Aircraft Card - Shows ready-to-use aircraft -->
             <div class="col-md-6 col-xl-3">
                 <div class="card h-100">
                     <div class="card-body">
                         <div class="d-flex align-items-start justify-content-between">
                             <div>
-                                <h6 class="card-subtitle mb-2 text-muted">Maintenance Gates</h6>
-                                <h2 class="card-title mb-0" th:text="${statistics.get('maintenanceGates')}">3</h2>
+                                <h6 class="card-subtitle mb-2 text-muted">Available Aircraft</h6>
+                                <h2 class="card-title mb-0" th:text="${statistics.get('availableAircraft')}">8</h2>
+                                <small class="text-primary">Ready for service</small>
+                            </div>
+                            <div class="p-2 bg-primary bg-opacity-10 rounded">
+                                <i class="fas fa-plane-departure text-primary fs-4"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Maintenance Card - Shows aircraft under maintenance -->
+            <div class="col-md-6 col-xl-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-start justify-content-between">
+                            <div>
+                                <h6 class="card-subtitle mb-2 text-muted">In Maintenance</h2>
+                                <h2 class="card-title mb-0" th:text="${statistics.get('maintenanceCount')}">2</h2>
+                                <small class="text-warning">Under maintenance</small>
                             </div>
                             <div class="p-2 bg-warning bg-opacity-10 rounded">
                                 <i class="fas fa-tools text-warning fs-4"></i>
@@ -63,34 +93,18 @@
                 </div>
             </div>
 
-            <!-- Occupied Gates -->
+            <!-- Delayed Flights Card - Shows flights requiring attention -->
             <div class="col-md-6 col-xl-3">
                 <div class="card h-100">
                     <div class="card-body">
                         <div class="d-flex align-items-start justify-content-between">
                             <div>
-                                <h6 class="card-subtitle mb-2 text-muted">Occupied Gates</h6>
-                                <h2 class="card-title mb-0" th:text="${statistics.get('occupiedGates')}">12</h2>
+                                <h6 class="card-subtitle mb-2 text-muted">Delayed Flights</h6>
+                                <h2 class="card-title mb-0" th:text="${statistics.get('delayedFlights')}">3</h2>
+                                <small class="text-danger">Requires attention</small>
                             </div>
-                            <div class="p-2 bg-primary bg-opacity-10 rounded">
-                                <i class="fas fa-plane text-primary fs-4"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Total Gates -->
-            <div class="col-md-6 col-xl-3">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-start justify-content-between">
-                            <div>
-                                <h6 class="card-subtitle mb-2 text-muted">Total Gates</h6>
-                                <h2 class="card-title mb-0" th:text="${statistics.get('totalGates')}">20</h2>
-                            </div>
-                            <div class="p-2 bg-info bg-opacity-10 rounded">
-                                <i class="fas fa-door-open text-info fs-4"></i>
+                            <div class="p-2 bg-danger bg-opacity-10 rounded">
+                                <i class="fas fa-clock text-danger fs-4"></i>
                             </div>
                         </div>
                     </div>
@@ -98,40 +112,59 @@
             </div>
         </div>
 
-        <!-- Gate Status Overview -->
-<div class="row">
-    <div class="col-12 col-xl-8 mb-4">
-        <div class="card">
-            <!-- Header remains the same -->
+        <!-- Active Flights Table Section - Real-time flight tracking -->
+        <div class="card mb-4">
+            <!-- Table Header with Refresh Button -->
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">Active Flights</h5>
+                <div class="btn-group">
+                    <button id="refreshButton" class="btn btn-outline-secondary">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+            <!-- Flight Data Table -->
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>Gate</th>
+                                <th>Flight #</th>
+                                <th>Origin</th>
+                                <th>Destination</th>
+                                <th>Aircraft</th>
                                 <th>Status</th>
-                                <th>Current Flight</th>
-                                <th>Next Flight</th>
+                                <th>ETD/ETA</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Change the iteration to use gateStatuses -->
-                            <tr th:each="gateStatus : ${gateUtilization.gateStatuses}">
-                                <td th:text="${gateStatus.gate}">Gate ID</td>
+                            <tr th:each="flight : ${activeFlights}">
+                                <td th:text="${flight.flightNumber}">AA123</td>
+                                <td th:text="${flight.origin}">LAX</td>
+                                <td th:text="${flight.destination}">JFK</td>
+                                <td th:text="${flight.aircraft}">B737-800</td>
                                 <td>
-                                    <span class="badge" 
-                                          th:classappend="${'bg-' + gateStatus.status.cssClass}"
-                                          th:text="${gateStatus.status.label}">
+                                    <span class="badge"
+                                          th:with="status=${flight.status}"
+                                          th:classappend="${'bg-' + status.getCssClass()}"
+                                          th:text="${status.getLabel()}">
                                         Status
                                     </span>
                                 </td>
-                                <td th:text="${gateStatus.currentFlight}">-</td>
-                                <td th:text="${gateStatus.nextFlight}">-</td>
+                                <td>
+                                    <span th:text="${#temporals.format(flight.scheduledDeparture, 'HH:mm')}">10:30</span>
+                                    /
+                                    <span th:text="${#temporals.format(flight.scheduledArrival, 'HH:mm')}">13:45</span>
+                                </td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
-                                        <button class="btn btn-outline-primary gate-details-btn" 
-                                                th:data-gate-id="${gateStatus.gate}">
+                                        <button class="btn btn-outline-primary update-status-btn"
+                                                th:data-flight-number="${flight.flightNumber}">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-outline-info view-details-btn"
+                                                th:data-flight-number="${flight.flightNumber}">
                                             <i class="fas fa-info-circle"></i>
                                         </button>
                                     </div>
@@ -142,103 +175,223 @@
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-<!-- Temporary Debug Section -->
-<div th:if="${@environment.getProperty('spring.profiles.active') == 'dev'}" 
-     class="alert alert-info">
-    <h4>Debug Information:</h4>
-    <p>Gate Utilization Data:</p>
-    <pre th:text="${gateUtilization}"></pre>
-    <p>Statistics:</p>
-    <pre th:text="${statistics}"></pre>
-</div>
-            <!-- Gate Alerts & Updates -->
-            <div class="col-12 col-xl-4 mb-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Gate Alerts & Updates</h5>
+        <!-- Aircraft Status Table Section - Current aircraft states -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Aircraft Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Registration</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                                <th>Location</th>
+                                <th>Next Maintenance</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="aircraft : ${aircraft}">
+                                <td th:text="${aircraft.registrationNumber}">N12345</td>
+                                <td th:text="${aircraft.model}">B737-800</td>
+                                <td>
+                                    <span class="badge"
+                                          th:with="status=${aircraft.status}"
+                                          th:classappend="${'bg-' + status.getCssClass()}"
+                                          th:text="${status.getDescription()}">
+                                        Available for service
+                                    </span>
+                                </td>
+                                <td th:text="${aircraft.currentLocation}">Gate A1</td>
+                                <td th:text="${aircraft.nextMaintenanceDue != null ? #temporals.format(aircraft.nextMaintenanceDue, 'yyyy-MM-dd') : 'Not Scheduled'}">
+                                    2025-02-15
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary aircraft-status-btn"
+                                                th:data-registration="${aircraft.registrationNumber}">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-outline-warning maintenance-btn" 
+                                                th:data-registration="${aircraft.registrationNumber}"
+                                                onclick="showMaintenanceModal(this.getAttribute('data-registration'))">
+                                            <i class="fas fa-tools"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Section - Interactive Forms and Dialogs -->
+        
+        <!-- New Flight Modal - Form for creating new flights -->
+        <div class="modal fade" id="newFlightModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Create New Flight</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                    <div class="card-body">
-                        <div id="alertsList" class="list-group">
-                            <!-- Alerts will be populated dynamically -->
+                    <div class="modal-body">
+                        <form id="newFlightForm">
+                            <div class="mb-3">
+                                <label class="form-label">Flight Number</label>
+                                <input type="text" class="form-control" name="flightNumber" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Airline Code</label>
+                                <input type="text" class="form-control" name="airlineCode" required 
+                                       pattern="[A-Z]{2,3}" 
+                                       title="2-3 capital letters (e.g., AA or UAL)">
+                                <small class="form-text text-muted">Enter airline code (e.g., AA for American Airlines)</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Origin</label>
+                                <input type="text" class="form-control" name="origin" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Destination</label>
+                                <input type="text" class="form-control" name="destination" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="assignedAircraft" class="form-label">Aircraft</label>
+                                <select class="form-select" id="assignedAircraft" name="assignedAircraft" required>
+                                    <option value="">Select Aircraft</option>
+                                    <option th:each="aircraft : ${availableAircraft}"
+                                            th:value="${aircraft.registrationNumber}"
+                                            th:text="${aircraft.registrationNumber + ' - ' + aircraft.model}">
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Departure Time</label>
+                                    <input type="datetime-local" class="form-control" name="scheduledDeparture" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Arrival Time</label>
+                                    <input type="datetime-local" class="form-control" name="scheduledArrival" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Create Flight</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flight Status Modal - Form for updating flight status -->
+        <div class="modal fade" id="flightStatusModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Update Flight Status</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="flightStatusForm">
+                            <input type="hidden" id="flightNumber" name="flightNumber">
+                            <div class="mb-3">
+                                <label class="form-label">New Status</label>
+                                <select class="form-control" name="status" required>
+                                    <option value="SCHEDULED">Scheduled</option>
+                                    <option value="BOARDING">Boarding</option>
+                                    <option value="DEPARTED">Departed</option>
+                                    <option value="EN_ROUTE">En Route</option>
+                                    <option value="APPROACHING">Approaching</option>
+                                    <option value="LANDED">Landed</option>
+                                    <option value="ARRIVED">Arrived</option>
+                                    <option value="DELAYED">Delayed</option>
+                                    <option value="CANCELLED">Cancelled</option>
+                                    <option value="DIVERTED">Diverted</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update Status</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flight Details Modal - Detailed flight information display -->
+        <div class="modal fade" id="flightDetailsModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Flight Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="flightDetailsContent">
+                            <!-- Content will be loaded dynamically -->
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- New Gate Modal -->
-        <div class="modal fade" id="newGateModal" tabindex="-1">
+        <!-- Maintenance Modal - Form for scheduling maintenance -->
+        <div class="modal fade" id="maintenanceModal" tabindex="-1">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Create New Gate</h5>
+                        <h5 class="modal-title">Schedule Maintenance</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="newGateForm">
+                        <form id="maintenanceForm">
+                            <input type="hidden" id="maintenance-registration" name="registrationNumber">
                             <div class="mb-3">
-                                <label for="terminal" class="form-label">Terminal</label>
-                                <select class="form-select" id="terminal" required>
-                                    <option value="">Select Terminal</option>
-                                    <option value="1">Terminal 1</option>
-                                    <option value="2">Terminal 2</option>
-                                    <option value="3">Terminal 3</option>
-                                    <option value="4">Terminal 4</option>
+                                <label class="form-label">Aircraft</label>
+                                <input type="text" class="form-control" id="maintenance-aircraft-display" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Maintenance Type *</label>
+                                <select class="form-select" name="maintenanceType" required>
+                                    <option value="ROUTINE">Routine Maintenance</option>
+                                    <option value="INSPECTION">Safety Inspection</option>
+                                    <option value="REPAIR">Repair Work</option>
+                                    <option value="OVERHAUL">Major Overhaul</option>
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <label for="gateNumber" class="form-label">Gate Number</label>
-                                <input type="text" class="form-control" id="gateNumber" required>
+                                <label class="form-label">Scheduled Date *</label>
+                                <input type="date" class="form-control" name="maintenanceDate" required>
                             </div>
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">Create Gate</button>
+                            <div class="mb-3">
+                                <label class="form-label">Description *</label>
+                                <textarea class="form-control" name="description" rows="3" required></textarea>
                             </div>
+                            <button type="submit" class="btn btn-primary">Schedule Maintenance</button>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Gate Change Request Modal -->
-        <div class="modal fade" id="gateChangeModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Request Gate Change</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="gateChangeForm">
-                            <div class="mb-3">
-                                <label for="flightNumber" class="form-label">Flight Number</label>
-                                <input type="text" class="form-control" id="flightNumber" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="currentGate" class="form-label">Current Gate</label>
-                                <input type="text" class="form-control" id="currentGate" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="requestedGate" class="form-label">Requested Gate</label>
-                                <input type="text" class="form-control" id="requestedGate" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="changeReason" class="form-label">Reason for Change</label>
-                                <textarea class="form-control" id="changeReason" rows="3" required></textarea>
-                            </div>
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">Submit Request</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
-
-    <!-- Include the operations.js script -->
-    <script th:src="@{/js/operations.js}"></script>
 </body>
 </html>
+
+<!-- 
+    Template Dependencies:
+    - Thymeleaf templating engine
+    - Bootstrap 5 CSS framework
+    - Font Awesome icons
+    - Custom JS: flight-operations.js
+    
+    Data Requirements:
+    - User role verification (OPERATIONS_MANAGER)
+    - Active flights list
+    - Available aircraft list
+    - Maintenance schedules
+    - Operational statistics
+-->

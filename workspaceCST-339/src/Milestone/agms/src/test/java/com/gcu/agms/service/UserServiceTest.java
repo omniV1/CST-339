@@ -9,8 +9,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.gcu.agms.model.UserModel;
-import com.gcu.agms.model.UserRole;
+import com.gcu.agms.model.auth.UserModel;
+import com.gcu.agms.model.auth.UserRole;
+import com.gcu.agms.service.impl.InMemoryUserService;
 
 /**
  * Test class for UserService

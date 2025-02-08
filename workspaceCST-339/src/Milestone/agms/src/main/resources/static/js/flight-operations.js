@@ -40,7 +40,38 @@ document.addEventListener('DOMContentLoaded', function() {
         statusForm.addEventListener('submit', handleAircraftStatusUpdate);
     }
 });
+function showUpdateStatusModal(flightNumber) {
+    // Set the flight number in the modal
+    document.getElementById('statusFlightNumber').value = flightNumber;
+    
+    // Show the modal
+    const modal = new bootstrap.Modal(document.getElementById('updateStatusModal'));
+    modal.show();
+}
 
+// Handle status update form submission
+document.getElementById('updateStatusForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+
+    fetch('/operations/flights/status', {
+        method: 'POST',
+        body: new URLSearchParams(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            closeModalCompletely('updateStatusModal');
+            window.location.reload();
+        } else {
+            alert('Failed to update status: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error updating flight status');
+    });
+});
 /**
  * Central initialization function that sets up all dashboard components
  * Initializes forms, buttons, and event listeners for the operations dashboard
@@ -75,13 +106,82 @@ function initializeNewFlightForm() {
     if (form) {
         console.log('Found new flight form');
         form.addEventListener('submit', function(e) {
-            console.log('Form submitted');
-            handleNewFlightSubmit(e);
+            e.preventDefault();
+            
+            // Combine date and time inputs for departure
+            const departureDate = document.getElementById('departureDate').value;
+            const departureTime = document.getElementById('departureTime').value;
+            const scheduledDeparture = `${departureDate}T${departureTime}`;
+            
+            // Combine date and time inputs for arrival
+            const arrivalDate = document.getElementById('arrivalDate').value;
+            const arrivalTime = document.getElementById('arrivalTime').value;
+            const scheduledArrival = `${arrivalDate}T${arrivalTime}`;
+            
+            // Create flight data object
+            const flightData = {
+                flightNumber: form.elements['flightNumber'].value,
+                airlineCode: form.elements['airlineCode'].value,
+                origin: form.elements['origin'].value,
+                destination: form.elements['destination'].value,
+                assignedAircraft: form.elements['assignedAircraft'].value,
+                scheduledDeparture: scheduledDeparture,
+                scheduledArrival: scheduledArrival,
+                status: 'SCHEDULED'
+            };
+            
+            // Submit as JSON with proper modal cleanup
+            fetch('/operations/flights/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(flightData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Properly close the modal
+                    const modalElement = document.getElementById('newFlightModal');
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    modalInstance.hide();
+                    
+                    // Remove modal backdrop and reset body
+                    document.body.classList.remove('modal-open');
+                    const backdrops = document.getElementsByClassName('modal-backdrop');
+                    while(backdrops.length > 0) {
+                        backdrops[0].remove();
+                    }
+                    
+                    // Reset overflow
+                    document.body.style.overflow = '';
+                    document.body.style.paddingRight = '';
+                    
+                    // Refresh the page
+                    window.location.reload();
+                } else {
+                    alert('Failed to create flight: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error creating flight');
+            });
         });
-    } else {
-        console.error('New flight form not found');
     }
 }
+
+// Add event listener for modal hidden event
+document.getElementById('newFlightModal').addEventListener('hidden.bs.modal', function () {
+    // Clean up modal artifacts
+    document.body.classList.remove('modal-open');
+    const backdrops = document.getElementsByClassName('modal-backdrop');
+    while(backdrops.length > 0) {
+        backdrops[0].remove();
+    }
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+});
 
 /**
  * Handles the submission of a new flight form
@@ -114,8 +214,15 @@ function handleNewFlightSubmit(e) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            const modal = bootstrap.Modal.getInstance(document.querySelector('#newFlightModal'));
+            // Close modal and remove backdrop
+            const modal = bootstrap.Modal.getInstance(document.getElementById('newFlightModal'));
             modal.hide();
+            document.body.classList.remove('modal-open');
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) {
+                backdrop.remove();
+            }
+            // Refresh the page
             window.location.reload();
         } else {
             alert('Failed to create flight: ' + data.message);
@@ -230,10 +337,8 @@ function handleMaintenanceSubmit(e) {
         .then(data => {
             console.log('Server response:', data);
             if (data.success) {
-                const modal = bootstrap.Modal.getInstance(document.getElementById('maintenanceModal'));
-                modal.hide();
-                refreshDashboard();
-                alert('Maintenance scheduled successfully');
+                closeModalCompletely('maintenanceModal');
+                window.location.reload();
             } else {
                 alert('Failed to schedule maintenance: ' + data.message);
             }
@@ -572,10 +677,8 @@ function handleAircraftStatusUpdate(e) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            const modal = bootstrap.Modal.getInstance(document.getElementById('aircraftStatusModal'));
-            modal.hide();
-            refreshDashboard();
-            alert('Aircraft status updated successfully');
+            closeModalCompletely('aircraftStatusModal');
+            window.location.reload();
         } else {
             alert('Failed to update aircraft status: ' + data.message);
         }
@@ -612,4 +715,20 @@ function loadMaintenanceHistory(registrationNumber) {
             console.error('Error loading maintenance history:', error);
             alert('Failed to load maintenance history');
         });
+}
+
+/**
+ * Helper function to properly close modals
+ * @param {string} modalId - The ID of the modal to close
+ */
+function closeModalCompletely(modalId) {
+    const modal = bootstrap.Modal.getInstance(document.getElementById(modalId));
+    if (modal) {
+        modal.hide();
+        document.body.classList.remove('modal-open');
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) {
+            backdrop.remove();
+        }
+    }
 }

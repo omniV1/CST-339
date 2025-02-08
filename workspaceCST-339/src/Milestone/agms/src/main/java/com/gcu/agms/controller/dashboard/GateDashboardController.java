@@ -1,19 +1,32 @@
 package com.gcu.agms.controller.dashboard;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.gcu.agms.model.gate.AssignmentModel;
 import com.gcu.agms.model.gate.GateModel;
+import com.gcu.agms.service.flight.AssignmentService;
 import com.gcu.agms.service.gate.GateManagementService;
 import com.gcu.agms.service.gate.GateOperationsService;
 import com.gcu.agms.service.gate.GateOperationsService.GateStatus;
@@ -34,6 +47,7 @@ public class GateDashboardController {
     
     private final GateOperationsService gateOperationsService;
     private final GateManagementService gateManagementService;
+    private final AssignmentService assignmentService; // Add this field
     
     /**
      * Constructor injection of required services.
@@ -43,9 +57,11 @@ public class GateDashboardController {
      */
     public GateDashboardController(
             GateOperationsService gateOperationsService,
-            GateManagementService gateManagementService) {
+            GateManagementService gateManagementService,
+            AssignmentService assignmentService) { // Add parameter
         this.gateOperationsService = gateOperationsService;
         this.gateManagementService = gateManagementService;
+        this.assignmentService = assignmentService; // Initialize service
     }
     
     /**
@@ -71,10 +87,17 @@ public class GateDashboardController {
         model.addAttribute("gateStatuses", gateOperationsService.getAllGateStatuses());
         model.addAttribute("statistics", gateOperationsService.getStatistics());
         
-        // Get detailed gate information
-        model.addAttribute("gates", gateManagementService.getAllGates());
+        // Get gates and their assignments
+        List<GateModel> gates = gateManagementService.getAllGates();
+        model.addAttribute("gates", gates);
         
-        model.addAttribute("gateModel", new GateModel());
+        // Add assignments for each gate
+        Map<String, List<AssignmentModel>> gateAssignments = new HashMap<>();
+        gates.forEach(gate -> {
+            gateAssignments.put(gate.getGateId(), 
+                assignmentService.getAssignmentsForGate(gate.getGateId()));
+        });
+        model.addAttribute("gateAssignments", gateAssignments);
         
         logger.info("Gate manager dashboard loaded successfully");
         return "dashboard/gate";
@@ -156,5 +179,74 @@ public class GateDashboardController {
         redirectAttributes.addFlashAttribute("success", 
             "Issue reported for gate " + gateId);
         return "redirect:/gates/details/" + gateId;
+    }
+
+    @PostMapping("/assignments/create")
+    public String createAssignment(@ModelAttribute AssignmentModel assignment,
+                                 RedirectAttributes redirectAttributes) {
+        logger.info("Creating new assignment for gate: {}", assignment.getGateId());
+        
+        boolean created = assignmentService.createAssignment(assignment);
+        if (created) {
+            redirectAttributes.addFlashAttribute("success", 
+                "Assignment created successfully");
+        } else {
+            redirectAttributes.addFlashAttribute("error", 
+                "Failed to create assignment - time conflict");
+        }
+        
+        return "redirect:/gates/dashboard";
+    }
+
+    @PostMapping("/assignments/delete/{id}")
+    public String deleteAssignment(@PathVariable Long id, 
+                                 @RequestParam String gateId,
+                                 RedirectAttributes redirectAttributes) {
+        logger.info("Deleting assignment {} from gate {}", id, gateId);
+        
+        boolean deleted = assignmentService.deleteAssignment(gateId, id);
+        if (deleted) {
+            redirectAttributes.addFlashAttribute("success", 
+                "Assignment deleted successfully");
+        } else {
+            redirectAttributes.addFlashAttribute("error", 
+                "Failed to delete assignment");
+        }
+        
+        return "redirect:/gates/dashboard";
+    }
+
+    @GetMapping("/assignments/print")
+    public ResponseEntity<Resource> printSchedule() {
+        logger.info("Generating gate schedule printout");
+        
+        String content = generateScheduleContent();
+        ByteArrayResource resource = new ByteArrayResource(content.getBytes());
+        
+        return ResponseEntity.ok()
+            .contentType(MediaType.TEXT_PLAIN)
+            .header(HttpHeaders.CONTENT_DISPOSITION, 
+                "attachment; filename=gate-schedule.txt")
+            .body(resource);
+    }
+
+    private String generateScheduleContent() {
+        StringBuilder content = new StringBuilder();
+        content.append("Gate Schedule Report\n");
+        content.append("Generated: ").append(LocalDateTime.now()).append("\n\n");
+        
+        gateManagementService.getAllGates().forEach(gate -> {
+            content.append("Gate: ").append(gate.getGateId()).append("\n");
+            List<AssignmentModel> assignments = 
+                assignmentService.getAssignmentsForGate(gate.getGateId());
+            assignments.forEach(a -> 
+                content.append(String.format("  %s: %s - %s\n", 
+                    a.getFlightNumber(), 
+                    a.getStartTime().format(DateTimeFormatter.ISO_LOCAL_TIME),
+                    a.getEndTime().format(DateTimeFormatter.ISO_LOCAL_TIME))));
+            content.append("\n");
+        });
+        
+        return content.toString();
     }
 }

@@ -149,4 +149,68 @@ public class InMemoryAssignmentService {
         }
         return false;
     }
+
+    /**
+     * Deletes an assignment from a specific gate.
+     * @param gateId The ID of the gate containing the assignment
+     * @param assignmentId The ID of the assignment to delete
+     * @return true if successfully deleted, false if not found
+     */
+    public boolean deleteAssignment(String gateId, Long assignmentId) {
+        logger.info("Attempting to delete assignment {} from gate {}", assignmentId, gateId);
+        
+        List<AssignmentModel> assignments = assignmentsByGate.get(gateId);
+        if (assignments != null) {
+            boolean removed = assignments.removeIf(a -> a.getId().equals(assignmentId));
+            if (removed) {
+                logger.info("Assignment successfully deleted");
+                return true;
+            }
+        }
+        
+        logger.warn("Assignment not found for deletion");
+        return false;
+    }
+
+    /**
+     * Updates an existing assignment.
+     * @param gateId The ID of the gate containing the assignment
+     * @param assignmentId The ID of the assignment to update
+     * @param updated The updated assignment data
+     * @return true if successfully updated, false if not found or conflict exists
+     */
+    public boolean updateAssignment(String gateId, Long assignmentId, AssignmentModel updated) {
+        logger.info("Attempting to update assignment {} for gate {}", assignmentId, gateId);
+        
+        List<AssignmentModel> assignments = assignmentsByGate.get(gateId);
+        if (assignments != null) {
+            // Find the existing assignment
+            Optional<AssignmentModel> existing = assignments.stream()
+                .filter(a -> a.getId().equals(assignmentId))
+                .findFirst();
+                
+            if (existing.isPresent()) {
+                // Check for conflicts with other assignments
+                boolean hasConflict = assignments.stream()
+                    .filter(a -> !a.getId().equals(assignmentId)) // Exclude current assignment
+                    .anyMatch(a -> !a.isCancelled() && a.hasConflict(updated));
+                    
+                if (hasConflict) {
+                    logger.warn("Update failed: time conflict detected");
+                    return false;
+                }
+                
+                // Update the assignment
+                updated.setId(assignmentId); // Ensure ID is preserved
+                updated.setUpdatedAt(LocalDateTime.now());
+                assignments.set(assignments.indexOf(existing.get()), updated);
+                
+                logger.info("Assignment successfully updated");
+                return true;
+            }
+        }
+        
+        logger.warn("Assignment not found for update");
+        return false;
+    }
 }

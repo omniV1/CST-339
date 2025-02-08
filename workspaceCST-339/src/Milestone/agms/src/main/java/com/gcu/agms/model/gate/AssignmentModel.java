@@ -33,29 +33,16 @@ public class AssignmentModel {
     private String assignedBy;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private boolean cancelled = false;
 
     /**
-     * Checks if this assignment conflicts with another assignment's time window
+     * Checks if this assignment has a time conflict with another assignment
      */
     public boolean hasConflict(AssignmentModel other) {
-        if (!this.gateId.equals(other.gateId)) {
-            return false;
-        }
-        return !(this.endTime.isBefore(other.startTime) || 
-                this.startTime.isAfter(other.endTime));
-    }
-
-    /**
-     * Updates the time window of this assignment
-     */
-    public boolean updateTimes(LocalDateTime newStart, LocalDateTime newEnd) {
-        if (newEnd.isBefore(newStart)) {
-            return false;
-        }
-        this.startTime = newStart;
-        this.endTime = newEnd;
-        this.updatedAt = LocalDateTime.now();
-        return true;
+        return !this.cancelled && 
+               !other.cancelled &&
+               !(this.endTime.isBefore(other.startTime) || 
+                 this.startTime.isAfter(other.endTime));
     }
 
     /**
@@ -63,23 +50,16 @@ public class AssignmentModel {
      */
     public boolean isActive() {
         LocalDateTime now = LocalDateTime.now();
-        return status == AssignmentStatus.ACTIVE && 
+        return !cancelled && 
                now.isAfter(startTime) && 
                now.isBefore(endTime);
     }
 
     /**
-     * Checks if the assignment has been completed
-     */
-    public boolean isComplete() {
-        return status == AssignmentStatus.COMPLETED;
-    }
-
-    /**
-     * Checks if the assignment has been cancelled
+     * Checks if this assignment is cancelled
      */
     public boolean isCancelled() {
-        return status == AssignmentStatus.CANCELLED;
+        return cancelled;
     }
 
     /**
@@ -91,11 +71,13 @@ public class AssignmentModel {
     }
 
     /**
-     * Initializes timestamps when creating a new assignment
+     * Initializes timestamps for a new assignment
      */
     public void initializeTimestamps() {
         LocalDateTime now = LocalDateTime.now();
-        this.createdAt = now;
+        if (this.createdAt == null) {
+            this.createdAt = now;
+        }
         this.updatedAt = now;
     }
 }

@@ -27,9 +27,6 @@
                                 <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#maintenanceModal">
                                     <i class="fas fa-tools me-2"></i>Schedule Maintenance
                                 </button>
-                                <button type="button" id="viewScheduleBtn" class="btn btn-outline-primary">
-                                    <i class="fas fa-calendar me-2"></i>View Schedule
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -167,6 +164,11 @@
                                                 th:data-flight-number="${flight.flightNumber}">
                                             <i class="fas fa-info-circle"></i>
                                         </button>
+                                        <!-- Add delete button -->
+                                        <button class="btn btn-outline-danger delete-flight-btn"
+                                                th:data-flight-number="${flight.flightNumber}">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -272,15 +274,50 @@
                                 </select>
                             </div>
                             <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Departure Time</label>
-                                    <input type="datetime-local" class="form-control" name="scheduledDeparture" required>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Arrival Time</label>
-                                    <input type="datetime-local" class="form-control" name="scheduledArrival" required>
-                                </div>
-                            </div>
+    <!-- Departure Date/Time -->
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Departure Time *</label>
+        <div class="row g-2">
+            <div class="col-md-6">
+                <input type="date" 
+                       class="form-control" 
+                       name="departureDate" 
+                       id="departureDate"
+                       required>
+            </div>
+            <div class="col-md-6">
+                <input type="time" 
+                       class="form-control" 
+                       name="departureTime" 
+                       id="departureTime"
+                       required>
+            </div>
+        </div>
+        <div class="invalid-feedback">Please select departure date and time.</div>
+    </div>
+
+    <!-- Arrival Date/Time -->
+    <div class="col-md-6 mb-3">
+        <label class="form-label">Arrival Time *</label>
+        <div class="row g-2">
+            <div class="col-md-6">
+                <input type="date" 
+                       class="form-control" 
+                       name="arrivalDate" 
+                       id="arrivalDate"
+                       required>
+            </div>
+            <div class="col-md-6">
+                <input type="time" 
+                       class="form-control" 
+                       name="arrivalTime" 
+                       id="arrivalTime"
+                       required>
+            </div>
+        </div>
+        <div class="invalid-feedback">Please select arrival date and time.</div>
+    </div>
+</div>
                             <button type="submit" class="btn btn-primary">Create Flight</button>
                         </form>
                     </div>
@@ -471,6 +508,44 @@
         </div>
     </div>
 </div>
+
+<!-- Add this modal for status updates -->
+<div class="modal fade" id="updateStatusModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Flight Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="updateStatusForm">
+                <div class="modal-body">
+                    <input type="hidden" id="statusFlightNumber" name="flightNumber">
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select name="status" class="form-select" required>
+                            <option value="SCHEDULED">Scheduled</option>
+                            <option value="BOARDING">Boarding</option>
+                            <option value="IN_FLIGHT">In Flight</option>
+                            <option value="LANDED">Landed</option>
+                            <option value="CANCELLED">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Location</label>
+                        <input type="text" name="location" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Update Status</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Include the JavaScript file at the bottom of your page -->
+<script th:src="@{/js/flight-operations.js}"></script>
 
     </div>
 </body>

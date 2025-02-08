@@ -38,4 +38,25 @@ public interface UserService {
      * @return List of all registered users
      */
     List<UserModel> getAllUsers();
+    
+    /**
+     * Deletes a user from the system by their ID.
+     * @param id The ID of the user to delete
+     * @return true if deletion was successful, false if user not found
+     */
+    boolean deleteUser(Long id);
+    
+    /**
+     * Finds a user by their ID.
+     * @param id The ID of the user to find
+     * @return The user if found, null otherwise
+     */
+    UserModel getUserById(Long id);
+    
+    /**
+     * Updates an existing user's information.
+     * @param userModel The updated user information
+     * @return true if update was successful, false otherwise
+     */
+    boolean updateUser(UserModel userModel);
 }

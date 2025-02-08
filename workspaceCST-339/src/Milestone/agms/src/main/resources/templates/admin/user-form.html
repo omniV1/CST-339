@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      th:replace="~{layouts/MainLayout :: layout(~{::div})}">
+<body>
+    <div th:fragment="content">
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-8 offset-md-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Add New User</h3>
+                        </div>
+                        <div class="card-body">
+                            <form th:action="${userModel.id != null} ? 
+                                  @{/admin/users/update/{id}(id=${userModel.id})} : 
+                                  @{/admin/users/add}"
+                                  th:object="${userModel}" 
+                                  method="post">
+                                
+                                <!-- Username field -->
+                                <div class="mb-3">
+                                    <label for="username" class="form-label">Username</label>
+                                    <input type="text" class="form-control" 
+                                           id="username" th:field="*{username}">
+                                    <div class="text-danger" 
+                                         th:if="${#fields.hasErrors('username')}" 
+                                         th:errors="*{username}"></div>
+                                </div>
+
+                                <!-- First Name field -->
+                                <div class="mb-3">
+                                    <label for="firstName" class="form-label">First Name</label>
+                                    <input type="text" class="form-control" 
+                                           id="firstName" th:field="*{firstName}">
+                                    <div class="text-danger" 
+                                         th:if="${#fields.hasErrors('firstName')}" 
+                                         th:errors="*{firstName}"></div>
+                                </div>
+
+                                <!-- Last Name field -->
+                                <div class="mb-3">
+                                    <label for="lastName" class="form-label">Last Name</label>
+                                    <input type="text" class="form-control" 
+                                           id="lastName" th:field="*{lastName}">
+                                    <div class="text-danger" 
+                                         th:if="${#fields.hasErrors('lastName')}" 
+                                         th:errors="*{lastName}"></div>
+                                </div>
+
+                                <!-- Email field -->
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" 
+                                           id="email" th:field="*{email}">
+                                    <div class="text-danger" 
+                                         th:if="${#fields.hasErrors('email')}" 
+                                         th:errors="*{email}"></div>
+                                </div>
+
+                                <!-- Phone Number field -->
+                                <div class="mb-3">
+                                    <label for="phoneNumber" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" 
+                                           id="phoneNumber" th:field="*{phoneNumber}">
+                                    <div class="text-danger" 
+                                         th:if="${#fields.hasErrors('phoneNumber')}" 
+                                         th:errors="*{phoneNumber}"></div>
+                                </div>
+
+                                <!-- Password field -->
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Password</label>
+                                    <input type="password" class="form-control" 
+                                           id="password" th:field="*{password}">
+                                    <div class="text-danger" 
+                                         th:if="${#fields.hasErrors('password')}" 
+                                         th:errors="*{password}"></div>
+                                    <small class="form-text text-muted">
+                                        Password must be at least 8 characters long and contain at least one uppercase letter, 
+                                        one lowercase letter, one number, and one special character.
+                                    </small>
+                                </div>
+
+                                <!-- Role field -->
+                                <div class="mb-3">
+                                    <label for="role" class="form-label">Role</label>
+                                    <select class="form-control" id="role" th:field="*{role}">
+                                        <option value="ADMIN">Administrator</option>
+                                        <option value="OPERATIONS_MANAGER">Operations Manager</option>
+                                        <option value="GATE_MANAGER">Gate Manager</option>
+                                        <option value="AIRLINE_STAFF">Airline Staff</option>
+                                        <option value="PUBLIC">Public User</option>
+                                    </select>
+                                </div>
+
+                                <!-- Auth Code Section -->
+                                <div class="mb-3" id="authCodeSection" style="display: none;">
+                                    <label for="authCode" class="form-label">Authorization Code</label>
+                                    <input type="text" class="form-control" 
+                                           id="authCode" th:field="*{authCode}">
+                                    <small class="form-text text-muted">
+                                        Required for administrative roles. Contact system administration for the code.
+                                    </small>
+                                </div>
+
+                                <!-- Submit and Cancel buttons -->
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary">
+                                        <span th:text="${userModel.id != null ? 'Update' : 'Add'} + ' User'">
+                                            Submit
+                                        </span>
+                                    </button>
+                                    <a href="/admin/dashboard" class="btn btn-secondary">Cancel</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add JavaScript for dynamic auth code field -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const roleSelect = document.getElementById('role');
+            const authCodeSection = document.getElementById('authCodeSection');
+            
+            function toggleAuthCodeField() {
+                const selectedRole = roleSelect.value;
+                if (selectedRole === 'ADMIN' || selectedRole === 'OPERATIONS_MANAGER') {
+                    authCodeSection.style.display = 'block';
+                } else {
+                    authCodeSection.style.display = 'none';
+                }
+            }
+            
+            roleSelect.addEventListener('change', toggleAuthCodeField);
+            toggleAuthCodeField(); // Initial check
+        });
+    </script>
+</body>
+</html>

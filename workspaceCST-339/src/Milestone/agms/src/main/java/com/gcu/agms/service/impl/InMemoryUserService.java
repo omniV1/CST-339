@@ -39,10 +39,12 @@ public class InMemoryUserService implements UserService {
         logger.info("Test users initialized successfully");
     }
 
+    // Update the createTestUser method
     private void createTestUser(String username, String password, String email,
                               String firstName, String lastName, String phone,
                               UserRole role) {
         UserModel user = new UserModel();
+        user.setId((long) (users.size() + 1)); // Generate sequential IDs
         user.setUsername(username);
         user.setPassword(password);
         user.setEmail(email);
@@ -61,6 +63,7 @@ public class InMemoryUserService implements UserService {
             logger.warn("Registration failed: Username already exists");
             return false;
         }
+        newUser.setId((long) (users.size() + 1)); // Generate sequential IDs
         users.add(newUser);
         logger.info("User registered successfully: {}", newUser.getUsername());
         return true;
@@ -88,5 +91,56 @@ public class InMemoryUserService implements UserService {
     public List<UserModel> getAllUsers() {
         logger.debug("Retrieving all users");
         return new ArrayList<>(users);
+    }
+
+    @Override
+    public boolean deleteUser(Long id) {
+        Optional<UserModel> userToDelete = users.stream()
+                                      .filter(user -> user.getId().equals(id))
+                                      .findFirst();
+
+        if (userToDelete.isPresent()) {
+            users.remove(userToDelete.get());
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public UserModel getUserById(Long id) {
+        logger.debug("Searching for user with ID: {}", id);
+        return users.stream()
+                .filter(user -> user.getId().equals(id))
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
+    public boolean updateUser(UserModel userModel) {
+        logger.info("Attempting to update user: {}", userModel.getUsername());
+        Optional<UserModel> existingUser = users.stream()
+                                          .filter(user -> user.getId().equals(userModel.getId()))
+                                          .findFirst();
+    
+        if (existingUser.isPresent()) {
+            UserModel user = existingUser.get();
+            // Don't update username as it's the unique identifier
+            user.setEmail(userModel.getEmail());
+            user.setFirstName(userModel.getFirstName());
+            user.setLastName(userModel.getLastName());
+            user.setPhoneNumber(userModel.getPhoneNumber());
+            user.setRole(userModel.getRole());
+        
+            // Only update password if it's provided (not null or empty)
+            if (userModel.getPassword() != null && !userModel.getPassword().trim().isEmpty()) {
+                user.setPassword(userModel.getPassword());
+            }
+        
+            logger.info("User updated successfully: {}", user.getUsername());
+            return true;
+        }
+    
+        logger.warn("User not found for update with ID: {}", userModel.getId());
+        return false;
     }
 }

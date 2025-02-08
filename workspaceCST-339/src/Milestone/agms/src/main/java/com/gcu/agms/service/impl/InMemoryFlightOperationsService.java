@@ -304,4 +304,9 @@ public List<Map<String, Object>> getActiveFlights() {
     public List<MaintenanceRecord> getMaintenanceHistory(String registrationNumber) {
         return maintenanceHistory.getOrDefault(registrationNumber, new ArrayList<>());
     }
+
+    @Override
+    public List<MaintenanceRecord> getMaintenanceRecords(String registrationNumber) {
+        return getMaintenanceHistory(registrationNumber);
+    }
 }

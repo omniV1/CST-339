@@ -150,26 +150,26 @@ The template uses Thymeleaf attributes (e.g., th:field, th:if, th:errors) to bin
                                         <option value="" selected>Select your role</option>
 
                                         <!-- Public/Customer Role -->
-                                        <option th:value="${T(com.gcu.agms.model.UserRole).PUBLIC}">
+                                        <option th:value="${T(com.gcu.agms.model.auth.UserRole).PUBLIC}">
                                             Customer/Public User
                                         </option>
 
                                         <!-- Standard Staff Roles -->
                                         <optgroup label="Airport Staff">
-                                            <option th:value="${T(com.gcu.agms.model.UserRole).AIRLINE_STAFF}">
+                                            <option th:value="${T(com.gcu.agms.model.auth.UserRole).AIRLINE_STAFF}">
                                                 Airline Staff
                                             </option>
-                                            <option th:value="${T(com.gcu.agms.model.UserRole).GATE_MANAGER}">
+                                            <option th:value="${T(com.gcu.agms.model.auth.UserRole).GATE_MANAGER}">
                                                 Gate Manager
                                             </option>
                                         </optgroup>
 
                                         <!-- Administrative Roles -->
                                         <optgroup label="Administrative Roles">
-                                            <option th:value="${T(com.gcu.agms.model.UserRole).ADMIN}">
+                                            <option th:value="${T(com.gcu.agms.model.auth.UserRole).ADMIN}">
                                                 System Administrator
                                             </option>
-                                            <option th:value="${T(com.gcu.agms.model.UserRole).OPERATIONS_MANAGER}">
+                                            <option th:value="${T(com.gcu.agms.model.auth.UserRole).OPERATIONS_MANAGER}">
                                                 Operations Manager
                                             </option>
                                         </optgroup>

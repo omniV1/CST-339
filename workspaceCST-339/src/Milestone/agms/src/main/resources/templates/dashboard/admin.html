@@ -2,22 +2,19 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="~{layouts/MainLayout :: layout(~{::div})}">
-      <head>
-        <title>Admin Dashboard - AGMS</title>
-    </head>
+<head>
+    <title>Admin Dashboard - AGMS</title>
+</head>
 <body>
     <div th:fragment="content">
-        <!-- Quick Actions Section - Enhanced with Gate Management -->
+        <!-- Quick Actions Section -->
         <div class="row mb-4">
             <div class="col-12">
                 <div class="card">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                            <h5 class="card-title mb-0">Quick Actions</h5>
+                            <h5 class="card-title mb-0">Administrative Actions</h5>
                             <div class="btn-group">
-                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createGateModal">
-                                    <i class="fas fa-door-open me-2"></i>Add Gate
-                                </button>
                                 <button class="btn btn-primary">
                                     <i class="fas fa-user-plus me-2"></i>Add User
                                 </button>
@@ -33,10 +30,10 @@
                 </div>
             </div>
         </div>
- 
-        <!-- Statistics Cards - Enhanced with Gate Metrics -->
+
+        <!-- Statistics Cards -->
         <div class="row g-4 mb-4">
-            <!-- User Statistics (Preserved) -->
+            <!-- User Statistics -->
             <div class="col-sm-6 col-xl-3">
                 <div class="card h-100">
                     <div class="card-body">
@@ -48,15 +45,15 @@
                                     <i class="fas fa-arrow-up"></i> Active user count
                                 </small>
                             </div>
-                            <div class="p-2 bg-primary bg-opacity-10 rounded">
-                                <i class="fas fa-users text-primary fs-4"></i>
+                            <div class="p-2 rounded" style="background-color: var(--agms-secondary);">
+                                <i class="fas fa-users" style="color: var(--agms-primary);"></i>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- System Health (Preserved) -->
+            <!-- System Health -->
             <div class="col-sm-6 col-xl-3">
                 <div class="card h-100">
                     <div class="card-body">
@@ -76,28 +73,7 @@
                 </div>
             </div>
 
-            <!-- Gate Statistics (New) -->
-            <div class="col-sm-6 col-xl-3">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="d-flex align-items-start justify-content-between">
-                            <div>
-                                <h6 class="card-subtitle mb-2 text-muted">Gate Status</h6>
-                                <h2 class="card-title mb-0" th:text="${gateStats.get('totalGates')}">0</h2>
-                                <small class="text-info">
-                                    <i class="fas fa-info-circle"></i>
-                                    <span th:text="${gateStats.get('availableGates')} + ' Available'">0 Available</span>
-                                </small>
-                            </div>
-                            <div class="p-2 bg-info bg-opacity-10 rounded">
-                                <i class="fas fa-door-open text-info fs-4"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- System Alerts (Enhanced) -->
+            <!-- System Alerts -->
             <div class="col-sm-6 col-xl-3">
                 <div class="card h-100">
                     <div class="card-body">
@@ -118,75 +94,14 @@
             </div>
         </div>
 
-        <!-- Gate Management and System Activity -->
+        <!-- System Health Details -->
         <div class="row">
-            <div class="col-12 mb-4">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">Gate Management</h5>
-                        <div class="btn-group">
-                            <button class="btn btn-sm btn-outline-primary" onclick="refreshGateData()">
-                                <i class="fas fa-sync-alt"></i>
-                            </button>
-                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" 
-                                    data-bs-target="#createGateModal">
-                                Add Gate
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>Gate ID</th>
-                                        <th>Terminal</th>
-                                        <th>Type</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr th:each="gate : ${gates}">
-                                        <td th:text="${gate.gateId}">Gate ID</td>
-                                        <td th:text="${gate.terminal}">Terminal</td>
-                                        <td th:text="${gate.gateType.description}">Type</td>
-                                        <td>
-                                            <span class="badge" 
-                                                  th:classappend="${'bg-' + gateStatuses.get(gate.gateId).cssClass}"
-                                                  th:text="${gateStatuses.get(gate.gateId).label}">
-                                                Status
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <div class="btn-group btn-group-sm">
-                                                <button class="btn btn-outline-primary" 
-                                                        th:attr="data-gate-id=${gate.gateId}">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button class="btn btn-outline-danger"
-                                                        th:attr="data-gate-id=${gate.gateId}">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-            <!-- System Health Details (Preserved) -->
             <div class="col-12 col-xl-4 mb-4">
                 <div class="card">
                     <div class="card-header">
                         <h5 class="card-title mb-0">System Health</h5>
                     </div>
                     <div class="card-body">
-                        <!-- Existing system health metrics -->
                         <div class="mb-3">
                             <div class="d-flex justify-content-between mb-1">
                                 <span>Database</span>
@@ -196,108 +111,11 @@
                                 <div class="progress-bar bg-success" role="progressbar" style="width: 98%"></div>
                             </div>
                         </div>
-                        <!-- Additional health metrics preserved -->
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Gate Creation Modal -->
-        <div class="modal fade" id="createGateModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Create New Gate</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form th:action="@{/admin/gates/create}" method="post" th:object="${gateModel}">
-                            <!-- Gate creation form fields -->
-                            <div class="mb-3">
-                                <label for="gateId" class="form-label">Gate ID</label>
-                                <input type="text" class="form-control" id="gateId" th:field="*{gateId}" 
-                                       pattern="^T[1-4]G[0-9]{1,2}$" required>
-                                <div class="form-text">Format: T#G# (e.g., T1G1)</div>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="terminal" class="form-label">Terminal</label>
-                                <select class="form-select" id="terminal" th:field="*{terminal}" required>
-                                    <option value="1">Terminal 1</option>
-                                    <option value="2">Terminal 2</option>
-                                    <option value="3">Terminal 3</option>
-                                    <option value="4">Terminal 4</option>
-                                </select>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="gateType" class="form-label">Gate Type</label>
-                                <select class="form-select" id="gateType" th:field="*{gateType}">
-                                    <option th:each="type : ${T(com.gcu.agms.model.GateModel.GateType).values()}"
-                                            th:value="${type}" 
-                                            th:text="${type.description}">
-                                    </option>
-                                </select>
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="gateSize" class="form-label">Gate Size</label>
-                                <select class="form-select" id="gateSize" th:field="*{gateSize}">
-                                    <option th:each="size : ${T(com.gcu.agms.model.GateModel.GateSize).values()}"
-                                            th:value="${size}" 
-                                            th:text="${size.description}">
-                                    </option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" id="hasJetBridge" 
-                                       th:field="*{hasJetBridge}">
-                                <label class="form-check-label" for="hasJetBridge">
-                                    Has Jet Bridge
-                                </label>
-                            </div>
-                            
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">Create Gate</button>
-                            </div>
-                        </form>
+                        <!-- Add more system metrics as needed -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <script th:inline="javascript">
-        document.addEventListener('DOMContentLoaded', function() {
-            // Edit button handler
-            document.querySelectorAll('.btn-outline-primary').forEach(button => {
-                button.addEventListener('click', function() {
-                    const gateId = this.getAttribute('data-gate-id');
-                    editGate(gateId);
-                });
-            });
-    
-            // Delete button handler
-            document.querySelectorAll('.btn-outline-danger').forEach(button => {
-                button.addEventListener('click', function() {
-                    const gateId = this.getAttribute('data-gate-id');
-                    deleteGate(gateId);
-                });
-            });
-        });
-    
-        function editGate(gateId) {
-            console.log('Editing gate:', gateId);
-            window.location.href = '/admin/gates/edit/' + gateId;
-        }
-    
-        function deleteGate(gateId) {
-            if (confirm('Are you sure you want to delete gate ' + gateId + '?')) {
-                console.log('Deleting gate:', gateId);
-                // Add DELETE request implementation
-            }
-        }
-    </script>
 </body>
 </html>

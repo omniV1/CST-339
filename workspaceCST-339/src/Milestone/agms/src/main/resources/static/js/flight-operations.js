@@ -18,6 +18,27 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         console.error('New flight button not found');
     }
+
+    // Add maintenance date initialization
+    const maintenanceDateInput = document.getElementById('maintenanceDate');
+    if (maintenanceDateInput) {
+        // Set minimum date to now
+        const now = new Date();
+        const minDateTime = formatDateForInput(now);
+        maintenanceDateInput.min = minDateTime;
+        
+        // Set default value to tomorrow at current time
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowFormatted = formatDateForInput(tomorrow);
+        maintenanceDateInput.value = tomorrowFormatted;
+    }
+
+    // Initialize aircraft status form
+    const statusForm = document.getElementById('aircraftStatusForm');
+    if (statusForm) {
+        statusForm.addEventListener('submit', handleAircraftStatusUpdate);
+    }
 });
 
 /**
@@ -73,12 +94,6 @@ function handleNewFlightSubmit(e) {
     const formData = new FormData(e.target);
     const flightData = {};
     
-    // Debug log form data
-    console.log('Form data entries:');
-    for (let [key, value] of formData.entries()) {
-        console.log(`${key}: ${value}`);
-    }
-    
     formData.forEach((value, key) => {
         if (key === 'scheduledDeparture' || key === 'scheduledArrival') {
             flightData[key] = value ? value + ':00' : null;
@@ -89,8 +104,6 @@ function handleNewFlightSubmit(e) {
     
     flightData.status = 'SCHEDULED';
     
-    console.log('Submitting flight data:', JSON.stringify(flightData, null, 2));
-
     fetch('/operations/flights/create', {
         method: 'POST',
         headers: {
@@ -98,31 +111,19 @@ function handleNewFlightSubmit(e) {
         },
         body: JSON.stringify(flightData)
     })
-    .then(response => {
-        console.log('Response:', response);
-        if (!response.ok) {
-            return response.text().then(text => {
-                console.error('Error response:', text);
-                throw new Error('Network response was not ok');
-            });
-        }
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
-        console.log('Success:', data);
         if (data.success) {
             const modal = bootstrap.Modal.getInstance(document.querySelector('#newFlightModal'));
-            if (modal) {
-                modal.hide();
-            }
-            refreshDashboard();  // Add this line
+            modal.hide();
+            window.location.reload();
         } else {
             alert('Failed to create flight: ' + data.message);
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error creating flight: ' + error.message);
+        alert('Error creating flight');
     });
 }
 
@@ -186,46 +187,65 @@ function handleMaintenanceSubmit(e) {
     const form = e.target;
     const formData = new FormData(form);
     
-    // Debug logging
-    console.log('Form data before submission:');
-    for (let [key, value] of formData.entries()) {
-        console.log(`${key}: ${value}`);
-    }
+    // Get date and time components
+    const dateValue = formData.get('maintenanceDate');
+    const timeValue = formData.get('maintenanceTime');
     
-    // Validate registration number
-    const registrationNumber = formData.get('registrationNumber');
-    if (!registrationNumber) {
-        alert('Missing aircraft registration number');
+    if (!dateValue || !timeValue) {
+        alert('Please select both date and time');
         return;
     }
 
-    // Convert to URL parameters
-    const params = new URLSearchParams(formData);
+    try {
+        // Format the date string exactly as the server expects it
+        // This will create a string like "2025-02-08 20:00:00"
+        const formattedDateTime = `${dateValue} ${timeValue}:00`;
+        console.log('Formatted date string:', formattedDateTime);
+        
+        // Create the data to send
+        const submitData = new FormData();
+        submitData.append('registrationNumber', formData.get('registrationNumber'));
+        submitData.append('maintenanceDate', formattedDateTime);  // This is now properly formatted
+        submitData.append('maintenanceType', formData.get('maintenanceType'));
+        submitData.append('description', formData.get('description'));
 
-    // Submit form
-    fetch('/operations/aircraft/maintenance', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: params
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Server response:', data);
-        if (data.success) {
-            const modal = bootstrap.Modal.getInstance(document.getElementById('maintenanceModal'));
-            modal.hide();
-            refreshDashboard();
-            alert('Maintenance scheduled successfully');
-        } else {
-            alert('Failed to schedule maintenance: ' + data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error scheduling maintenance');
-    });
+        // Log what we're sending
+        console.log('Sending maintenance data:');
+        submitData.forEach((value, key) => console.log(`${key}: ${value}`));
+
+        // Send the request
+        fetch('/operations/aircraft/maintenance', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams(submitData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Server response:', data);
+            if (data.success) {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('maintenanceModal'));
+                modal.hide();
+                refreshDashboard();
+                alert('Maintenance scheduled successfully');
+            } else {
+                alert('Failed to schedule maintenance: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error scheduling maintenance:', error);
+            alert('Failed to schedule maintenance: ' + error.message);
+        });
+    } catch (error) {
+        console.error('Error formatting date:', error);
+        alert('Invalid date or time format. Please try again.');
+    }
 }
 
 /**
@@ -247,41 +267,18 @@ function showFlightStatusModal(flightNumber) {
 function showMaintenanceModal(registrationNumber) {
     console.log('Opening maintenance modal for aircraft:', registrationNumber);
     
-    // Get aircraft details
-    fetch(`/operations/aircraft/${registrationNumber}`)
-        .then(response => response.json())
-        .then(aircraft => {
-            const modal = document.getElementById('maintenanceModal');
-            if (modal) {
-                // Set hidden registration field
-                const regInput = modal.querySelector('#maintenance-registration');
-                if (regInput) {
-                    regInput.value = registrationNumber;
-                }
-                
-                // Set display field
-                const displayInput = modal.querySelector('#maintenance-aircraft-display');
-                if (displayInput) {
-                    displayInput.value = `${registrationNumber} - ${aircraft.model}`;
-                }
-                
-                // Set minimum date to today
-                const dateInput = modal.querySelector('input[name="maintenanceDate"]');
-                if (dateInput) {
-                    const today = new Date().toISOString().split('T')[0];
-                    dateInput.min = today;
-                    dateInput.value = today;
-                }
-                
-                // Show modal
-                const bsModal = new bootstrap.Modal(modal);
-                bsModal.show();
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching aircraft details:', error);
-            alert('Error loading aircraft details');
-        });
+    const modal = document.getElementById('maintenanceModal');
+    if (modal) {
+        // Set the selected aircraft in the dropdown
+        const aircraftSelect = modal.querySelector('#aircraft-display');
+        if (aircraftSelect) {
+            aircraftSelect.value = registrationNumber;
+        }
+        
+        // Show the modal
+        const bsModal = new bootstrap.Modal(modal);
+        bsModal.show();
+    }
 }
 
 /**
@@ -289,10 +286,28 @@ function showMaintenanceModal(registrationNumber) {
  * @param {string} registration - The aircraft registration number
  */
 function showAircraftStatusModal(registration) {
-    const modal = document.querySelector('#aircraftStatusModal');
+    console.log('Opening status modal for aircraft:', registration);
+    
+    const modal = document.getElementById('aircraftStatusModal');
     if (modal) {
-        document.querySelector('#registrationNumber').value = registration;
-        new bootstrap.Modal(modal).show();
+        // Set the registration number
+        document.getElementById('status-registration').value = registration;
+        
+        // Fetch and display current aircraft details
+        fetch(`/operations/aircraft/${registration}`)
+            .then(response => response.json())
+            .then(aircraft => {
+                modal.querySelector('select[name="status"]').value = aircraft.status;
+                modal.querySelector('input[name="location"]').value = aircraft.currentLocation || '';
+                
+                // Show modal and load history
+                new bootstrap.Modal(modal).show();
+                loadMaintenanceHistory(registration);
+            })
+            .catch(error => {
+                console.error('Error loading aircraft details:', error);
+                alert('Failed to load aircraft details');
+            });
     }
 }
 
@@ -490,4 +505,111 @@ function updateStatisticsCards(statistics) {
     document.querySelector('[data-stat="availableAircraft"]').textContent = statistics.availableAircraft;
     document.querySelector('[data-stat="maintenanceCount"]').textContent = statistics.maintenanceCount;
     document.querySelector('[data-stat="delayedFlights"]').textContent = statistics.delayedFlights;
+}
+
+/**
+ * Updates the registration field with a given value
+ * @param {string} value - The value to set in the registration field
+ */
+function updateRegistrationField(value) {
+    const registrationField = document.getElementById('maintenance-registration');
+    if (registrationField) {
+        registrationField.value = value;
+    }
+}
+
+/**
+ * Formats a date object for datetime-local input
+ * @param {Date} date - The date to format
+ * @returns {string} Formatted date string for input
+ */
+function formatDateForInput(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
+/**
+ * Formats a date for server submission
+ * @param {Date} date - The date to format
+ * @returns {string} Formatted date string for server
+ */
+function formatDateForServer(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = '00';
+    
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
+/**
+ * Handles aircraft status update form submission
+ * @param {Event} e - The form submission event
+ */
+function handleAircraftStatusUpdate(e) {
+    e.preventDefault();
+    console.log('Processing aircraft status update');
+    
+    const form = e.target;
+    const formData = new FormData(form);
+    
+    // Convert to URL parameters
+    const params = new URLSearchParams(formData);
+    
+    fetch('/operations/aircraft/update', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: params
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('aircraftStatusModal'));
+            modal.hide();
+            refreshDashboard();
+            alert('Aircraft status updated successfully');
+        } else {
+            alert('Failed to update aircraft status: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error updating aircraft status:', error);
+        alert('Error updating aircraft status');
+    });
+}
+
+/**
+ * Loads and displays maintenance history for an aircraft
+ * @param {string} registrationNumber - The aircraft registration number
+ */
+function loadMaintenanceHistory(registrationNumber) {
+    console.log('Loading maintenance history for:', registrationNumber);
+    
+    fetch(`/operations/aircraft/${registrationNumber}/maintenance`)
+        .then(response => response.json())
+        .then(records => {
+            const tableBody = document.getElementById('maintenanceHistoryTable');
+            if (tableBody) {
+                tableBody.innerHTML = records.map(record => `
+                    <tr>
+                        <td>${formatDateTime(record.scheduledDate)}</td>
+                        <td>${record.type}</td>
+                        <td><span class="badge bg-${record.status.cssClass}">${record.status.label}</span></td>
+                        <td>${record.description}</td>
+                    </tr>
+                `).join('');
+            }
+        })
+        .catch(error => {
+            console.error('Error loading maintenance history:', error);
+            alert('Failed to load maintenance history');
+        });
 }

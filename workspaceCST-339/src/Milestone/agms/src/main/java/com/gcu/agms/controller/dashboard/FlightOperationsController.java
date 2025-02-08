@@ -1,6 +1,8 @@
 package com.gcu.agms.controller.dashboard;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.gcu.agms.model.flight.AircraftModel;
 import com.gcu.agms.model.flight.FlightModel;
 import com.gcu.agms.service.flight.FlightOperationsService;
+import com.gcu.agms.model.maintenance.MaintenanceRecord;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -298,38 +301,47 @@ public class FlightOperationsController {
      * @return Response indicating scheduling success or failure
      */
     @PostMapping("/aircraft/maintenance")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> scheduleMaintenance(
-            @RequestParam String registrationNumber,
-            @RequestParam String maintenanceDate,
-            @RequestParam String maintenanceType,
-            @RequestParam String description) {
+@ResponseBody
+public ResponseEntity<Map<String, Object>> scheduleMaintenance(
+        @RequestParam String registrationNumber,
+        @RequestParam String maintenanceDate,
+        @RequestParam String maintenanceType,
+        @RequestParam String description) {
+    
+    logger.info("Scheduling maintenance - Registration: {}, Date: {}, Type: {}", 
+        registrationNumber, maintenanceDate, maintenanceType);
+    
+    Map<String, Object> response = new HashMap<>();
+    
+    try {
+        // Parse the date directly from the format sent by the client
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime parsedDate = LocalDateTime.parse(maintenanceDate, formatter);
         
-        logger.info("Scheduling maintenance - Registration: {}, Date: {}, Type: {}", 
-            registrationNumber, maintenanceDate, maintenanceType);
+        boolean scheduled = flightOperationsService.scheduleMaintenance(
+            registrationNumber, 
+            parsedDate,
+            maintenanceType,
+            description
+        );
         
-        Map<String, Object> response = new HashMap<>();
-        
-        try {
-            boolean scheduled = flightOperationsService.scheduleMaintenance(
-                registrationNumber, 
-                LocalDateTime.parse(maintenanceDate + "T00:00:00"),
-                maintenanceType,
-                description
-            );
-            
-            response.put("success", scheduled);
-            response.put("message", scheduled ? 
-                "Maintenance scheduled successfully" : 
-                "Failed to schedule maintenance");
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            logger.error("Error scheduling maintenance", e);
-            response.put("success", false);
-            response.put("message", "Error scheduling maintenance: " + e.getMessage());
-            return ResponseEntity.badRequest().body(response);
-        }
+        response.put("success", scheduled);
+        response.put("message", scheduled ? 
+            "Maintenance scheduled successfully" : 
+            "Failed to schedule maintenance");
+        return ResponseEntity.ok(response);
+    } catch (DateTimeParseException e) {
+        logger.error("Error parsing maintenance date: {}", maintenanceDate, e);
+        response.put("success", false);
+        response.put("message", "Invalid date format. Please use format: YYYY-MM-DD HH:mm:ss");
+        return ResponseEntity.badRequest().body(response);
+    } catch (Exception e) {
+        logger.error("Error scheduling maintenance", e);
+        response.put("success", false);
+        response.put("message", "Error scheduling maintenance: " + e.getMessage());
+        return ResponseEntity.badRequest().body(response);
     }
+}
 
     /**
      * Retrieves detailed information about a specific aircraft
@@ -363,4 +375,28 @@ public class FlightOperationsController {
         ));
     }
 
+      /**
+     * Retrieves maintenance history for an aircraft
+     * @param registrationNumber The registration number of the aircraft
+     * @return ResponseEntity containing list of maintenance records or 404 if not found
+     */
+    @GetMapping("/aircraft/{registrationNumber}/maintenance")
+    @ResponseBody
+    public ResponseEntity<?> getMaintenanceHistory(@PathVariable String registrationNumber) {
+        logger.info("Retrieving maintenance history for aircraft: {}", registrationNumber);
+        
+        try {
+            List<MaintenanceRecord> history = flightOperationsService.getMaintenanceRecords(registrationNumber);
+            if (history.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.ok(history);
+        } catch (Exception e) {
+            logger.error("Error retrieving maintenance history for {}", registrationNumber, e);
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "message", "Error retrieving maintenance history: " + e.getMessage()
+            ));
+        }
+    }
 }

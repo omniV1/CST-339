@@ -2,25 +2,25 @@
 
 /* Color System */
 :root {
-    /* Primary Colors */
-    --agms-primary: #004B8D;
-    --agms-secondary: #2C3E50;
-    --agms-accent: #3498DB;
+    /* Primary Colors - Arizona Flag Theme */
+    --agms-primary: #300f00;     /* Arizona Red */
+    --agms-secondary: #ffc2c2;   /* Arizona Blue */
+    --agms-accent: #330800;      /* Arizona Gold/Yellow */
     
-    /* Semantic Colors */
+    /* Semantic Colors - Keeping these for functionality */
     --agms-success: #2ECC71;
     --agms-warning: #F1C40F;
     --agms-danger: #E74C3C;
     --agms-info: #3498DB;
     
     /* Background Colors */
-    --agms-bg-light: #F8F9FA;
-    --agms-bg-dark: #343A40;
+    --agms-bg-light: #fff7f7;
+    --agms-bg-dark: #000000;    /* Darker Arizona Blue */
     
     /* Text Colors */
-    --agms-text-primary: #2C3E50;
-    --agms-text-secondary: #6C757D;
-    --agms-text-light: #F8F9FA;
+    --agms-text-primary: #300f00;
+    --agms-text-secondary: #faf6f6;
+    --agms-text-light: #f3eded;
 }
 
 /* Typography System */
@@ -38,7 +38,7 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Layout Components */
 .agms-card {
-    background: white;
+    background: rgb(255, 249, 246);
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     transition: transform 0.2s ease-in-out;
@@ -48,12 +48,12 @@ h1, h2, h3, h4, h5, h6 {
     transform: translateY(-2px);
 }
 
-/* Navigation Styling */
+/* Keep navbar styling consistent */
 .navbar-agms {
     background-color: var(--agms-primary);
+    border-bottom: 3px solid var(--agms-accent);
     padding: 1rem 0;
 }
-
 .navbar-agms .nav-link {
     color: var(--agms-text-light);
     font-weight: 500;
@@ -76,7 +76,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-agms-primary:hover {
-    background-color: var(--agms-accent);
+    background-color: var(--agms-secondary);
     transform: translateY(-1px);
 }
 
@@ -129,4 +129,239 @@ h1, h2, h3, h4, h5, h6 {
     h1 {
         font-size: 2rem;
     }
+}
+
+/* Remove gradient from Bootstrap overrides */
+.bg-primary {
+    background-color: var(--agms-primary) !important;
+}
+
+.btn-primary {
+    background-color: var(--agms-primary) !important;
+    border-color: var(--agms-primary) !important;
+}
+
+.btn-primary:hover {
+    background-color: var(--agms-secondary) !important;
+    border-color: var(--agms-secondary) !important;
+    transform: translateY(-1px);
+}
+
+/* Update Cards and Containers */
+.card-header {
+    background-color: var(--agms-primary);
+    color: var(--agms-text-light);
+    border-bottom: 2px solid var(--agms-accent);
+}
+
+.modal-header {
+    background-color: var(--agms-primary);
+    color: var(--agms-text-light);
+    border-bottom: 2px solid var(--agms-accent);
+}
+
+/* Footer styling */
+.footer {
+    background: var(--agms-bg-dark) !important;
+    color: var(--agms-text-light) !important;
+    border-top: 3px solid var(--agms-accent);
+}
+
+/* Update Table styling */
+.table thead th {
+    background-color: var(--agms-primary);
+    color: var(--agms-text-light);
+    border-bottom: 2px solid var(--agms-accent);
+}
+
+
+/* Status badges */
+.badge.bg-success {
+    background-color: var(--agms-success) !important;
+}
+
+.badge.bg-warning {
+    background-color: var(--agms-warning) !important;
+}
+
+.badge.bg-danger {
+    background-color: var(--agms-danger) !important;
+}
+
+.badge.bg-info {
+    background-color: var(--agms-info) !important;
+}
+
+.badge.bg-primary {
+    background: var(--agms-primary) !important;
+}
+
+.badge.bg-secondary {
+    background: var(--agms-secondary) !important;
+}
+
+/* Form elements */
+.form-control:focus {
+    border-color: var(--agms-accent);
+    box-shadow: 0 0 0 0.25rem rgba(244, 198, 18, 0.25);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--agms-accent) !important;
+    box-shadow: 0 0 0 0.25rem rgba(244, 198, 18, 0.25) !important;
+}
+
+/* Active nav items */
+.nav-link.active {
+    color: var(--agms-accent) !important;
+    font-weight: 600;
+}
+
+.nav-link:hover {
+    color: var(--agms-accent) !important;
+}
+
+/* Dashboard stats cards */
+.stats-card {
+    border-left: 4px solid var(--agms-accent);
+}
+
+/* Alert styling */
+.alert-primary {
+    background-color: rgba(206, 64, 55, 0.1);
+    border-color: var(--agms-primary);
+    color: var(--agms-primary);
+}
+
+/* Modal close button */
+.btn-close {
+    color: var(--agms-text-light);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--agms-bg-light);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--agms-secondary);
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--agms-primary);
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, rgba(250, 247, 247, 0.1) 0%, rgba(160, 159, 158, 0.1) 100%);
+   
+}
+
+/* Feature Icons */
+.feature-icon {
+    transition: transform 0.3s ease;
+    background: linear-gradient(135deg, var(--agms-primary) 0%, var(--agms-secondary) 100%);
+    border: 2px solid var(--agms-accent);
+}
+
+.feature-icon:hover {
+    transform: scale(1.1);
+}
+
+/* Card hover effects */
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
+}
+
+/* Remove bg-gradient class */
+.bg-gradient {
+    background-color: var(--agms-primary) !important;
+}
+
+/* Outline buttons */
+.btn-outline-primary {
+    color: var(--agms-primary) !important;
+    border-color: var(--agms-primary) !important;
+}
+
+.btn-outline-primary:hover {
+    color: white !important;
+    background: var(--agms-primary) !important;
+}
+
+/* Remove gradient from Progress bars */
+.progress-bar {
+    background-color: var(--agms-primary);
+}
+
+/* Home-specific styles */
+.home-page .hero-section {
+    background-color: #F5F5F1; /* Eggshell background */
+    color: var(--agms-text-light);
+    padding: 4rem 2rem;
+}
+
+.home-page .hero-section h1 {
+    background: linear-gradient(135deg, var(--agms-primary) 0%, var(--agms-secondary) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: none;
+}
+
+.home-page .hero-section p {
+    color: var(--agms-text-primary);
+}
+
+.home-page .navbar-agms {
+    background: linear-gradient(135deg, var(--agms-primary) 0%, var(--agms-secondary) 100%);
+}
+
+.navbar-agms {
+    background: linear-gradient(135deg, var(--agms-primary) 0%, var(--agms-secondary) 100%);
+    padding: 1rem 0;
+}
+
+.home-page .hero-section h1 {
+    color: var(--agms-text-light);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.home-page .feature-icon {
+    transition: transform 0.3s ease;
+    background: linear-gradient(135deg, var(--agms-primary) 0%, var(--agms-secondary) 100%);
+    border: 2px solid var(--agms-accent);
+    color: var(--agms-text-light);
+}
+
+.home-page .btn-primary {
+    background: linear-gradient(135deg, var(--agms-primary) 0%, var(--agms-secondary) 100%) !important;
+    border-color: var(--agms-primary) !important;
+}
+
+.home-page .btn-primary:hover {
+    background: linear-gradient(135deg, var(--agms-secondary) 0%, var(--agms-primary) 100%) !important;
+    border-color: var(--agms-secondary) !important;
+    transform: translateY(-1px);
+}
+
+.home-page .card-header {
+    background: linear-gradient(135deg, var(--agms-primary) 0%, var(--agms-secondary) 100%);
+}
+
+.home-page .navbar-agms {
+    background: linear-gradient(135deg, var(--agms-primary) 0%, var(--agms-secondary) 100%);
+    border-bottom: 3px solid var(--agms-accent);
 }

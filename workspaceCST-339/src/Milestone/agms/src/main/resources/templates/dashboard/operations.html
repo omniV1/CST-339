@@ -67,8 +67,8 @@
                                 <h2 class="card-title mb-0" th:text="${statistics.get('availableAircraft')}">8</h2>
                                 <small class="text-primary">Ready for service</small>
                             </div>
-                            <div class="p-2 bg-primary bg-opacity-10 rounded">
-                                <i class="fas fa-plane-departure text-primary fs-4"></i>
+                            <div class="p-2 rounded" style="background-color: var(--agms-secondary);">
+                                <i class="fas fa-plane-departure" style="color: var(--agms-primary);"></i>
                             </div>
                         </div>
                     </div>
@@ -338,44 +338,139 @@
             </div>
         </div>
 
-        <!-- Maintenance Modal - Form for scheduling maintenance -->
-        <div class="modal fade" id="maintenanceModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Schedule Maintenance</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+       <!-- Maintenance Modal with Separate Date/Time Inputs -->
+<div class="modal fade" id="maintenanceModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Schedule Maintenance</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="maintenanceForm" novalidate>
+                    <!-- Aircraft selection -->
+                    <div class="mb-3">
+                        <label class="form-label">Select Aircraft *</label>
+                        <select class="form-select" id="aircraft-display" name="registrationNumber" required>
+                            <option value="">Select Aircraft</option>
+                            <option th:each="aircraft : ${aircraft}"
+                                    th:value="${aircraft.registrationNumber}"
+                                    th:text="${aircraft.registrationNumber + ' - ' + aircraft.model}">
+                            </option>
+                        </select>
+                        <div class="invalid-feedback">Please select an aircraft.</div>
                     </div>
-                    <div class="modal-body">
-                        <form id="maintenanceForm">
-                            <input type="hidden" id="maintenance-registration" name="registrationNumber">
-                            <div class="mb-3">
-                                <label class="form-label">Aircraft</label>
-                                <input type="text" class="form-control" id="maintenance-aircraft-display" readonly>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Maintenance Type *</label>
-                                <select class="form-select" name="maintenanceType" required>
-                                    <option value="ROUTINE">Routine Maintenance</option>
-                                    <option value="INSPECTION">Safety Inspection</option>
-                                    <option value="REPAIR">Repair Work</option>
-                                    <option value="OVERHAUL">Major Overhaul</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Scheduled Date *</label>
-                                <input type="date" class="form-control" name="maintenanceDate" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Description *</label>
-                                <textarea class="form-control" name="description" rows="3" required></textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Schedule Maintenance</button>
-                        </form>
+                    
+                    <!-- Separate date and time inputs -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Maintenance Date *</label>
+                            <input type="date" 
+                                   class="form-control" 
+                                   name="maintenanceDate" 
+                                   id="maintenanceDate"
+                                   required>
+                            <div class="invalid-feedback">Please select a date.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Maintenance Time *</label>
+                            <input type="time" 
+                                   class="form-control" 
+                                   name="maintenanceTime" 
+                                   id="maintenanceTime"
+                                   required>
+                            <div class="invalid-feedback">Please select a time.</div>
+                        </div>
+                    </div>
+
+                    <!-- Maintenance type -->
+                    <div class="mb-3">
+                        <label class="form-label">Maintenance Type *</label>
+                        <select class="form-control" name="maintenanceType" required>
+                            <option value="ROUTINE">Routine Maintenance</option>
+                            <option value="REPAIR">Repair Work</option>
+                            <option value="INSPECTION">Safety Inspection</option>
+                        </select>
+                        <div class="invalid-feedback">Please select a maintenance type.</div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                        <label class="form-label">Description *</label>
+                        <textarea class="form-control" 
+                                  name="description" 
+                                  rows="3" 
+                                  required
+                                  placeholder="Enter maintenance details..."></textarea>
+                        <div class="invalid-feedback">Please provide a description.</div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-calendar-check me-2"></i>Schedule Maintenance
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Aircraft Status Modal -->
+<div class="modal fade" id="aircraftStatusModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Aircraft Status</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="aircraftStatusForm">
+                    <input type="hidden" id="status-registration" name="registrationNumber">
+                    
+                    <!-- Status Selection -->
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select class="form-select" name="status" required>
+                            <option value="AVAILABLE">Available for service</option>
+                            <option value="IN_SERVICE">In Service</option>
+                            <option value="MAINTENANCE">Under Maintenance</option>
+                            <option value="GROUNDED">Grounded</option>
+                        </select>
+                    </div>
+
+                    <!-- Location -->
+                    <div class="mb-3">
+                        <label class="form-label">Current Location</label>
+                        <input type="text" class="form-control" name="location" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Update Status</button>
+                </form>
+
+                <!-- Maintenance History Table -->
+                <div class="mt-4">
+                    <h6>Maintenance History</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody id="maintenanceHistoryTable">
+                                <!-- Maintenance records will be inserted here dynamically -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+</div>
 
     </div>
 </body>
@@ -394,4 +489,5 @@
     - Available aircraft list
     - Maintenance schedules
     - Operational statistics
+    - Maintenance history
 -->

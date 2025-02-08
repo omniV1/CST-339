@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import com.gcu.agms.model.flight.AircraftModel;
 import com.gcu.agms.model.flight.FlightModel;
+import com.gcu.agms.model.maintenance.MaintenanceRecord;
 
 /**
  * Service interface defining flight operations functionality.
@@ -54,6 +55,13 @@ public interface FlightOperationsService {
                               String maintenanceType,
                               String description);
 
+    /**
+     * Retrieves maintenance records for a specific aircraft
+     * @param registrationNumber The aircraft's registration number
+     * @return List of maintenance records for the aircraft
+     */
+    public List<MaintenanceRecord> getMaintenanceRecords(String registrationNumber);
+
     // Flight Management
     /**
      * Creates or updates flight information
@@ -90,5 +98,6 @@ public interface FlightOperationsService {
      * @return true if deletion was successful, false otherwise
      */
     boolean deleteFlight(String flightNumber);
+
     
 }

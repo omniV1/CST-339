@@ -32,11 +32,9 @@
 - ✅ Admin Dashboard
   - System overview
   - User management interface
-  - System health monitoring
 - ✅ Operations Dashboard
   - Gate status overview
   - Assignment management
-  - Real-time updates
 - ✅ Gate Manager Dashboard
   - Gate maintenance scheduling
   - Status management
@@ -52,17 +50,14 @@
 - ✅ Set up Spring Boot configuration
 - ✅ Integrated Bootstrap framework
 - ✅ Created error handling system
+- ✅ Integrate Spring Beans
+- ✅ Seperate concerns between layers (N-layered architecture)
 
-### Documentation
-- ✅ Updated class diagrams
-- ✅ Created ER diagrams
-- ✅ Updated technical documentation
-- ✅ Added installation instructions
-- ✅ Created user guides
+
 
 ## Project Links
 - **GitHub Repository:** https://github.com/omniV1/CST-339/tree/main/workspaceCST-339/src/Milestone
-- **Screencast Demo:** https://youtu.be/_irjMh0NmtE
+- **Screencast Demo:** https://www.youtube.com/watch?v=Yzfabtl3ii4
 - **Javadoc:** https://github.com/omniV1/CST-339/tree/main/workspaceCST-339/src/Milestone/agms/docs/apidocs
 - **Testing** https://github.com/omniV1/CST-339/tree/main/workspaceCST-339/src/Milestone/agms/src/test/java/com/gcu/agms/service
 ## Technical Requirements

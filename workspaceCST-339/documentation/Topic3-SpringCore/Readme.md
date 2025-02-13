@@ -109,8 +109,6 @@ Thread ID: 297
 | Request | Per HTTP request | Request-bound | Immediate |
 | Session | Per user session | Session-preserved | Session timeout |
 
-[Previous sections remain the same until REST Service Implementation]
-
 ## REST Service Implementation
 
 The REST service implementation provides dual-format endpoints supporting both JSON and XML responses. Our testing through Postman verified proper content negotiation and data formatting. Let's examine the complete API specification and implementation details.

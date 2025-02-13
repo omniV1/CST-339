@@ -36,7 +36,7 @@ The system successfully initialized the service bean with Instance ID 1, and the
 
 #### This screenshot displays the console output
 
-![Part 1 Console Output]()
+![Part 1 Console Output](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/Part1ConsoleOutput.png)
 
 ### Orders Page Functionality
 
@@ -48,7 +48,7 @@ The Orders page implementation successfully renders data through the getOrders()
 | 000000001 | Product 1 | 1.0 | 1 |
 | 000000002 | Product 2 | 2.0 | 2 |
 
-![Orders page]()
+![Orders page](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/OrdersPage.png)
 
 ## Part 2: Spring Bean Life Cycle and Scopes
 
@@ -71,18 +71,18 @@ Thread ID: 213
 ```
 #### This is the output of Prototyoe Scope
 
-![Prototype]()
+![Prototype](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/PrototypeScope.png)
 
 #### This is the output of Request Scope
 
-![Request]()
+![Request](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/RequestScope.png)
 
 #### This is the output of Session Scope
 
-![Session]()
+![Session](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/SessionScope.png)
 
 #### This is the output of Singleton Scope
-![Singleton]()
+![Singleton](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/SingletonScope.png)
 
 The request scope implementation demonstrated proper lifecycle management through three key phases:
 1. Initialization at request start
@@ -168,13 +168,13 @@ Our Postman testing confirmed proper functionality of both endpoints. The testin
 
 [Rest of the document remains the same...]
 
-![get json in browser]()
+![get json in browser](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/SingletonScope.png)
 
-![get json in postman]()
+![get json in postman](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/SingletonScope.png)
 
-![get xml in browser]()
+![get xml in browser](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/SingletonScope.png)
 
-![get xml in postman]()
+![get xml in postman](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/SingletonScope.png)
 
 ### Postman Documentation
 https://documenter.getpostman.com/view/32764813/2sAYXCiyKe

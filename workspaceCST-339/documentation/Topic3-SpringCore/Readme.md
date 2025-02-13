@@ -48,7 +48,7 @@ The Orders page implementation successfully renders data through the getOrders()
 | 000000001 | Product 1 | 1.0 | 1 |
 | 000000002 | Product 2 | 2.0 | 2 |
 
-![Orders page](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/OrdersPage.png)
+![Orders page](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/OrdersPage1.png)
 
 ## Part 2: Spring Bean Life Cycle and Scopes
 

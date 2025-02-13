@@ -10,49 +10,79 @@
 
 ---
 
+# Airport Gate Management System (AGMS)
+## Design Report - Milestone 3
+### CST-339: Java Enterprise Application Development
+
+**Date:** February 12, 2025  
+**Version:** 3.0  
+**Author:** Owen Lindsey  
+**Course:** CST-339 - Java Programming III  
+**Professor:** Professor Robert Estey
+
+---
+
+## Executive Summary
+
+This milestone represents significant progress in implementing core Spring functionality, particularly focusing on Spring Beans, Spring Core, and Dependency Injection. The application has been refactored to utilize these Spring features effectively while maintaining a clean separation of concerns through our N-Layer architecture.
+
 ## Completed Tasks Checklist
 
-### Main Application Module
-- ✅ Implemented root URI with landing page
-- ✅ Created navigation menu system with role-based access
-- ✅ Integrated Bootstrap for responsive design
-- ✅ Established consistent application theme and styling
-- ✅ Implemented Spring MVC architecture
-- ✅ Added application branding and logo
+### Main Application Module Updates
+- ✅ Implemented final styles and theme using CSS variables for consistent branding
+- ✅ Created comprehensive layout system using Thymeleaf templates
+- ✅ Established Arizona-themed color scheme throughout application
+- ✅ Added responsive design elements for all screen sizes
+- ✅ Integrated Font Awesome icons for improved visual feedback
 
-### User Authentication & Registration
-- ✅ Created user registration system with validation
-- ✅ Implemented role-based registration logic
-- ✅ Added authorization code system for admin roles
-- ✅ Developed user model and data validation
-- ✅ Implemented login functionality with session management
-- ✅ Added role-based dashboard redirection
+### Authentication Refactoring
+- ✅ Refactored login module to use Spring Beans and DI
+- ✅ Implemented LoginService with proper dependency injection
+- ✅ Created UserService interface with InMemory implementation
+- ✅ Added AuthorizationCodeService for role validation
+- ✅ Implemented session management using Spring
+- ✅ Added role-based access control
 
-### Role-Specific Dashboards
-- ✅ Admin Dashboard
-  - System overview
-  - User management interface
-- ✅ Operations Dashboard
-  - Gate status overview
-  - Assignment management
-- ✅ Gate Manager Dashboard
-  - Gate maintenance scheduling
-  - Status management
-  - Issue reporting
-- ✅ Airline Staff Dashboard
-  - Flight schedules
-  - Gate assignments
-  - Status updates
+### Registration Enhancements
+- ✅ Refactored registration to use Spring Beans and DI
+- ✅ Implemented comprehensive data validation
+- ✅ Added role-specific authorization code validation
+- ✅ Created user model with proper validation annotations
+- ✅ Implemented clean separation between controllers and services
 
-### Technical Infrastructure
-- ✅ Implemented Thymeleaf templates
-- ✅ Created common layout system
-- ✅ Set up Spring Boot configuration
-- ✅ Integrated Bootstrap framework
-- ✅ Created error handling system
-- ✅ Integrate Spring Beans
-- ✅ Seperate concerns between layers (N-layered architecture)
+### Product Creation Module
+- ✅ Implemented Spring MVC architecture for product creation
+- ✅ Added comprehensive data validation using annotations
+- ✅ Created product object models (Flight, Gate, Assignment)
+- ✅ Designed database models for future implementation
+- ✅ Implemented service layer with dependency injection
 
+### Technical Achievements
+- ✅ Implemented comprehensive N-Layer architecture
+- ✅ Created service interfaces with clean separation
+- ✅ Added proper dependency injection throughout
+- ✅ Established consistent error handling
+- ✅ Implemented logging using SLF4J
+
+## Key Technical Decisions
+
+### Spring Implementation
+The application now fully embraces Spring's dependency injection and Bean management capabilities:
+
+1. **Service Layer Design**
+   - Created interfaces for all services (UserService, LoginService, etc.)
+   - Implemented InMemory service implementations for development
+   - Used constructor injection for clean dependency management
+
+2. **Controller Refactoring**
+   - Separated business logic into service layer
+   - Implemented proper error handling and validation
+   - Added proper session management
+
+3. **Model Enhancement**
+   - Added validation annotations
+   - Implemented proper data encapsulation
+   - Created comprehensive DTOs for data transfer
 
 
 ## Project Links

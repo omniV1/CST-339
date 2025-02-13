@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="layouts/defaultTemplate">
+    <!-- The layout:decorate attribute ensures this page uses our template -->
+<div layout:fragment="content">
+    <!-- This content will be inserted into the "content" section of our template -->
+    <table style="width: 50%">
+        <thead>
+            <tr>
+                <th style="text-align: center">Order Number</th>
+                <th style="text-align: center">Product Name</th>
+                <th style="text-align: center">Price</th>
+                <th style="text-align: center">Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Show message if no orders exist -->
+            <tr th:if="${orders.empty}">
+                <td style="text-align: center" colspan="4">No Orders Available</td>
+            </tr>
+            <!-- Iterate through orders if they exist -->
+            <tr th:each="order : ${orders}">
+                <td style="text-align: center"><h5 th:text="${order.orderNo}">0000000000</h5></td>
+                <td style="text-align: center"><h5 th:text="${order.productName}">Product 1</h5></td>
+                <td style="text-align: center"><h5 th:text="${order.price}">1.00</h5></td>
+                <td style="text-align: center"><h5 th:text="${order.quantity}">1</h5></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+</html>

@@ -1,0 +1,12 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Welcome Page</title>
+</head>
+<body>
+    <!-- Display the welcome message -->
+    <h2 th:text="${message}">Default Welcome Message</h2>
+    
+    <!-- Link to the HelloWorldController test2 endpoint -->
+    <a th:href="@{/hello/test2}">Go to Hello World Controller</a>
+</body>
+</html>

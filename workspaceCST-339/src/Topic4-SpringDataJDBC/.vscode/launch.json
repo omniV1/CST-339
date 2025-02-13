@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-Topic04Application<topic04>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.gcu.topic04.Topic04Application",
+            "projectName": "topic04",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

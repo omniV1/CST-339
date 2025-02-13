@@ -5,8 +5,10 @@
 **Author:** Owen Lindsey  
 **Course:** CST-339 - Java Programming III  
 **Professor:** Professor Robert Estey
+
 **Source code:** 
 https://github.com/omniV1/CST-339/tree/main/workspaceCST-339/src/Topic3-SpringCore/topic03
+
 ---
 ## Part 1: Creating Spring Bean Services Using Spring Core
 

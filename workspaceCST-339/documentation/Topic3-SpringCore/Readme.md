@@ -169,13 +169,14 @@ Our Postman testing confirmed proper functionality of both endpoints. The testin
 
 [Rest of the document remains the same...]
 
-![get json in browser](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/SingletonScope.png)
+![get json in browser](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/getjson-in-browser.png)
 
-![get json in postman](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/SingletonScope.png)
+![get json in postman](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/getjson-postman.png)
 
-![get xml in browser](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/SingletonScope.png)
+![get xml in browser](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/getxml-in-browser.png)
 
-![get xml in postman](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/SingletonScope.png)
+![get xml in postman](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/getxml-postman.png)
+
 
 ### Postman Documentation
 https://documenter.getpostman.com/view/32764813/2sAYXCiyKe

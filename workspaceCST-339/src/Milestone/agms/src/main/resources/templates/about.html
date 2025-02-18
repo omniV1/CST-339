@@ -13,14 +13,16 @@ It includes the following sections:
 The template uses Bootstrap for styling and Font Awesome for icons.
 -->
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{layouts/MainLayout :: layout(~{::div})}">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/MainLayout :: layout(~{::div})}">
+<head>
+    <title>About Us</title>
+</head>
 <body>
     <div th:fragment="content">
         <!-- Hero Section -->
         <div class="bg-primary bg-gradient text-white py-5 mb-5">
             <div class="container">
-                <h1 class="display-4 fw-bold">About AGMS</h1>
+                <h1 class="display-4 fw-bold text-white">About AGMS</h1>
                 <p class="lead">Revolutionizing Airport Gate Management</p>
             </div>
         </div>
@@ -157,12 +159,14 @@ The template uses Bootstrap for styling and Font Awesome for icons.
                 <div class="col-12 text-center">
                     <h2 class="mb-4">Need More Information?</h2>
                     <p class="lead">Contact our support team for detailed information about AGMS</p>
-                    <a href="#" class="btn btn-primary btn-lg">
+                    <a href="/contact" class="btn btn-primary btn-lg">
                         <i class="fas fa-envelope me-2"></i>Contact Support
                     </a>
                 </div>
             </div>
         </div>
+
+        
     </div>
 </body>
 </html>

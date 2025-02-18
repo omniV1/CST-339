@@ -1,5 +1,6 @@
 package com.gcu.agms.controller.core;
 
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
@@ -12,21 +13,26 @@ import org.springframework.web.bind.annotation.GetMapping;
  * 
  * Methods:
  * - about(): Returns the name of the view for the about page.
+ * - contact(): Returns the name of the view for the contact page.
  */
+@Controller
 public class AboutController {
-                
     
-    /** 
-     * @return String
+    /**
+     * Handles requests to the about page
+     * @return The name of the view template to render
      */
-    // This is a controller for the about page
-    // It is a simple controller that returns the about page
-    // It is mapped to the /about URL
-    // It is a simple controller that returns the about page
-    // It is mapped to the /about URL
     @GetMapping("/about")
     public String about() {
         return "about";
     }
-    
+
+    /**
+     * Handles requests to the contact page
+     * @return The name of the view template to render
+     */
+    @GetMapping("/contact")
+    public String contact() {
+        return "contact";
+    }
 }

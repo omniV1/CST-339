@@ -39,14 +39,4 @@ public class HomeController {
         return "home";
     }
 
-    /**
-     * Handles requests to the about page
-     * @param model The Spring MVC model for passing data to the view
-     * @return The name of the view template to render
-     */
-    @GetMapping("/about")
-    public String showAboutPage(Model model) {
-        model.addAttribute("pageTitle", "About AGMS");
-        return "about";
-    }
 }

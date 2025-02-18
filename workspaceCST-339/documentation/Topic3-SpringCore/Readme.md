@@ -109,8 +109,6 @@ Thread ID: 297
 | Request | Per HTTP request | Request-bound | Immediate |
 | Session | Per user session | Session-preserved | Session timeout |
 
-[Previous sections remain the same until REST Service Implementation]
-
 ## REST Service Implementation
 
 The REST service implementation provides dual-format endpoints supporting both JSON and XML responses. Our testing through Postman verified proper content negotiation and data formatting. Let's examine the complete API specification and implementation details.
@@ -171,13 +169,14 @@ Our Postman testing confirmed proper functionality of both endpoints. The testin
 
 [Rest of the document remains the same...]
 
-![get json in browser](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/SingletonScope.png)
+![get json in browser](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/getjson-in-browser.png)
 
-![get json in postman](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/SingletonScope.png)
+![get json in postman](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/getjson-postman.png)
 
-![get xml in browser](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/SingletonScope.png)
+![get xml in browser](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/getxml-in-browser.png)
 
-![get xml in postman](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/SingletonScope.png)
+![get xml in postman](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic3-SpringCore/Screenshots/getxml-postman.png)
+
 
 ### Postman Documentation
 https://documenter.getpostman.com/view/32764813/2sAYXCiyKe

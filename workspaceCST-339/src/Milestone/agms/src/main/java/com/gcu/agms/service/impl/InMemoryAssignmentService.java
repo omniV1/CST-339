@@ -138,16 +138,7 @@ public class InMemoryAssignmentService {
      */
     public boolean updateAssignmentStatus(String gateId, Long assignmentId, 
                                         AssignmentStatus newStatus) {
-        List<AssignmentModel> assignments = assignmentsByGate.get(gateId);
-        if (assignments != null) {
-            for (AssignmentModel assignment : assignments) {
-                if (assignment.getId().equals(assignmentId)) {
-                    assignment.updateStatus(newStatus);
-                    return true;
-                }
-            }
-        }
-        return false;
+        return updateAssignmentField(gateId, assignmentId, assignment -> assignment.updateStatus(newStatus));
     }
 
     /**
@@ -211,6 +202,22 @@ public class InMemoryAssignmentService {
         }
         
         logger.warn("Assignment not found for update");
+        return false;
+    }
+
+    /**
+     * Helper method to update a field of an assignment.
+     */
+    private boolean updateAssignmentField(String gateId, Long assignmentId, java.util.function.Consumer<AssignmentModel> updater) {
+        List<AssignmentModel> assignments = assignmentsByGate.get(gateId);
+        if (assignments != null) {
+            for (AssignmentModel assignment : assignments) {
+                if (assignment.getId().equals(assignmentId)) {
+                    updater.accept(assignment);
+                    return true;
+                }
+            }
+        }
         return false;
     }
 }

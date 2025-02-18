@@ -26,7 +26,7 @@ public class StaticAuthorizationCodeService implements AuthorizationCodeService 
     
     // Using a Map to store valid authorization codes and their corresponding roles
     private final Map<String, UserRole> validAuthCodes;
-    
+
     /**
      * Initializes the service with a set of predefined authorization codes.
      * In a production environment, these codes would be stored securely and
@@ -56,13 +56,11 @@ public class StaticAuthorizationCodeService implements AuthorizationCodeService 
     public boolean isValidAuthCode(String authCode, UserRole requestedRole) {
         logger.debug("Validating auth code for role: {}", requestedRole);
         
-        // If no auth code was provided, it can't be valid
         if (authCode == null || authCode.trim().isEmpty()) {
             logger.warn("Empty or null authorization code provided");
             return false;
         }
         
-        // Check if the auth code exists and matches the requested role
         UserRole authorizedRole = validAuthCodes.get(authCode);
         boolean isValid = authorizedRole != null && authorizedRole == requestedRole;
         

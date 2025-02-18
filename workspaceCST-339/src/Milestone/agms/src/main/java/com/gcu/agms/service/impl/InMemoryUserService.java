@@ -39,8 +39,15 @@ public class InMemoryUserService implements UserService {
         logger.info("Test users initialized successfully");
     }
 
-    // Update the createTestUser method
     private void createTestUser(String username, String password, String email,
+                              String firstName, String lastName, String phone,
+                              UserRole role) {
+        UserModel user = createUser(username, password, email, firstName, lastName, phone, role);
+        users.add(user);
+        logger.debug("Created test user: {}", username);
+    }
+
+    private UserModel createUser(String username, String password, String email,
                               String firstName, String lastName, String phone,
                               UserRole role) {
         UserModel user = new UserModel();
@@ -52,8 +59,7 @@ public class InMemoryUserService implements UserService {
         user.setLastName(lastName);
         user.setPhoneNumber(phone);
         user.setRole(role);
-        users.add(user);
-        logger.debug("Created test user: {}", username);
+        return user;
     }
 
     @Override
@@ -63,8 +69,10 @@ public class InMemoryUserService implements UserService {
             logger.warn("Registration failed: Username already exists");
             return false;
         }
-        newUser.setId((long) (users.size() + 1)); // Generate sequential IDs
-        users.add(newUser);
+        UserModel user = createUser(newUser.getUsername(), newUser.getPassword(), newUser.getEmail(),
+                                    newUser.getFirstName(), newUser.getLastName(), newUser.getPhoneNumber(),
+                                    newUser.getRole());
+        users.add(user);
         logger.info("User registered successfully: {}", newUser.getUsername());
         return true;
     }
@@ -124,23 +132,26 @@ public class InMemoryUserService implements UserService {
     
         if (existingUser.isPresent()) {
             UserModel user = existingUser.get();
-            // Don't update username as it's the unique identifier
-            user.setEmail(userModel.getEmail());
-            user.setFirstName(userModel.getFirstName());
-            user.setLastName(userModel.getLastName());
-            user.setPhoneNumber(userModel.getPhoneNumber());
-            user.setRole(userModel.getRole());
-        
-            // Only update password if it's provided (not null or empty)
-            if (userModel.getPassword() != null && !userModel.getPassword().trim().isEmpty()) {
-                user.setPassword(userModel.getPassword());
-            }
-        
+            updateUserFields(user, userModel);
             logger.info("User updated successfully: {}", user.getUsername());
             return true;
         }
     
         logger.warn("User not found for update with ID: {}", userModel.getId());
         return false;
+    }
+
+    private void updateUserFields(UserModel user, UserModel userModel) {
+        // Don't update username as it's the unique identifier
+        user.setEmail(userModel.getEmail());
+        user.setFirstName(userModel.getFirstName());
+        user.setLastName(userModel.getLastName());
+        user.setPhoneNumber(userModel.getPhoneNumber());
+        user.setRole(userModel.getRole());
+    
+        // Only update password if it's provided (not null or empty)
+        if (userModel.getPassword() != null && !userModel.getPassword().trim().isEmpty()) {
+            user.setPassword(userModel.getPassword());
+        }
     }
 }

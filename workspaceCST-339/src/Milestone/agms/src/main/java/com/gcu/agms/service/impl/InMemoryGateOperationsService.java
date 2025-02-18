@@ -31,15 +31,18 @@ public class InMemoryGateOperationsService implements GateOperationsService {
         for (int terminal = 1; terminal <= 4; terminal++) {
             for (int gate = 1; gate <= 5; gate++) {
                 String gateId = String.format("T%dG%d", terminal, gate);
-                // Randomly assign an initial status to each gate
-                int random = new Random().nextInt(3);
-                GateStatus status = GateStatus.values()[random];
+                GateStatus status = getRandomGateStatus();
                 gateStatuses.put(gateId, status);
                 logger.debug("Initialized gate {} with status {}", gateId, status);
             }
         }
         
         logger.info("Gate initialization complete. Total gates: {}", gateStatuses.size());
+    }
+
+    private GateStatus getRandomGateStatus() {
+        int random = new Random().nextInt(GateStatus.values().length);
+        return GateStatus.values()[random];
     }
 
     @Override
@@ -55,15 +58,12 @@ public class InMemoryGateOperationsService implements GateOperationsService {
         
         Map<String, Integer> stats = new HashMap<>();
         stats.put("totalGates", gateStatuses.size());
-        stats.put("availableGates", countGatesByStatus(GateStatus.AVAILABLE));
-        stats.put("occupiedGates", countGatesByStatus(GateStatus.OCCUPIED));
-        stats.put("maintenanceGates", countGatesByStatus(GateStatus.MAINTENANCE));
         
-        logger.info("Gate statistics calculated - Total: {}, Available: {}, Occupied: {}, Maintenance: {}",
-                   stats.get("totalGates"),
-                   stats.get("availableGates"),
-                   stats.get("occupiedGates"),
-                   stats.get("maintenanceGates"));
+        for (GateStatus status : GateStatus.values()) {
+            stats.put(status.name().toLowerCase() + "Gates", countGatesByStatus(status));
+        }
+        
+        logger.info("Gate statistics calculated - {}", stats);
         
         return stats;
     }

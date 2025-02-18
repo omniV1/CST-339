@@ -149,32 +149,31 @@ public class InMemoryFlightOperationsService implements FlightOperationsService 
     }
 
     @Override
-public List<Map<String, Object>> getActiveFlights() {
-    List<Map<String, Object>> activeFlights = new ArrayList<>();
-    
-    // Convert flight data to the format expected by the view
-    flights.values().stream()
-           .forEach(flight -> {
-               Map<String, Object> flightInfo = new HashMap<>();
-               flightInfo.put("flightNumber", flight.getFlightNumber());
-               flightInfo.put("airlineCode", flight.getAirlineCode());
-               flightInfo.put("origin", flight.getOrigin());
-               flightInfo.put("destination", flight.getDestination());
-               flightInfo.put("aircraft", flight.getAssignedAircraft());
-               flightInfo.put("status", flight.getStatus());
-               flightInfo.put("scheduledDeparture", flight.getScheduledDeparture());
-               flightInfo.put("scheduledArrival", flight.getScheduledArrival());
-               
-               // Add current location if available
-               if (flight.getCurrentLocation() != null) {
-                   flightInfo.put("currentLocation", flight.getCurrentLocation());
-               }
-               
-               activeFlights.add(flightInfo);
-           });
-    
-    return activeFlights;
-}
+    public List<Map<String, Object>> getActiveFlights() {
+        List<Map<String, Object>> activeFlights = new ArrayList<>();
+        
+        // Convert flight data to the format expected by the view
+        flights.values().forEach(flight -> {
+            Map<String, Object> flightInfo = new HashMap<>();
+            flightInfo.put("flightNumber", flight.getFlightNumber());
+            flightInfo.put("airlineCode", flight.getAirlineCode());
+            flightInfo.put("origin", flight.getOrigin());
+            flightInfo.put("destination", flight.getDestination());
+            flightInfo.put("aircraft", flight.getAssignedAircraft());
+            flightInfo.put("status", flight.getStatus());
+            flightInfo.put("scheduledDeparture", flight.getScheduledDeparture());
+            flightInfo.put("scheduledArrival", flight.getScheduledArrival());
+            
+            // Add current location if available
+            if (flight.getCurrentLocation() != null) {
+                flightInfo.put("currentLocation", flight.getCurrentLocation());
+            }
+            
+            activeFlights.add(flightInfo);
+        });
+        
+        return activeFlights;
+    }
 
     @Override
     public Map<String, Integer> getOperationalStatistics() {
@@ -300,13 +299,8 @@ public List<Map<String, Object>> getActiveFlights() {
         }
     }
 
-    // Add method to get maintenance history
-    public List<MaintenanceRecord> getMaintenanceHistory(String registrationNumber) {
-        return maintenanceHistory.getOrDefault(registrationNumber, new ArrayList<>());
-    }
-
     @Override
     public List<MaintenanceRecord> getMaintenanceRecords(String registrationNumber) {
-        return getMaintenanceHistory(registrationNumber);
+        return maintenanceHistory.getOrDefault(registrationNumber, new ArrayList<>());
     }
 }

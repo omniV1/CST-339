@@ -16,7 +16,6 @@ import com.gcu.agms.service.gate.GateManagementService;
 
 import jakarta.annotation.PostConstruct;
 
-
 /**
  * An in-memory implementation of the GateManagementService interface that manages airport gates.
  * This service provides CRUD operations for gate management and stores gate data in memory using a HashMap.
@@ -104,21 +103,22 @@ public class InMemoryGateManagementService implements GateManagementService {
                    .filter(gate -> gate.getTerminal().equals(terminal))
                    .collect(Collectors.toList());
     }
+    
     @PostConstruct
-public void initialize() {
-    logger.info("Initializing sample gates");
-    
-    for (int terminal = 1; terminal <= 4; terminal++) {
-        for (int gate = 1; gate <= 5; gate++) {
-            GateModel gateModel = new GateModel();
-            String gateId = String.format("T%dG%d", terminal, gate);
-            gateModel.setGateId(gateId);
-            gateModel.setTerminal(String.valueOf(terminal));
-            gateModel.setGateNumber(String.valueOf(gate));
-            gates.put(gateId, gateModel);
+    public void initialize() {
+        logger.info("Initializing sample gates");
+        
+        for (int terminal = 1; terminal <= 4; terminal++) {
+            for (int gate = 1; gate <= 5; gate++) {
+                GateModel gateModel = new GateModel();
+                String gateId = String.format("T%dG%d", terminal, gate);
+                gateModel.setGateId(gateId);
+                gateModel.setTerminal(String.valueOf(terminal));
+                gateModel.setGateNumber(String.valueOf(gate));
+                gates.put(gateId, gateModel);
+            }
         }
+        
+        logger.info("Initialized {} sample gates", gates.size());
     }
-    
-    logger.info("Initialized {} sample gates", gates.size());
-}
 }

@@ -26,11 +26,19 @@ public class LoginController {
     
     private final LoginService loginService;
     
-    // Constructor injection of LoginService
+    /**
+     * Constructor injection of LoginService.
+     * @param loginService Service handling login operations
+     */
     public LoginController(LoginService loginService) {
         this.loginService = loginService;
     }
     
+    /**
+     * Displays the login page.
+     * @param model the model to be used in the view
+     * @return the login view name
+     */
     @GetMapping("/login")
     public String displayLogin(Model model) {
         if (!model.containsAttribute("loginModel")) {
@@ -40,6 +48,14 @@ public class LoginController {
         return "login";
     }
     
+    /**
+     * Processes the login request.
+     * @param loginModel the login form data
+     * @param bindingResult the result of form validation
+     * @param session the HTTP session
+     * @param redirectAttributes attributes for redirect scenarios
+     * @return the redirect URL based on the authentication result
+     */
     @PostMapping("/doLogin")
     public String doLogin(@Valid LoginModel loginModel,
                          BindingResult bindingResult,
@@ -84,6 +100,12 @@ public class LoginController {
             });
     }
     
+    /**
+     * Processes the logout request.
+     * @param session the HTTP session
+     * @param redirectAttributes attributes for redirect scenarios
+     * @return the redirect URL to the login page
+     */
     @GetMapping("/logout")
     public String logout(HttpSession session, RedirectAttributes redirectAttributes) {
         logger.info("Processing logout request");

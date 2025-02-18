@@ -47,7 +47,7 @@ public class GateDashboardController {
     
     private final GateOperationsService gateOperationsService;
     private final GateManagementService gateManagementService;
-    private final AssignmentService assignmentService; // Add this field
+    private final AssignmentService assignmentService;
     
     /**
      * Constructor injection of required services.
@@ -58,10 +58,10 @@ public class GateDashboardController {
     public GateDashboardController(
             GateOperationsService gateOperationsService,
             GateManagementService gateManagementService,
-            AssignmentService assignmentService) { // Add parameter
+            AssignmentService assignmentService) {
         this.gateOperationsService = gateOperationsService;
         this.gateManagementService = gateManagementService;
-        this.assignmentService = assignmentService; // Initialize service
+        this.assignmentService = assignmentService;
     }
     
     /**

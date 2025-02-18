@@ -1,4 +1,7 @@
-// Print schedule function
+/**
+ * Print schedule function
+ * Fetches the schedule and triggers a download of the gate-schedule.txt file
+ */
 function printSchedule() {
     fetch('/gates/assignments/print')
         .then(response => response.blob())
@@ -18,7 +21,11 @@ function printSchedule() {
         });
 }
 
-// Show update modal
+/**
+ * Show update modal
+ * Fetches assignment details and populates the update modal
+ * @param {number} assignmentId - The ID of the assignment to update
+ */
 function showUpdateModal(assignmentId) {
     fetch(`/gates/assignments/${assignmentId}`)
         .then(response => response.json())
@@ -38,7 +45,11 @@ function showUpdateModal(assignmentId) {
         });
 }
 
-// Helper function to format datetime for input fields
+/**
+ * Helper function to format datetime for input fields
+ * @param {string} dateString - The date string to format
+ * @returns {string} Formatted date string for input fields
+ */
 function formatDateTime(dateString) {
     const date = new Date(dateString);
     return date.toISOString().slice(0, 16);

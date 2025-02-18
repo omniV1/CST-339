@@ -25,19 +25,16 @@ import jakarta.servlet.http.HttpSession;
  *   <li>Default - Redirects to the home page ("/")</li>
  * </ul>
  * </p>
- * 
- * @param model the model to be used in the view
- * @param session the HTTP session containing user attributes
- * @return the redirect URL based on the user's role
  */
 @Controller
 public class DashboardController {
     
-    
-    /** 
-     * @param model
-     * @param session
-     * @return String
+    /**
+     * Handles routing to the appropriate dashboard based on the user's role.
+     * 
+     * @param model the model to be used in the view
+     * @param session the HTTP session containing user attributes
+     * @return the redirect URL based on the user's role
      */
     @GetMapping("/dashboard")
     public String showDashboard(Model model, HttpSession session) {

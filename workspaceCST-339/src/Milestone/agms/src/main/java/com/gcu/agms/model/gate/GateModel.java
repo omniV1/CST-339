@@ -51,12 +51,6 @@ public class GateModel {
     private boolean hasJetBridge = true;
     private List<GateFeature> features = new ArrayList<>();
 
-    public String getGateId() {
-
-        return gateId;
-
-    }
-
     /**
      * Gate types representing the kind of flights the gate can handle
      */

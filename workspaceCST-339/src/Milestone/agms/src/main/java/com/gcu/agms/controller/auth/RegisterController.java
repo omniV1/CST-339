@@ -1,5 +1,7 @@
 package com.gcu.agms.controller.auth;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,30 +29,10 @@ import jakarta.validation.Valid;
  * Endpoints:
  * - GET /register: Displays the registration page.
  * - POST /doRegister: Processes the registration form submission.
- * 
- * Methods:
- * - showRegisterPage(Model model): Initializes and displays the registration form.
- * - processRegistration(UserModel userModel, BindingResult bindingResult, RedirectAttributes redirectAttributes):
- *   Validates the registration form, checks authorization codes for certain roles, and attempts to register the user.
- * 
- * Validation:
- * - Ensures that the authorization code is valid for roles such as ADMIN and OPERATIONS_MANAGER.
- * - Checks for validation errors in the UserModel.
- * 
- * Role Handling:
- * - Sets a default role of PUBLIC if no role is selected.
- * - Provides role-specific success messages upon successful registration.
- * 
- * Error Handling:
- * - Handles validation errors and displays appropriate messages.
- * - Checks for duplicate usernames and provides feedback if the username already exists.
- * 
- * Redirects:
- * - Redirects to the login page upon successful registration.
- * - Redirects back to the registration page with error messages if registration fails.
  */
 @Controller
 public class RegisterController {
+    private static final Logger logger = LoggerFactory.getLogger(RegisterController.class);
     
     @Autowired
     private UserService userService;
@@ -61,6 +43,9 @@ public class RegisterController {
     /**
      * Displays the registration page and initializes a new UserModel if needed.
      * This method handles the initial GET request to show the registration form.
+     * 
+     * @param model the model to be used in the view
+     * @return the registration view name
      */
     @GetMapping("/register")
     public String showRegisterPage(Model model) {
@@ -75,6 +60,11 @@ public class RegisterController {
     /**
      * Processes the registration form submission.
      * This method handles validation, role authorization, and user creation.
+     * 
+     * @param userModel the user form data
+     * @param bindingResult the result of form validation
+     * @param redirectAttributes attributes for redirect scenarios
+     * @return the redirect URL based on the registration result
      */
     @PostMapping("/doRegister")
     public String processRegistration(
@@ -82,7 +72,7 @@ public class RegisterController {
             BindingResult bindingResult,
             RedirectAttributes redirectAttributes) {
         
-        System.out.println("Processing registration request for user: " + userModel.getUsername());
+        logger.info("Processing registration request for user: {}", userModel.getUsername());
         
         // First, check if this is an administrative role requiring authorization
         if (userModel.getRole() == UserRole.ADMIN || 
@@ -98,10 +88,7 @@ public class RegisterController {
         
         // Check for any validation errors from the @Valid annotation
         if (bindingResult.hasErrors()) {
-            System.out.println("Validation errors found:");
-            bindingResult.getAllErrors().forEach(error -> 
-                System.out.println(error.getDefaultMessage())
-            );
+            logger.warn("Validation errors found during registration");
             return "register";
         }
         
@@ -110,14 +97,14 @@ public class RegisterController {
             userModel.setRole(UserRole.PUBLIC);
         }
         
-        System.out.println("Role set to: " + userModel.getRole());
-        System.out.println("Attempting to register user...");
+        logger.info("Role set to: {}", userModel.getRole());
+        logger.info("Attempting to register user...");
         
         // Attempt to register the user
         boolean registrationSuccess = userService.registerUser(userModel);
         
         if (registrationSuccess) {
-            System.out.println("Registration successful for user: " + userModel.getUsername());
+            logger.info("Registration successful for user: {}", userModel.getUsername());
             
             // Create role-specific success messages
             String successMessage = switch(userModel.getRole()) {
@@ -136,7 +123,7 @@ public class RegisterController {
             redirectAttributes.addFlashAttribute("successMessage", successMessage);
             return "redirect:/login";
         } else {
-            System.out.println("Registration failed: Username already exists");
+            logger.warn("Registration failed: Username already exists");
             redirectAttributes.addFlashAttribute("error",
                 "Username already exists. Please choose a different username.");
             return "redirect:/register";

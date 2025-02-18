@@ -40,7 +40,6 @@ public class AdminDashboardController {
      * The admin dashboard requires access to all major system services
      * to provide comprehensive management capabilities.
      */
-    
     public AdminDashboardController(
             UserService userService,
             GateOperationsService gateOperationsService,
@@ -79,7 +78,6 @@ public class AdminDashboardController {
         
         // Add gate management information
         model.addAttribute("gates", gateManagementService.getAllGates());
-
         model.addAttribute("gateModel", new GateModel());
         
         // Terminal-specific gate information
@@ -172,11 +170,11 @@ public class AdminDashboardController {
             userService.registerUser(userModel);
             redirectAttributes.addFlashAttribute("success", 
                 "User " + userModel.getUsername() + " created successfully");
-            return "redirect:/admin/dashboard";  // Changed from "/admin/users" to "/admin/dashboard"
+            return "redirect:/admin/dashboard";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", 
                 "Failed to create user: " + e.getMessage());
-            return "redirect:/admin/dashboard";  // Changed from "/admin/users" to "/admin/dashboard"
+            return "redirect:/admin/dashboard";
         }
     }
     
@@ -184,28 +182,12 @@ public class AdminDashboardController {
      * Displays the user management interface.
      * Provides administrators with tools to manage system users.
      */
-    @Controller
-@RequestMapping("/admin/users")
-public class UserManagementController {
-    private final UserService userService;
-    
-    public UserManagementController(UserService userService) {
-        this.userService = userService;
-    }
-    
-    @GetMapping
-    public String getUserManagement(Model model) {
-        model.addAttribute("users", userService.getAllUsers());
-        return "dashboard/admin/users";
-    }
-
     @GetMapping("/users")
     public String showUsers(Model model) {
         model.addAttribute("users", userService.getAllUsers());
         model.addAttribute("pageTitle", "User Management - AGMS");
         return "admin/users";
     }
-}
     
     /**
      * Displays system health and monitoring information.
@@ -222,6 +204,10 @@ public class UserManagementController {
         return "admin/system-health";
     }
 
+    /**
+     * Handles the deletion of a user.
+     * Administrators can delete users from the system.
+     */
     @PostMapping("/users/delete/{id}")
     public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         logger.info("Processing user deletion request for ID: {}", id);
@@ -243,6 +229,10 @@ public class UserManagementController {
         return "redirect:/admin/dashboard";
     }
 
+    /**
+     * Displays the form for editing a user.
+     * This provides the admin interface for editing user details.
+     */
     @GetMapping("/users/edit/{id}")
     public String showEditUserForm(@PathVariable Long id, Model model) {
         logger.info("Showing edit form for user ID: {}", id);
@@ -257,6 +247,10 @@ public class UserManagementController {
         return "admin/user-form";
     }
 
+    /**
+     * Handles the update of a user's details.
+     * Administrators can update user information.
+     */
     @PostMapping("/users/update/{id}")
     public String updateUser(@PathVariable Long id, 
                            @Valid UserModel userModel,

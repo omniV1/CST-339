@@ -22,7 +22,6 @@ public class LoginService {
     private final UserService userService;
     
     // Constructor injection for UserService
-    
     public LoginService(UserService userService) {
         this.userService = userService;
     }
@@ -38,21 +37,13 @@ public class LoginService {
         logger.info("Attempting authentication for user: {}", loginModel.getUsername());
         
         // Find user and verify credentials
-        Optional<UserModel> userOpt = userService.findByUsername(loginModel.getUsername());
-        
-        if (userOpt.isPresent()) {
-            UserModel user = userOpt.get();
-            
-            if (userService.authenticate(loginModel.getUsername(), loginModel.getPassword())) {
-                // Update last login time
+        return userService.findByUsername(loginModel.getUsername())
+            .filter(user -> userService.authenticate(loginModel.getUsername(), loginModel.getPassword()))
+            .map(user -> {
                 user.setLastLogin(LocalDateTime.now());
                 logger.info("Authentication successful for user: {}", loginModel.getUsername());
-                return Optional.of(user);
-            }
-        }
-        
-        logger.warn("Authentication failed for user: {}", loginModel.getUsername());
-        return Optional.empty();
+                return user;
+            });
     }
 
     /**

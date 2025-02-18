@@ -82,11 +82,7 @@ public class AssignmentService {
         }
         
         // Check for conflicts
-        List<AssignmentModel> existingAssignments = getAssignmentsForGate(assignment.getGateId());
-        boolean hasConflict = existingAssignments.stream()
-            .anyMatch(existing -> !existing.isCancelled() && existing.hasConflict(assignment));
-            
-        if (hasConflict) {
+        if (hasConflict(assignment)) {
             logger.warn("Time conflict detected for gate: {}", assignment.getGateId());
             return false;
         }
@@ -102,6 +98,12 @@ public class AssignmentService {
             
         logger.info("Assignment created successfully");
         return true;
+    }
+    
+    private boolean hasConflict(AssignmentModel assignment) {
+        List<AssignmentModel> existingAssignments = getAssignmentsForGate(assignment.getGateId());
+        return existingAssignments.stream()
+            .anyMatch(existing -> !existing.isCancelled() && existing.hasConflict(assignment));
     }
     
     public List<AssignmentModel> getAssignmentsForGate(String gateId) {
@@ -131,23 +133,26 @@ public class AssignmentService {
     }
     
     public boolean updateAssignment(String gateId, Long assignmentId, AssignmentModel updated) {
+        return updateAssignmentField(gateId, assignmentId, assignment -> {
+            updated.setId(assignmentId);
+            assignmentsByGate.get(gateId).set(assignmentsByGate.get(gateId).indexOf(assignment), updated);
+        });
+    }
+
+    public boolean deleteAssignment(String gateId, Long assignmentId) {
+        return updateAssignmentField(gateId, assignmentId, assignment -> 
+            assignmentsByGate.get(gateId).remove(assignment));
+    }
+
+    private boolean updateAssignmentField(String gateId, Long assignmentId, java.util.function.Consumer<AssignmentModel> updater) {
         List<AssignmentModel> assignments = assignmentsByGate.get(gateId);
         if (assignments != null) {
-            for (int i = 0; i < assignments.size(); i++) {
-                if (assignments.get(i).getId().equals(assignmentId)) {
-                    assignments.set(i, updated);
+            for (AssignmentModel assignment : assignments) {
+                if (assignment.getId().equals(assignmentId)) {
+                    updater.accept(assignment);
                     return true;
                 }
             }
-        }
-        return false;
-    }
-
-
-    public boolean deleteAssignment(String gateId, Long assignmentId) {
-        List<AssignmentModel> assignments = assignmentsByGate.get(gateId);
-        if (assignments != null) {
-            return assignments.removeIf(a -> a.getId().equals(assignmentId));
         }
         return false;
     }
@@ -164,5 +169,4 @@ public class AssignmentService {
         
         return currentAssignments;
     }
-    
 }

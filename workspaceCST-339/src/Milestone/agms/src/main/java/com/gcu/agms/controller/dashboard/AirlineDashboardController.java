@@ -37,7 +37,6 @@ public class AirlineDashboardController {
      * the ability to submit change requests. They don't need the full
      * management capabilities of other roles.
      */
-
     public AirlineDashboardController(
             GateOperationsService gateOperationsService,
             GateManagementService gateManagementService) {

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -26,6 +27,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@NoArgsConstructor
 @Component
 public class AircraftModel {
     @NotEmpty(message = "Registration number is required")
@@ -41,7 +43,6 @@ public class AircraftModel {
     private String currentLocation;
 
     private LocalDateTime nextMaintenanceDue;
-   
 
     public AircraftModel(String registrationNumber, String model, AircraftType type) {
         this.registrationNumber = registrationNumber;
@@ -49,12 +50,11 @@ public class AircraftModel {
         this.type = type;
         this.status = AircraftStatus.AVAILABLE;
     }
-    
-    public AircraftModel() {
-        this.status = AircraftStatus.AVAILABLE;
+
+    public boolean isAvailableForService() {
+        return status == AircraftStatus.AVAILABLE;
     }
 
-    // Your existing enum
     public enum AircraftStatus {
         AVAILABLE("Available for service", "success"),
         IN_SERVICE("Currently in service", "primary"),
@@ -69,13 +69,12 @@ public class AircraftModel {
             this.cssClass = cssClass;
         }
 
-        public String getDescription() { return description; }
-        public String getCssClass() { return cssClass; }
-    }
+        public String getDescription() {
+            return description;
+        }
 
-    // Business logic method
-    public boolean isAvailableForService() {
-        return status == AircraftStatus.AVAILABLE;
+        public String getCssClass() {
+            return cssClass;
+        }
     }
-
 }

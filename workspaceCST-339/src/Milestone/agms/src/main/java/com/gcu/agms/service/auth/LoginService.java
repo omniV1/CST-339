@@ -67,12 +67,7 @@ public class LoginService {
         username = username.trim();
         password = password.trim();
         
-        // Add length validation
-        if (username.length() == 0 || username.length() > 50 ||
-            password.length() == 0 || password.length() > 50) {
-            return false;
-        }
-        
-        return true;
+        return !username.isEmpty() && username.length() <= 50 &&
+               !password.isEmpty() && password.length() <= 50;
     }
 }

@@ -34,11 +34,14 @@ import jakarta.validation.Valid;
 public class RegisterController {
     private static final Logger logger = LoggerFactory.getLogger(RegisterController.class);
     
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final AuthorizationCodeService authCodeService;
     
     @Autowired
-    private AuthorizationCodeService authCodeService;
+    public RegisterController(UserService userService, AuthorizationCodeService authCodeService) {
+        this.userService = userService;
+        this.authCodeService = authCodeService;
+    }
     
     /**
      * Displays the registration page and initializes a new UserModel if needed.

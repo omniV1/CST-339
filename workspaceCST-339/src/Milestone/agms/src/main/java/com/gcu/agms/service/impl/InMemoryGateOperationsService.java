@@ -1,8 +1,8 @@
 package com.gcu.agms.service.impl;
 
+import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +21,7 @@ import jakarta.annotation.PostConstruct;
 @Service
 public class InMemoryGateOperationsService implements GateOperationsService {
     private static final Logger logger = LoggerFactory.getLogger(InMemoryGateOperationsService.class);
+    private final SecureRandom secureRandom = new SecureRandom();
     private final Map<String, GateStatus> gateStatuses = new HashMap<>();
 
     @PostConstruct
@@ -41,8 +42,7 @@ public class InMemoryGateOperationsService implements GateOperationsService {
     }
 
     private GateStatus getRandomGateStatus() {
-        int random = new Random().nextInt(GateStatus.values().length);
-        return GateStatus.values()[random];
+        return GateStatus.values()[secureRandom.nextInt(GateStatus.values().length)];
     }
 
     @Override

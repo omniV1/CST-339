@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.gcu.agms.model.auth.LoginModel;
@@ -21,6 +22,7 @@ import jakarta.validation.Valid;
  * as required by Milestone 3.
  */
 @Controller
+@RequestMapping("/auth")  // Add base mapping
 public class LoginController {
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
     
@@ -39,7 +41,7 @@ public class LoginController {
      * @param model the model to be used in the view
      * @return the login view name
      */
-    @GetMapping("/login")
+    @GetMapping("/login") // Maps to /auth/login
     public String displayLogin(Model model) {
         if (!model.containsAttribute("loginModel")) {
             model.addAttribute("loginModel", new LoginModel());
@@ -56,7 +58,7 @@ public class LoginController {
      * @param redirectAttributes attributes for redirect scenarios
      * @return the redirect URL based on the authentication result
      */
-    @PostMapping("/doLogin")
+    @PostMapping("/login") // Maps to /auth/login 
     public String doLogin(@Valid LoginModel loginModel,
                          BindingResult bindingResult,
                          HttpSession session,
@@ -68,13 +70,13 @@ public class LoginController {
         if (bindingResult.hasErrors()) {
             logger.warn("Login form validation failed");
             redirectAttributes.addFlashAttribute("error", "Please fill in all required fields");
-            return "redirect:/login";
+            return "redirect:/auth/login";
         }
         
         // Validate credential format
         if (!loginService.validateCredentials(loginModel)) {
             redirectAttributes.addFlashAttribute("error", "Invalid username or password format");
-            return "redirect:/login";
+            return "redirect:/auth/login";
         }
         
         // Attempt authentication
@@ -96,7 +98,7 @@ public class LoginController {
             })
             .orElseGet(() -> {
                 redirectAttributes.addFlashAttribute("error", "Invalid username or password");
-                return "redirect:/login";
+                return "redirect:/auth/login";
             });
     }
     
@@ -106,12 +108,12 @@ public class LoginController {
      * @param redirectAttributes attributes for redirect scenarios
      * @return the redirect URL to the login page
      */
-    @GetMapping("/logout")
+    @GetMapping("/logout") // Maps to /auth/logout
     public String logout(HttpSession session, RedirectAttributes redirectAttributes) {
         logger.info("Processing logout request");
         session.invalidate();
         redirectAttributes.addFlashAttribute("successMessage", 
             "You have been successfully logged out");
-        return "redirect:/login";
+        return "redirect:/auth/login";
     }
 }

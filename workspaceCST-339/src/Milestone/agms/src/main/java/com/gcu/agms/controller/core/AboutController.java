@@ -1,6 +1,7 @@
 package com.gcu.agms.controller.core;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 /**
@@ -23,7 +24,8 @@ public class AboutController {
      * @return The name of the view template to render
      */
     @GetMapping("/about")
-    public String about() {
+    public String about(Model model) {
+        model.addAttribute("pageTitle", "About - AGMS");
         return "about";
     }
 
@@ -32,7 +34,8 @@ public class AboutController {
      * @return The name of the view template to render
      */
     @GetMapping("/contact")
-    public String contact() {
+    public String contact(Model model) {
+        model.addAttribute("pageTitle", "Contact Us - AGMS");
         return "contact";
     }
 }

@@ -7,6 +7,7 @@ package com.gcu.agms.model.gate;
  */
 public enum AssignmentStatus {
     SCHEDULED("Scheduled", "primary"),
+    IN_PROGRESS("In Progress", "warning"),
     ACTIVE("Active", "success"),
     COMPLETED("Completed", "info"),
     CANCELLED("Cancelled", "danger"),

@@ -66,6 +66,7 @@ public class InMemoryAssignmentService {
         assignment.setEndTime(end);
         assignment.setAssignedBy(assignedBy);
         assignment.setStatus(AssignmentStatus.SCHEDULED);
+        assignment.setStatus(AssignmentStatus.SCHEDULED);
         assignment.initializeTimestamps();
         
         assignmentsByGate.computeIfAbsent(gateId, k -> new ArrayList<>()).add(assignment);
@@ -126,6 +127,7 @@ public class InMemoryAssignmentService {
         }
         
         assignment.setId(nextId++);
+        assignment.setGateId(assignment.getGateId()); // Ensure gateId is set correctly
         assignment.initializeTimestamps();
         assignmentsByGate.computeIfAbsent(assignment.getGateId(), 
                                         k -> new ArrayList<>()).add(assignment);
@@ -221,4 +223,6 @@ public class InMemoryAssignmentService {
         }
         return false;
     }
+
+    
 }

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -48,5 +49,32 @@ class AboutControllerTest {
         mockMvc.perform(get("/contact"))
                .andExpect(status().isOk())
                .andExpect(view().name("contact"));
+    }
+
+    @Test
+    @DisplayName("Should return about view with model attributes")
+    void testAboutPageWithModel() throws Exception {
+        mockMvc.perform(get("/about"))
+               .andExpect(status().isOk())
+               .andExpect(view().name("about"))
+               .andExpect(model().attributeExists("pageTitle"))
+               .andExpect(model().attribute("pageTitle", "About - AGMS"));
+    }
+
+    @Test
+    @DisplayName("Should return contact view with model attributes")
+    void testContactPageWithModel() throws Exception {
+        mockMvc.perform(get("/contact"))
+               .andExpect(status().isOk())
+               .andExpect(view().name("contact"))
+               .andExpect(model().attributeExists("pageTitle"))
+               .andExpect(model().attribute("pageTitle", "Contact Us - AGMS"));
+    }
+
+    @Test
+    @DisplayName("Should handle non-existent page request")
+    void testNonExistentPage() throws Exception {
+        mockMvc.perform(get("/non-existent"))
+               .andExpect(status().isNotFound());
     }
 }

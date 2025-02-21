@@ -20,7 +20,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import com.gcu.agms.model.gate.GateModel;
-import com.gcu.agms.service.flight.FlightOperationsService;
 import com.gcu.agms.service.gate.GateManagementService;
 import com.gcu.agms.service.gate.GateOperationsService;
 
@@ -30,7 +29,6 @@ class AirlineDashboardControllerTest {
     private MockMvc mockMvc;
     private GateOperationsService gateOperationsService;
     private GateManagementService gateManagementService;
-    private FlightOperationsService flightOperationsService;
     private AirlineDashboardController controller;
     private MockHttpSession session;
 
@@ -39,7 +37,7 @@ class AirlineDashboardControllerTest {
         // Initialize mocks
         gateOperationsService = mock(GateOperationsService.class);
         gateManagementService = mock(GateManagementService.class);
-        flightOperationsService = mock(FlightOperationsService.class);
+      
         
         // Create controller with mocked services
         controller = new AirlineDashboardController(gateOperationsService, gateManagementService);
@@ -85,7 +83,7 @@ class AirlineDashboardControllerTest {
         // Use String for gate ID
         String gateId = "1";
         GateModel gate = new GateModel();
-        gate.setId(Long.parseLong(gateId));
+        gate.setId(Long.valueOf(gateId));
         
         when(gateManagementService.getGateById(gateId)).thenReturn(Optional.of(gate));
         

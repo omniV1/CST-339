@@ -9,6 +9,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.gcu.agms.model.auth.UserModel;
@@ -27,10 +28,11 @@ import jakarta.validation.Valid;
  * - AuthorizationCodeService: Validates authorization codes for roles requiring special permissions.
  * 
  * Endpoints:
- * - GET /register: Displays the registration page.
- * - POST /doRegister: Processes the registration form submission.
+ * - GET /auth/register: Displays the registration page.
+ * - POST /auth/register: Processes the registration form submission.
  */
 @Controller
+@RequestMapping("/auth") // Add base mapping to match other auth controllers
 public class RegisterController {
     private static final Logger logger = LoggerFactory.getLogger(RegisterController.class);
     
@@ -50,7 +52,7 @@ public class RegisterController {
      * @param model the model to be used in the view
      * @return the registration view name
      */
-    @GetMapping("/register")
+    @GetMapping("/register") // Now maps to /auth/register
     public String showRegisterPage(Model model) {
         // Create a new UserModel if one doesn't exist in the model
         if (!model.containsAttribute("userModel")) {
@@ -69,7 +71,7 @@ public class RegisterController {
      * @param redirectAttributes attributes for redirect scenarios
      * @return the redirect URL based on the registration result
      */
-    @PostMapping("/doRegister")
+    @PostMapping("/register") // Changed from /doRegister to /register for consistency
     public String processRegistration(
             @Valid @ModelAttribute("userModel") UserModel userModel,
             BindingResult bindingResult,
@@ -124,7 +126,7 @@ public class RegisterController {
             };
             
             redirectAttributes.addFlashAttribute("successMessage", successMessage);
-            return "redirect:/login";
+            return "redirect:/auth/login"; // Update redirect path
         } else {
             logger.warn("Registration failed: Username already exists");
             redirectAttributes.addFlashAttribute("error",

@@ -235,18 +235,34 @@ public class GateDashboardController {
         content.append("Gate Schedule Report\n");
         content.append("Generated: ").append(LocalDateTime.now()).append("\n\n");
         
-        gateManagementService.getAllGates().forEach(gate -> {
+        List<GateModel> gates = gateManagementService.getAllGates();
+        for (GateModel gate : gates) {
             content.append("Gate: ").append(gate.getGateId()).append("\n");
-            List<AssignmentModel> assignments = 
-                assignmentService.getAssignmentsForGate(gate.getGateId());
-            assignments.forEach(a -> 
+            List<AssignmentModel> assignments = assignmentService.getAssignmentsForGate(gate.getGateId());
+            for (AssignmentModel assignment : assignments) {
                 content.append(String.format("  %s: %s - %s\n", 
-                    a.getFlightNumber(), 
-                    a.getStartTime().format(DateTimeFormatter.ISO_LOCAL_TIME),
-                    a.getEndTime().format(DateTimeFormatter.ISO_LOCAL_TIME))));
+                    assignment.getFlightNumber(), 
+                    assignment.getStartTime().format(DateTimeFormatter.ISO_LOCAL_TIME),
+                    assignment.getEndTime().format(DateTimeFormatter.ISO_LOCAL_TIME)));
+            }
             content.append("\n");
-        });
+        }
         
         return content.toString();
+    }
+
+    @GetMapping("/details/{gateId}/schedule")
+    public String showSchedule(@PathVariable String gateId, Model model) {
+        logger.info("Viewing schedule for gate: {}", gateId);
+
+        Optional<GateModel> gate = gateManagementService.getGateById(gateId);
+        if (gate.isPresent()) {
+            model.addAttribute("pageTitle", "Gate Schedule - AGMS");
+            model.addAttribute("gate", gate.get());
+            model.addAttribute("assignments", assignmentService.getAssignmentsForGate(gateId));
+            return "gates/schedule";
+        }
+        
+        return "redirect:/gates/dashboard";
     }
 }

@@ -10,7 +10,9 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-
+    networks:
+      - agms-network
+  
   app:
     build:
       context: .
@@ -24,6 +26,8 @@ services:
       SPRING_DATASOURCE_PASSWORD: root
     depends_on:
       - mysql
+    networks:
+      - agms-network
 
   sonarqube:
     image: sonarqube:latest
@@ -36,6 +40,12 @@ services:
       - SONAR_JDBC_PASSWORD=sonar
     depends_on:
       - sonarqube-db
+    networks:
+      - agms-network
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_logs:/opt/sonarqube/logs
+      - sonarqube_extensions:/opt/sonarqube/extensions
 
   sonarqube-db:
     image: postgres:latest
@@ -46,7 +56,16 @@ services:
       - POSTGRES_DB=sonarqube
     volumes:
       - sonarqube_db_data:/var/lib/postgresql/data
+    networks:
+      - agms-network
+
+networks:
+  agms-network:
+    driver: bridge
 
 volumes:
   mysql_data:
   sonarqube_db_data:
+  sonarqube_data:
+  sonarqube_logs:
+  sonarqube_extensions:

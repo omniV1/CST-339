@@ -1,6 +1,7 @@
 package com.gcu.agms.service.auth;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -8,6 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.when;
@@ -94,48 +97,29 @@ class LoginServiceTest {
         assertFalse(loginService.validateCredentials(null));
     }
     
-    @Test
-    @DisplayName("Should not validate empty credentials")
-    void testValidateCredentialsEmpty() {
-        // Arrange
-        LoginModel loginModel = new LoginModel();
-        loginModel.setUsername("");
-        loginModel.setPassword("");
-        
+    @ParameterizedTest(name = "Should not validate credentials: {0}")
+    @MethodSource("invalidCredentialsProvider")
+    @DisplayName("Should validate credential edge cases")
+    void testCredentialValidationEdgeCases(String testCase, LoginModel loginModel) {
         // Act
         boolean result = loginService.validateCredentials(loginModel);
         
         // Assert
-        assertFalse(result);
+        assertFalse(result, "Should reject " + testCase);
     }
     
-    @Test
-    @DisplayName("Should not validate credentials with null username")
-    void testValidateCredentialsNullUsername() {
-        // Arrange
-        LoginModel loginModel = new LoginModel();
-        loginModel.setUsername(null);
-        loginModel.setPassword("password123");
-        
-        // Act
-        boolean result = loginService.validateCredentials(loginModel);
-        
-        // Assert
-        assertFalse(result);
+    private static Stream<Object[]> invalidCredentialsProvider() {
+        return Stream.of(
+            new Object[]{"empty credentials", createLoginModel("", "")},
+            new Object[]{"null username", createLoginModel(null, "password123")},
+            new Object[]{"null password", createLoginModel("testuser", null)}
+        );
     }
     
-    @Test
-    @DisplayName("Should not validate credentials with null password")
-    void testValidateCredentialsNullPassword() {
-        // Arrange
-        LoginModel loginModel = new LoginModel();
-        loginModel.setUsername("testuser");
-        loginModel.setPassword(null);
-        
-        // Act
-        boolean result = loginService.validateCredentials(loginModel);
-        
-        // Assert
-        assertFalse(result);
+    private static LoginModel createLoginModel(String username, String password) {
+        LoginModel model = new LoginModel();
+        model.setUsername(username);
+        model.setPassword(password);
+        return model;
     }
 }

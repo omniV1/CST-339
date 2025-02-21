@@ -68,11 +68,8 @@ public class InMemoryFlightOperationsService implements FlightOperationsService 
     }
 
     @Override
-    public boolean updateAircraftStatus(String registrationNumber, 
-                                      AircraftModel.AircraftStatus newStatus, 
-                                      String location) {
-        logger.info("Updating aircraft {} status to {} at location {}", 
-                   registrationNumber, newStatus, location);
+    public boolean updateAircraftStatus(String registrationNumber, AircraftModel.AircraftStatus newStatus, String location) {
+        logger.info("Updating aircraft {} status to {} at location {}", registrationNumber, newStatus, location);
         
         AircraftModel aircraftModel = aircraft.get(registrationNumber);
         if (aircraftModel == null) {
@@ -82,6 +79,65 @@ public class InMemoryFlightOperationsService implements FlightOperationsService 
 
         aircraftModel.setStatus(newStatus);
         aircraftModel.setCurrentLocation(location);
+        return true;
+    }
+
+    @Override
+    public boolean scheduleMaintenance(String registrationNumber, LocalDateTime maintenanceDate, String maintenanceType, String description) {
+        logger.info("Scheduling maintenance - Details: Registration={}, Date={}, Type={}, Description={}", registrationNumber, maintenanceDate, maintenanceType, description);
+        
+        try {
+            if (registrationNumber == null || registrationNumber.trim().isEmpty()) {
+                logger.warn("Invalid registration number provided");
+                return false;
+            }
+
+            AircraftModel aircraft = this.aircraft.get(registrationNumber);
+            if (aircraft == null) {
+                logger.warn("Aircraft not found: {}", registrationNumber);
+                return false;
+            }
+
+            // Create maintenance record
+            MaintenanceRecord record = new MaintenanceRecord();
+            record.setRecordId(UUID.randomUUID().toString());
+            record.setRegistrationNumber(registrationNumber);
+            record.setScheduledDate(maintenanceDate);
+            record.setType(MaintenanceType.valueOf(maintenanceType));
+            record.setDescription(description);
+            record.setStatus(MaintenanceStatus.SCHEDULED);
+
+            // Update aircraft status
+            aircraft.setStatus(AircraftModel.AircraftStatus.MAINTENANCE);
+            aircraft.setNextMaintenanceDue(maintenanceDate);
+
+            // Store maintenance record
+            maintenanceHistory.computeIfAbsent(registrationNumber, k -> new ArrayList<>()).add(record);
+
+            logger.info("Maintenance scheduled successfully for aircraft: {}", registrationNumber);
+            return true;
+        } catch (Exception e) {
+            logger.error("Error scheduling maintenance: {}", e.getMessage(), e);
+            return false;
+        }
+    }
+
+    @Override
+    public List<MaintenanceRecord> getMaintenanceRecords(String registrationNumber) {
+        return maintenanceHistory.getOrDefault(registrationNumber, new ArrayList<>());
+    }
+
+    @Override
+    public boolean createFlight(FlightModel flight) {
+        logger.info("Creating new flight: {}", flight.getFlightNumber());
+        
+        if (flights.containsKey(flight.getFlightNumber())) {
+            logger.warn("Flight already exists: {}", flight.getFlightNumber());
+            return false;
+        }
+        
+        flights.put(flight.getFlightNumber(), flight);
+        logger.info("Flight created successfully");
         return true;
     }
 
@@ -181,37 +237,24 @@ public class InMemoryFlightOperationsService implements FlightOperationsService 
         
         // Count total flights and active flights
         stats.put("totalFlights", flights.size());
-        stats.put("activeFlights", (int) flights.values()
-            .stream()
-            .filter(FlightModel::isActive)
-            .count());
-            
+        stats.put("activeFlights", (int) flights.values().stream().filter(FlightModel::isActive).count());
+        
         // Count delayed flights
-        stats.put("delayedFlights", (int) flights.values()
-            .stream()
-            .filter(FlightModel::isDelayed)
-            .count());
-            
+        stats.put("delayedFlights", (int) flights.values().stream().filter(FlightModel::isDelayed).count());
+        
         // Count aircraft by availability
         stats.put("totalAircraft", aircraft.size());
-        stats.put("availableAircraft", (int) aircraft.values()
-            .stream()
-            .filter(AircraftModel::isAvailableForService)
-            .count());
+        stats.put("availableAircraft", (int) aircraft.values().stream().filter(AircraftModel::isAvailableForService).count());
         
         // Add maintenance count
-        stats.put("maintenanceCount", (int) aircraft.values()
-            .stream()
-            .filter(a -> a.getStatus() == AircraftModel.AircraftStatus.MAINTENANCE)
-            .count());
+        stats.put("maintenanceCount", (int) aircraft.values().stream().filter(a -> a.getStatus() == AircraftModel.AircraftStatus.MAINTENANCE).count());
         
         return stats;
     }
 
     @Override
     public boolean updateFlightStatus(String flightNumber, String newStatus, String location) {
-        logger.info("Updating flight {} status to {} at location {}", 
-                   flightNumber, newStatus, location);
+        logger.info("Updating flight {} status to {} at location {}", flightNumber, newStatus, location);
         
         FlightModel flight = flights.get(flightNumber);
         if (flight == null) {
@@ -252,55 +295,5 @@ public class InMemoryFlightOperationsService implements FlightOperationsService 
             logger.error("Error deleting flight: {}", e.getMessage());
             return false;
         }
-    }
-
-    @Override
-    public boolean scheduleMaintenance(String registrationNumber, 
-                                     LocalDateTime maintenanceDate,
-                                     String maintenanceType,
-                                     String description) {
-        logger.info("Scheduling maintenance - Details: Registration={}, Date={}, Type={}, Description={}",
-            registrationNumber, maintenanceDate, maintenanceType, description);
-        
-        try {
-            if (registrationNumber == null || registrationNumber.trim().isEmpty()) {
-                logger.warn("Invalid registration number provided");
-                return false;
-            }
-
-            AircraftModel aircraft = this.aircraft.get(registrationNumber);
-            if (aircraft == null) {
-                logger.warn("Aircraft not found: {}", registrationNumber);
-                return false;
-            }
-
-            // Create maintenance record
-            MaintenanceRecord record = new MaintenanceRecord();
-            record.setRecordId(UUID.randomUUID().toString());
-            record.setRegistrationNumber(registrationNumber);
-            record.setScheduledDate(maintenanceDate);
-            record.setType(MaintenanceType.valueOf(maintenanceType));
-            record.setDescription(description);
-            record.setStatus(MaintenanceStatus.SCHEDULED);
-
-            // Update aircraft status
-            aircraft.setStatus(AircraftModel.AircraftStatus.MAINTENANCE);
-            aircraft.setNextMaintenanceDue(maintenanceDate);
-
-            // Store maintenance record
-            maintenanceHistory.computeIfAbsent(registrationNumber, k -> new ArrayList<>())
-                             .add(record);
-
-            logger.info("Maintenance scheduled successfully for aircraft: {}", registrationNumber);
-            return true;
-        } catch (Exception e) {
-            logger.error("Error scheduling maintenance: {}", e.getMessage(), e);
-            return false;
-        }
-    }
-
-    @Override
-    public List<MaintenanceRecord> getMaintenanceRecords(String registrationNumber) {
-        return maintenanceHistory.getOrDefault(registrationNumber, new ArrayList<>());
     }
 }

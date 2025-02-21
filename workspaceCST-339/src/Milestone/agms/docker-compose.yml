@@ -25,5 +25,28 @@ services:
     depends_on:
       - mysql
 
+  sonarqube:
+    image: sonarqube:latest
+    container_name: sonarqube
+    ports:
+      - "9000:9000"
+    environment:
+      - SONAR_JDBC_URL=jdbc:postgresql://sonarqube-db:5432/sonarqube
+      - SONAR_JDBC_USERNAME=sonar
+      - SONAR_JDBC_PASSWORD=sonar
+    depends_on:
+      - sonarqube-db
+
+  sonarqube-db:
+    image: postgres:latest
+    container_name: sonarqube-db
+    environment:
+      - POSTGRES_USER=sonar
+      - POSTGRES_PASSWORD=sonar
+      - POSTGRES_DB=sonarqube
+    volumes:
+      - sonarqube_db_data:/var/lib/postgresql/data
+
 volumes:
   mysql_data:
+  sonarqube_db_data:

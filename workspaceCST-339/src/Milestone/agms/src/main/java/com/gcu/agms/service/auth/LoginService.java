@@ -57,15 +57,22 @@ public class LoginService {
             return false;
         }
         
-        boolean isValid = loginModel.getUsername() != null 
-                         && !loginModel.getUsername().trim().isEmpty()
-                         && loginModel.getPassword() != null 
-                         && !loginModel.getPassword().trim().isEmpty();
+        String username = loginModel.getUsername();
+        String password = loginModel.getPassword();
         
-        if (!isValid) {
-            logger.warn("Invalid login credential format");
+        if (username == null || password == null) {
+            return false;
         }
         
-        return isValid;
+        username = username.trim();
+        password = password.trim();
+        
+        // Add length validation
+        if (username.length() == 0 || username.length() > 50 ||
+            password.length() == 0 || password.length() > 50) {
+            return false;
+        }
+        
+        return true;
     }
 }

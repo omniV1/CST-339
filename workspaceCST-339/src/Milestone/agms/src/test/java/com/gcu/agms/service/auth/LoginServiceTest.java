@@ -112,7 +112,11 @@ class LoginServiceTest {
         return Stream.of(
             new Object[]{"empty credentials", createLoginModel("", "")},
             new Object[]{"null username", createLoginModel(null, "password123")},
-            new Object[]{"null password", createLoginModel("testuser", null)}
+            new Object[]{"null password", createLoginModel("testuser", null)},
+            new Object[]{"whitespace username", createLoginModel("   ", "password123")},
+            new Object[]{"whitespace password", createLoginModel("testuser", "   ")},
+            new Object[]{"very long username", createLoginModel("a".repeat(101), "password123")},
+            new Object[]{"very long password", createLoginModel("testuser", "a".repeat(101))}
         );
     }
     
@@ -121,5 +125,64 @@ class LoginServiceTest {
         model.setUsername(username);
         model.setPassword(password);
         return model;
+    }
+    
+    @Test
+    @DisplayName("Should handle authentication with non-matching passwords")
+    void testAuthenticateNonMatchingPasswords() {
+        // Arrange
+        LoginModel loginModel = new LoginModel();
+        loginModel.setUsername("testuser");
+        loginModel.setPassword("password123");
+        
+        UserModel user = new UserModel();
+        user.setUsername("testuser");
+        user.setPassword("differentpassword");
+        user.setRole(UserRole.PUBLIC);
+        
+        when(userService.findByUsername("testuser")).thenReturn(Optional.of(user));
+        when(userService.authenticate("testuser", "password123")).thenReturn(false);
+        
+        // Act
+        Optional<UserModel> result = loginService.authenticate(loginModel);
+        
+        // Assert
+        assertFalse(result.isPresent(), "Should not authenticate with non-matching passwords");
+    }
+
+    @Test
+    @DisplayName("Should validate credentials with special characters")
+    void testValidateCredentialsWithSpecialChars() {
+        // Arrange
+        LoginModel loginModel = new LoginModel();
+        loginModel.setUsername("test.user@domain.com");
+        loginModel.setPassword("Pass@123!");
+        
+        // Act
+        boolean result = loginService.validateCredentials(loginModel);
+        
+        // Assert
+        assertTrue(result, "Should accept valid credentials with special characters");
+    }
+
+    @Test
+    @DisplayName("Should handle authentication with disabled user")
+    void testAuthenticateDisabledUser() {
+        // Arrange
+        LoginModel loginModel = new LoginModel();
+        loginModel.setUsername("disabled");
+        loginModel.setPassword("password123");
+        
+        UserModel user = new UserModel();
+        user.setUsername("disabled");
+        user.setEnabled(false);
+        
+        when(userService.findByUsername("disabled")).thenReturn(Optional.of(user));
+        
+        // Act
+        Optional<UserModel> result = loginService.authenticate(loginModel);
+        
+        // Assert
+        assertFalse(result.isPresent(), "Should not authenticate disabled user");
     }
 }

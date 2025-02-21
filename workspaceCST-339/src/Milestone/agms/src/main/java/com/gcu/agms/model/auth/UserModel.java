@@ -1,5 +1,6 @@
 package com.gcu.agms.model.auth;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import jakarta.validation.constraints.Email;
@@ -28,7 +29,9 @@ import lombok.Data;
  * - Notification (One-to-Many): Users receive system notifications
  */
 @Data
-public class UserModel {
+public class UserModel implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     // Database and audit fields - Required by UML for entity tracking
     private Long id;
     private Boolean isActive;
@@ -39,8 +42,11 @@ public class UserModel {
     // Authorization and role management
     private String authCode;
     
+    
     @NotNull(message = "User role is required")
-    private UserRole role = UserRole.PUBLIC; // This is correct syntax
+    private UserRole role = UserRole.PUBLIC;
+
+    private boolean enabled;
 
     // User authentication fields with validation
     @NotEmpty(message = "Username is required")
@@ -181,5 +187,14 @@ public class UserModel {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

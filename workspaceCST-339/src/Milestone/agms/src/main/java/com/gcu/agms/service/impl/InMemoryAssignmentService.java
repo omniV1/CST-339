@@ -51,6 +51,7 @@ public class InMemoryAssignmentService {
         logger.info("Sample assignments created");
     }
     
+    
     /**
      * Helper method to create a sample assignment.
      */

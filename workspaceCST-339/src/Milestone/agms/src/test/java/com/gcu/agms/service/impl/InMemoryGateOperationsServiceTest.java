@@ -12,6 +12,10 @@ import org.junit.jupiter.api.Test;
 
 import com.gcu.agms.service.gate.GateOperationsService.GateStatus;
 
+/**
+ * Test suite for InMemoryGateOperationsService
+ * Tests gate status management and statistics functionality
+ */
 @DisplayName("InMemoryGateOperationsService Tests")
 class InMemoryGateOperationsServiceTest {
     
@@ -23,6 +27,10 @@ class InMemoryGateOperationsServiceTest {
         gateOperationsService.initializeData();
     }
 
+    /**
+     * Verifies that getAllGateStatuses returns non-null and non-empty map
+     * Tests basic gate status retrieval functionality
+     */
     @Test
     @DisplayName("Should retrieve all gate statuses")
     void testGetAllGateStatuses() {
@@ -31,6 +39,10 @@ class InMemoryGateOperationsServiceTest {
         assertFalse(statuses.isEmpty(), "Gate statuses should not be empty");
     }
 
+    /**
+     * Validates statistics map contains all required keys
+     * Tests that service provides complete statistical data
+     */
     @Test
     @DisplayName("Should retrieve valid statistics")
     void testGetStatistics() {
@@ -42,6 +54,10 @@ class InMemoryGateOperationsServiceTest {
         assertTrue(stats.containsKey("maintenanceGates"), "Should contain maintenance gates count");
     }
 
+    /**
+     * Ensures counts of gates by status match statistics
+     * Cross-validates status counts with aggregated statistics
+     */
     @Test
     @DisplayName("Should count gates by status correctly")
     void testCountGatesByStatus() {

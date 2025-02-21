@@ -18,6 +18,10 @@ import com.gcu.agms.model.flight.AircraftType;
 import com.gcu.agms.model.flight.FlightModel;
 import com.gcu.agms.model.maintenance.MaintenanceRecord;
 
+/**
+ * Test suite for InMemoryFlightOperationsService
+ * Tests aircraft registration, maintenance, and flight operations
+ */
 @DisplayName("InMemoryFlightOperationsService Tests")
 class InMemoryFlightOperationsServiceTest {
     
@@ -29,9 +33,14 @@ class InMemoryFlightOperationsServiceTest {
         flightOperationsService.initialize();
     }
 
+    /**
+     * Tests successful aircraft registration and retrieval
+     * Verifies basic aircraft management functionality
+     */
     @Test
     @DisplayName("Should register aircraft successfully")
     void testRegisterAircraft() {
+        // AircraftModel(String registrationNumber, String model, AircraftType type)
         AircraftModel aircraft = new AircraftModel("TEST123", "Boeing 737-800", AircraftType.NARROW_BODY);
         assertTrue(flightOperationsService.registerAircraft(aircraft));
         
@@ -40,6 +49,10 @@ class InMemoryFlightOperationsServiceTest {
         assertEquals("Boeing 737-800", found.get().getModel());
     }
 
+    /**
+     * Ensures duplicate aircraft registrations are prevented
+     * Tests data integrity constraints
+     */
     @Test
     @DisplayName("Should not register duplicate aircraft")
     void testRegisterDuplicateAircraft() {
@@ -48,6 +61,10 @@ class InMemoryFlightOperationsServiceTest {
         assertFalse(flightOperationsService.registerAircraft(aircraft));
     }
 
+    /**
+     * Validates aircraft status updates
+     * Tests status management and location tracking
+     */
     @Test
     @DisplayName("Should update aircraft status")
     void testUpdateAircraftStatus() {
@@ -66,6 +83,10 @@ class InMemoryFlightOperationsServiceTest {
         assertEquals("Gate A1", updated.get().getCurrentLocation());
     }
 
+    /**
+     * Tests maintenance scheduling functionality
+     * Verifies maintenance record creation and retrieval
+     */
     @Test
     @DisplayName("Should schedule maintenance")
     void testScheduleMaintenance() {
@@ -85,6 +106,10 @@ class InMemoryFlightOperationsServiceTest {
         assertEquals("ROUTINE", records.get(0).getType().toString());
     }
 
+    /**
+     * Validates flight creation and retrieval
+     * Tests basic flight management operations
+     */
     @Test
     @DisplayName("Should create and retrieve flight")
     void testCreateAndRetrieveFlight() {

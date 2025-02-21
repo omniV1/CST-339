@@ -15,6 +15,10 @@ import org.junit.jupiter.api.Test;
 import com.gcu.agms.model.gate.AssignmentModel;
 import com.gcu.agms.model.gate.AssignmentStatus;
 
+/**
+ * Test suite for InMemoryAssignmentService
+ * Tests gate assignment management and scheduling
+ */
 @DisplayName("InMemoryAssignmentService Tests")
 class InMemoryAssignmentServiceTest {
     
@@ -26,6 +30,10 @@ class InMemoryAssignmentServiceTest {
         service.initialize();
     }
 
+    /**
+     * Tests creation of new gate assignments
+     * Validates basic assignment functionality
+     */
     @Test
     @DisplayName("Should create new assignment")
     void testCreateAssignment() {
@@ -44,6 +52,10 @@ class InMemoryAssignmentServiceTest {
         assertEquals("AA999", assignments.get(0).getFlightNumber());
     }
 
+    /**
+     * Ensures overlapping assignments are detected
+     * Tests scheduling conflict prevention
+     */
     @Test
     @DisplayName("Should detect assignment conflicts")
     void testAssignmentConflict() {
@@ -69,6 +81,10 @@ class InMemoryAssignmentServiceTest {
         assertFalse(service.createAssignment(assignment2));
     }
 
+    /**
+     * Validates assignment status updates
+     * Tests state management of assignments
+     */
     @Test
     @DisplayName("Should update assignment status")
     void testUpdateAssignmentStatus() {
@@ -93,6 +109,10 @@ class InMemoryAssignmentServiceTest {
         assertEquals(AssignmentStatus.ACTIVE, assignments.get(0).getStatus());
     }
 
+    /**
+     * Tests assignment deletion functionality
+     * Verifies cleanup of gate assignments
+     */
     @Test
     @DisplayName("Should delete assignment")
     void testDeleteAssignment() {
@@ -116,6 +136,10 @@ class InMemoryAssignmentServiceTest {
         assertTrue(service.getAssignmentsForGate("T4G5").isEmpty());
     }
 
+    /**
+     * Validates current and future assignment retrieval
+     * Tests temporal aspects of assignment management
+     */
     @Test
     @DisplayName("Should get current and next assignments")
     void testGetCurrentAndNextAssignments() {

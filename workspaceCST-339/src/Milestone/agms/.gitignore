@@ -47,3 +47,8 @@ build/
 .env.development
 .env.test
 .env.production
+
+### Docker files ###
+Dockerfile
+docker-compose*.yml
+*.yml

@@ -22,7 +22,7 @@ import jakarta.validation.Valid;
  * as required by Milestone 3.
  */
 @Controller
-@RequestMapping("/auth")  // Add base mapping
+@RequestMapping({"/", "/auth"}) // Handle both root and /auth paths
 public class LoginController {
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
     private static final String LOGIN_REDIRECT = "redirect:/auth/login";
@@ -42,7 +42,7 @@ public class LoginController {
      * @param model the model to be used in the view
      * @return the login view name
      */
-    @GetMapping("/login") // Maps to /auth/login
+    @GetMapping({"/login", ""}) // Handle /login and root path
     public String displayLogin(Model model) {
         if (!model.containsAttribute("loginModel")) {
             model.addAttribute("loginModel", new LoginModel());

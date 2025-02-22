@@ -32,7 +32,7 @@ import jakarta.validation.Valid;
  * - POST /auth/register: Processes the registration form submission.
  */
 @Controller
-@RequestMapping("/auth") // Add base mapping to match other auth controllers
+@RequestMapping({"/", "/auth"}) // Handle both root and /auth paths
 public class RegisterController {
     private static final Logger logger = LoggerFactory.getLogger(RegisterController.class);
     
@@ -52,7 +52,7 @@ public class RegisterController {
      * @param model the model to be used in the view
      * @return the registration view name
      */
-    @GetMapping("/register") // Now maps to /auth/register
+    @GetMapping("/register")
     public String showRegisterPage(Model model) {
         // Create a new UserModel if one doesn't exist in the model
         if (!model.containsAttribute("userModel")) {

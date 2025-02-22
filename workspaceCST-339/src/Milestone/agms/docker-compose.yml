@@ -1,15 +1,16 @@
+version: '3.8'
 services:
   mysql:
-    image: mysql:latest
+    image: mysql:8.0
     restart: always
     container_name: agms-mysql
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: agms
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=agms
     ports:
       - "3306:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
+      - mysql-data:/var/lib/mysql
     networks:
       - agms-network
   
@@ -26,6 +27,20 @@ services:
       SPRING_DATASOURCE_PASSWORD: root
     depends_on:
       - mysql
+    networks:
+      - agms-network
+
+  agms-app:
+    build: .
+    ports:
+      - "8050:8050"  # Match application.properties port
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SERVER_PORT=8050
+    volumes:
+      - ./src:/app/src  # Mount source code
+      - ./target:/app/target  # Mount compiled classes
+      - ~/.m2:/root/.m2
     networks:
       - agms-network
 
@@ -69,3 +84,4 @@ volumes:
   sonarqube_data:
   sonarqube_logs:
   sonarqube_extensions:
+  mysql-data:

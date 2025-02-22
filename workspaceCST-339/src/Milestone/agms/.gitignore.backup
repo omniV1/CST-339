@@ -1,0 +1,65 @@
+# Help documentation
+HELP.md
+
+# Build directories
+target/
+build/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# IDE files
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+# Configuration files
+### Properties ###
+*.properties
+!src/main/resources/application-example.properties
+
+### Environment files ###
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+<<<<<<< HEAD
+
+### Properties ###
+application.properties
+sonar-project.properties
+
+### Docker ###
+Dockerfile
+docker-compose.yml
+=======
+### Docker files ###
+Dockerfile
+docker-compose*.yml
+*.yml
+>>>>>>> fix-gitignore

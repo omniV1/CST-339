@@ -25,6 +25,7 @@ import jakarta.validation.Valid;
 @RequestMapping("/auth")  // Add base mapping
 public class LoginController {
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
+    private static final String LOGIN_REDIRECT = "redirect:/auth/login";
     
     private final LoginService loginService;
     
@@ -70,13 +71,13 @@ public class LoginController {
         if (bindingResult.hasErrors()) {
             logger.warn("Login form validation failed");
             redirectAttributes.addFlashAttribute("error", "Please fill in all required fields");
-            return "redirect:/auth/login";
+            return LOGIN_REDIRECT;
         }
         
         // Validate credential format
         if (!loginService.validateCredentials(loginModel)) {
             redirectAttributes.addFlashAttribute("error", "Invalid username or password format");
-            return "redirect:/auth/login";
+            return LOGIN_REDIRECT;
         }
         
         // Attempt authentication
@@ -98,7 +99,7 @@ public class LoginController {
             })
             .orElseGet(() -> {
                 redirectAttributes.addFlashAttribute("error", "Invalid username or password");
-                return "redirect:/auth/login";
+                return LOGIN_REDIRECT;
             });
     }
     
@@ -114,6 +115,6 @@ public class LoginController {
         session.invalidate();
         redirectAttributes.addFlashAttribute("successMessage", 
             "You have been successfully logged out");
-        return "redirect:/auth/login";
+        return LOGIN_REDIRECT;
     }
 }

@@ -30,7 +30,8 @@ class RegisterControllerTest {
     private UserService userService;
     private AuthorizationCodeService authCodeService;
     private RegisterController controller;
-    private MockHttpSession session;
+  
+   
 
     @BeforeEach
     void setUp() {
@@ -46,7 +47,7 @@ class RegisterControllerTest {
                                 .setViewResolvers(viewResolver)
                                 .build();
                                 
-        session = new MockHttpSession();
+       
     }
 
     @Test
@@ -64,7 +65,11 @@ class RegisterControllerTest {
     void testRegisterSuccess() throws Exception {
         when(userService.registerUser(any(UserModel.class))).thenReturn(true);
 
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("userRole", "PUBLIC");
+
         mockMvc.perform(post("/auth/register")
+                .session(session)  // Add session to request
                 .param("username", "newuser")
                 .param("password", "Password123!")
                 .param("firstName", "Test")  // Add required fields

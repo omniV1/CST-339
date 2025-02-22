@@ -79,7 +79,7 @@ The template uses Thymeleaf attributes (e.g., th:field, th:if, th:errors) to bin
                             </div>
 
                             <!-- Registration Form -->
-                            <form th:action="@{/doRegister}" th:object="${userModel}" method="post">
+                            <form th:action="@{/auth/register}" th:object="${userModel}" method="post">
                                 <!-- First Name Field -->
                                 <div class="mb-3">
                                     <label for="firstName" class="form-label">First Name</label>
@@ -198,6 +198,11 @@ The template uses Thymeleaf attributes (e.g., th:field, th:if, th:errors) to bin
                                     <button type="submit" class="btn btn-primary">Register</button>
                                 </div>
                             </form>
+
+                            <!-- Login Link -->
+                            <div class="text-center mt-3">
+                                <p>Already have an account? <a th:href="@{/auth/login}">Login here</a></p>
+                            </div>
                         </div>
                     </div>
                 </div>

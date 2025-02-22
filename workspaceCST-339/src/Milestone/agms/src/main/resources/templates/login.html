@@ -59,7 +59,7 @@ Dependencies:
                             </div>
 
                             <!-- Login Form -->
-                            <form th:action="@{/doLogin}" th:object="${loginModel}" method="post">
+                            <form th:action="@{/auth/login}" th:object="${loginModel}" method="post">
                                 <!-- Username Field -->
                                 <div class="mb-3">
                                     <label for="username" class="form-label">Username</label>
@@ -88,7 +88,7 @@ Dependencies:
 
                             <!-- Registration Link -->
                             <div class="text-center mt-3">
-                                <p>Don't have an account? <a th:href="@{/register}">Register here</a></p>
+                                <p>Don't have an account? <a th:href="@{/auth/register}">Register here</a></p>
                             </div>
                         </div>
                     </div>

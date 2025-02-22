@@ -25,20 +25,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class HomeController {
     
-    /**
-     * Handles requests to the root URI and index page
-     * Maps both "/" and "/index" to the home view
-     * 
-     * @param model The Spring MVC model for passing data to the view
-     * @return The name of the view template to render
-     */
-    @GetMapping({"/", "/index"})  // Add /index mapping
+    @GetMapping({"/", "/index"})
     public String showHomePage(Model model) {
-        // Add page title to the model
         model.addAttribute("pageTitle", "AGMS - Airport Gate Management System");
-        // Add welcome message
         model.addAttribute("welcomeMessage", "Welcome to the Airport Gate Management System");
         return "home";
     }
-
 }

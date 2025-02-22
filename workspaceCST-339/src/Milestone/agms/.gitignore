@@ -38,4 +38,9 @@ build/
 
 
 ### Properties ###
-.properties
+application.properties
+sonar-project.properties
+
+### Docker ###
+Dockerfile
+docker-compose.yml

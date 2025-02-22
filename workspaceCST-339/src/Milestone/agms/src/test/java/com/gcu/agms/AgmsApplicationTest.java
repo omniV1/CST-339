@@ -19,9 +19,17 @@ class AgmsApplicationTest {
 
     @Test
     void mainMethodStartsApplication() {
+        // Act
         AgmsApplication.main(new String[] {
             "--spring.main.web-application-type=none",
             "--spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration"
         });
+
+        // Assert
+        assertNotNull(applicationContext, "Application context should be available after startup");
+        assertNotNull(applicationContext.getBean(AgmsApplication.class), 
+            "Main application bean should be available");
+        assertNotNull(applicationContext.getStartupDate(), 
+            "Application should have a startup date");
     }
 }

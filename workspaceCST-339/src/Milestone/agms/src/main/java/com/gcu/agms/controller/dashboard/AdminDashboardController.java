@@ -31,6 +31,27 @@ import jakarta.validation.Valid;
 public class AdminDashboardController {
     private static final Logger logger = LoggerFactory.getLogger(AdminDashboardController.class);
     
+    // View constants
+    private static final String PAGE_TITLE_ATTR = "pageTitle";
+    private static final String USER_FORM_VIEW = "admin/user-form";
+    private static final String DASHBOARD_VIEW = "dashboard/admin";
+    private static final String DASHBOARD_REDIRECT = "redirect:/admin/dashboard";
+    private static final String GATES_VIEW = "admin/gates";
+    private static final String GATE_FORM_VIEW = "admin/gate-form";
+    private static final String USERS_VIEW = "admin/users";
+    private static final String SYSTEM_HEALTH_VIEW = "admin/system-health";
+    
+    // Model attribute constants
+    private static final String USER_MODEL_ATTR = "userModel";
+    private static final String GATE_MODEL_ATTR = "gateModel";
+    private static final String USERS_ATTR = "users";
+    private static final String GATES_ATTR = "gates";
+    private static final String GATE_STATS_ATTR = "gateStats";
+    
+    // Flash attribute constants
+    private static final String SUCCESS_ATTR = "success";
+    private static final String ERROR_ATTR = "error";
+
     private final UserService userService;
     private final GateOperationsService gateOperationsService;
     private final GateManagementService gateManagementService;
@@ -65,20 +86,19 @@ public class AdminDashboardController {
         
         logger.info("Loading admin dashboard");
         
-        // Add page title
-        model.addAttribute("pageTitle", "Admin Dashboard - AGMS");
+        model.addAttribute(PAGE_TITLE_ATTR, "Admin Dashboard - AGMS");
         
         // Add user statistics
-        model.addAttribute("users", userService.getAllUsers());
+        model.addAttribute(USERS_ATTR, userService.getAllUsers());
         model.addAttribute("totalUsers", userService.getAllUsers().size());
         
         // Add gate operations statistics
         model.addAttribute("gateStatuses", gateOperationsService.getAllGateStatuses());
-        model.addAttribute("gateStats", gateOperationsService.getStatistics());
+        model.addAttribute(GATE_STATS_ATTR, gateOperationsService.getStatistics());
         
         // Add gate management information
-        model.addAttribute("gates", gateManagementService.getAllGates());
-        model.addAttribute("gateModel", new GateModel());
+        model.addAttribute(GATES_ATTR, gateManagementService.getAllGates());
+        model.addAttribute(GATE_MODEL_ATTR, new GateModel());
         
         // Terminal-specific gate information
         for (int i = 1; i <= 4; i++) {
@@ -87,7 +107,7 @@ public class AdminDashboardController {
         }
         
         logger.info("Admin dashboard loaded successfully");
-        return "dashboard/admin";
+        return DASHBOARD_VIEW;
     }
     
     /**
@@ -97,9 +117,9 @@ public class AdminDashboardController {
     @GetMapping("/gates")
     public String showGateManagement(Model model) {
         logger.info("Loading gate management view");
-        model.addAttribute("pageTitle", "Gate Management - AGMS");
-        model.addAttribute("gates", gateManagementService.getAllGates());
-        return "admin/gates";
+        model.addAttribute(PAGE_TITLE_ATTR, "Gate Management - AGMS");
+        model.addAttribute(GATES_ATTR, gateManagementService.getAllGates());
+        return GATES_VIEW;
     }
     
     /**
@@ -109,9 +129,9 @@ public class AdminDashboardController {
     @GetMapping("/gates/create")
     public String showCreateGateForm(Model model) {
         logger.info("Displaying gate creation form");
-        model.addAttribute("pageTitle", "Create New Gate - AGMS");
-        model.addAttribute("gateModel", new GateModel());
-        return "admin/gate-form";
+        model.addAttribute(PAGE_TITLE_ATTR, "Create New Gate - AGMS");
+        model.addAttribute(GATE_MODEL_ATTR, new GateModel());
+        return GATE_FORM_VIEW;
     }
     
     /**
@@ -126,21 +146,21 @@ public class AdminDashboardController {
         
         if (result.hasErrors()) {
             logger.warn("Gate creation validation failed");
-            return "admin/gate-form";
+            return GATE_FORM_VIEW;
         }
         
         boolean created = gateManagementService.createGate(gateModel);
         if (created) {
             logger.info("Gate created successfully: {}", gateModel.getGateId());
-            redirectAttributes.addFlashAttribute("success", 
+            redirectAttributes.addFlashAttribute(SUCCESS_ATTR, 
                 "Gate " + gateModel.getGateId() + " created successfully");
+            return "redirect:/admin/gates";  // Make sure this returns a redirect
         } else {
             logger.warn("Gate creation failed - ID already exists: {}", gateModel.getGateId());
-            redirectAttributes.addFlashAttribute("error", 
+            redirectAttributes.addFlashAttribute(ERROR_ATTR, 
                 "Gate with ID " + gateModel.getGateId() + " already exists");
+            return "redirect:/admin/gates";
         }
-        
-        return "redirect:/admin/gates";
     }
     
     /**
@@ -149,9 +169,9 @@ public class AdminDashboardController {
      */
     @GetMapping("/users/add")
     public String showAddUserForm(Model model) {
-        model.addAttribute("userModel", new UserModel());
-        model.addAttribute("pageTitle", "Add New User - AGMS");
-        return "admin/user-form";
+        model.addAttribute(USER_MODEL_ATTR, new UserModel());
+        model.addAttribute(PAGE_TITLE_ATTR, "Add New User - AGMS");
+        return USER_FORM_VIEW;
     }
 
     /**
@@ -163,18 +183,18 @@ public class AdminDashboardController {
                          BindingResult result,
                          RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
-            return "admin/user-form";
+            return USER_FORM_VIEW;
         }
 
         try {
             userService.registerUser(userModel);
-            redirectAttributes.addFlashAttribute("success", 
+            redirectAttributes.addFlashAttribute(SUCCESS_ATTR, 
                 "User " + userModel.getUsername() + " created successfully");
-            return "redirect:/admin/dashboard";
+            return DASHBOARD_REDIRECT;
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", 
+            redirectAttributes.addFlashAttribute(ERROR_ATTR, 
                 "Failed to create user: " + e.getMessage());
-            return "redirect:/admin/dashboard";
+            return DASHBOARD_REDIRECT;
         }
     }
     
@@ -184,9 +204,9 @@ public class AdminDashboardController {
      */
     @GetMapping("/users")
     public String showUsers(Model model) {
-        model.addAttribute("users", userService.getAllUsers());
-        model.addAttribute("pageTitle", "User Management - AGMS");
-        return "admin/users";
+        model.addAttribute(USERS_ATTR, userService.getAllUsers());
+        model.addAttribute(PAGE_TITLE_ATTR, "User Management - AGMS");
+        return USERS_VIEW;
     }
     
     /**
@@ -196,12 +216,12 @@ public class AdminDashboardController {
     @GetMapping("/system-health")
     public String showSystemHealth(Model model) {
         logger.info("Loading system health view");
-        model.addAttribute("pageTitle", "System Health - AGMS");
+        model.addAttribute(PAGE_TITLE_ATTR, "System Health - AGMS");
         
         // Add gate statistics for system health overview
-        model.addAttribute("gateStats", gateOperationsService.getStatistics());
+        model.addAttribute(GATE_STATS_ATTR, gateOperationsService.getStatistics());
         
-        return "admin/system-health";
+        return SYSTEM_HEALTH_VIEW;
     }
 
     /**
@@ -216,17 +236,17 @@ public class AdminDashboardController {
             boolean deleted = userService.deleteUser(id);
             if (deleted) {
                 logger.info("User deleted successfully: {}", id);
-                redirectAttributes.addFlashAttribute("success", "User deleted successfully");
+                redirectAttributes.addFlashAttribute(SUCCESS_ATTR, "User deleted successfully");
             } else {
                 logger.warn("User not found for deletion: {}", id);
-                redirectAttributes.addFlashAttribute("error", "User not found");
+                redirectAttributes.addFlashAttribute(ERROR_ATTR, "User not found");
             }
         } catch (Exception e) {
             logger.error("Error deleting user: {}", e.getMessage());
-            redirectAttributes.addFlashAttribute("error", "Error deleting user: " + e.getMessage());
+            redirectAttributes.addFlashAttribute(ERROR_ATTR, "Error deleting user: " + e.getMessage());
         }
         
-        return "redirect:/admin/dashboard";
+        return DASHBOARD_REDIRECT;
     }
 
     /**
@@ -239,12 +259,12 @@ public class AdminDashboardController {
         
         UserModel user = userService.getUserById(id);
         if (user == null) {
-            return "redirect:/admin/dashboard";
+            return DASHBOARD_REDIRECT;
         }
         
-        model.addAttribute("userModel", user);
-        model.addAttribute("pageTitle", "Edit User - AGMS");
-        return "admin/user-form";
+        model.addAttribute(USER_MODEL_ATTR, user);
+        model.addAttribute(PAGE_TITLE_ATTR, "Edit User - AGMS");
+        return USER_FORM_VIEW;
     }
 
     /**
@@ -259,20 +279,20 @@ public class AdminDashboardController {
         logger.info("Processing user update request for ID: {}", id);
         
         if (result.hasErrors()) {
-            return "admin/user-form";
+            return USER_FORM_VIEW;
         }
 
         try {
             userModel.setId(id);
             userService.updateUser(userModel);
-            redirectAttributes.addFlashAttribute("success", 
+            redirectAttributes.addFlashAttribute(SUCCESS_ATTR, 
                 "User " + userModel.getUsername() + " updated successfully");
         } catch (Exception e) {
             logger.error("Error updating user", e);
-            redirectAttributes.addFlashAttribute("error", 
+            redirectAttributes.addFlashAttribute(ERROR_ATTR, 
                 "Failed to update user: " + e.getMessage());
         }
         
-        return "redirect:/admin/dashboard";
+        return DASHBOARD_REDIRECT;
     }
 }

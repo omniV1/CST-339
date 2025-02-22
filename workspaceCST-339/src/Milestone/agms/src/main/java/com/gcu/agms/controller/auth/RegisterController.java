@@ -2,7 +2,6 @@ package com.gcu.agms.controller.auth;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -36,10 +35,23 @@ import jakarta.validation.Valid;
 public class RegisterController {
     private static final Logger logger = LoggerFactory.getLogger(RegisterController.class);
     
+    // Add constants for view names and attributes
+    private static final String REGISTER_VIEW = "register";
+    private static final String LOGIN_REDIRECT = "redirect:/auth/login";
+    private static final String REGISTER_REDIRECT = "redirect:/register";
+    private static final String USER_MODEL_ATTR = "userModel";
+    private static final String PAGE_TITLE_ATTR = "pageTitle";
+    private static final String ERROR_ATTR = "error";
+    private static final String SUCCESS_ATTR = "successMessage";
+    
     private final UserService userService;
     private final AuthorizationCodeService authCodeService;
     
-    @Autowired
+    /**
+     * Constructor injection of UserService and AuthorizationCodeService.
+     * @param userService Service handling user registration
+     * @param authCodeService Service handling authorization code validation
+     */
     public RegisterController(UserService userService, AuthorizationCodeService authCodeService) {
         this.userService = userService;
         this.authCodeService = authCodeService;
@@ -55,11 +67,11 @@ public class RegisterController {
     @GetMapping("/register")
     public String showRegisterPage(Model model) {
         // Create a new UserModel if one doesn't exist in the model
-        if (!model.containsAttribute("userModel")) {
-            model.addAttribute("userModel", new UserModel());
+        if (!model.containsAttribute(USER_MODEL_ATTR)) {
+            model.addAttribute(USER_MODEL_ATTR, new UserModel());
         }
-        model.addAttribute("pageTitle", "Register - AGMS");
-        return "register";
+        model.addAttribute(PAGE_TITLE_ATTR, "Register - AGMS");
+        return REGISTER_VIEW;
     }
     
     /**
@@ -73,35 +85,30 @@ public class RegisterController {
      */
     @PostMapping("/register") // Changed from /doRegister to /register for consistency
     public String processRegistration(
-            @Valid @ModelAttribute("userModel") UserModel userModel,
+            @Valid @ModelAttribute(USER_MODEL_ATTR) UserModel userModel,
             BindingResult bindingResult,
             RedirectAttributes redirectAttributes) {
         
         logger.info("Processing registration request for user: {}", userModel.getUsername());
         
-        // First, check if this is an administrative role requiring authorization
-        if (userModel.getRole() == UserRole.ADMIN || 
-            userModel.getRole() == UserRole.OPERATIONS_MANAGER) {
+        // Combine role check and auth code validation
+        if ((userModel.getRole() == UserRole.ADMIN || 
+             userModel.getRole() == UserRole.OPERATIONS_MANAGER) &&
+            !authCodeService.isValidAuthCode(userModel.getAuthCode(), userModel.getRole())) {
             
-            // Verify the authorization code matches the requested role
-            if (!authCodeService.isValidAuthCode(userModel.getAuthCode(), userModel.getRole())) {
-                bindingResult.rejectValue("authCode", "invalid.authCode", 
-                    "Invalid authorization code for the selected role.");
-                return "register";
-            }
+            bindingResult.rejectValue("authCode", "invalid.authCode", 
+                "Invalid authorization code for the selected role.");
+            return REGISTER_VIEW;
         }
         
         // Check for any validation errors from the @Valid annotation
         if (bindingResult.hasErrors()) {
             logger.warn("Validation errors found during registration");
-            return "register";
+            return REGISTER_VIEW;
         }
         
         // Set a default role if none was selected
-        if (userModel.getRole() == null) {
-            userModel.setRole(UserRole.PUBLIC);
-        }
-        
+        userModel.setRole(userModel.getRole() == null ? UserRole.PUBLIC : userModel.getRole());
         logger.info("Role set to: {}", userModel.getRole());
         logger.info("Attempting to register user...");
         
@@ -125,13 +132,13 @@ public class RegisterController {
                     "Registration successful! Please login with your credentials.";
             };
             
-            redirectAttributes.addFlashAttribute("successMessage", successMessage);
-            return "redirect:/auth/login"; // Update redirect path
+            redirectAttributes.addFlashAttribute(SUCCESS_ATTR, successMessage);
+            return LOGIN_REDIRECT;
         } else {
             logger.warn("Registration failed: Username already exists");
-            redirectAttributes.addFlashAttribute("error",
+            redirectAttributes.addFlashAttribute(ERROR_ATTR,
                 "Username already exists. Please choose a different username.");
-            return "redirect:/register";
+            return REGISTER_REDIRECT;
         }
     }
 }

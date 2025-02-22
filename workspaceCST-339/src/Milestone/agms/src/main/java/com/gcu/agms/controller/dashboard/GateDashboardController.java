@@ -45,6 +45,12 @@ import jakarta.servlet.http.HttpSession;
 public class GateDashboardController {
     private static final Logger logger = LoggerFactory.getLogger(GateDashboardController.class);
     
+    // Add constants for view paths and redirects
+    private static final String DASHBOARD_REDIRECT = "redirect:/gates/dashboard";
+    private static final String PAGE_TITLE_ATTR = "pageTitle";
+    private static final String SUCCESS_ATTR = "success";
+    private static final String ERROR_ATTR = "error";
+    
     private final GateOperationsService gateOperationsService;
     private final GateManagementService gateManagementService;
     private final AssignmentService assignmentService;
@@ -81,7 +87,7 @@ public class GateDashboardController {
         logger.info("Loading gate manager dashboard");
         
         // Add page title
-        model.addAttribute("pageTitle", "Gate Management Dashboard - AGMS");
+        model.addAttribute(PAGE_TITLE_ATTR, "Gate Management Dashboard - AGMS");
         
         // Get current gate statuses and statistics
         model.addAttribute("gateStatuses", gateOperationsService.getAllGateStatuses());
@@ -120,7 +126,7 @@ public class GateDashboardController {
             return "gates/details";
         }
         
-        return "redirect:/gates/dashboard";
+        return DASHBOARD_REDIRECT;
     }
     
     /**
@@ -138,7 +144,7 @@ public class GateDashboardController {
         // Note: In a real implementation, this would call a method to update the status
         // For now, we'll just show the concept with a success message
         
-        redirectAttributes.addFlashAttribute("success", 
+        redirectAttributes.addFlashAttribute(SUCCESS_ATTR, 
             "Gate " + gateId + " status updated to " + newStatus.getLabel());
         return "redirect:/gates/details/" + gateId;
     }
@@ -159,7 +165,7 @@ public class GateDashboardController {
             return "gates/maintenance";
         }
         
-        return "redirect:/gates/dashboard";
+        return DASHBOARD_REDIRECT;
     }
     
     /**
@@ -176,7 +182,7 @@ public class GateDashboardController {
         // Note: In a real implementation, this would create an issue record
         // For now, we'll just show the concept with a success message
         
-        redirectAttributes.addFlashAttribute("success", 
+        redirectAttributes.addFlashAttribute(SUCCESS_ATTR, 
             "Issue reported for gate " + gateId);
         return "redirect:/gates/details/" + gateId;
     }
@@ -188,14 +194,14 @@ public class GateDashboardController {
         
         boolean created = assignmentService.createAssignment(assignment);
         if (created) {
-            redirectAttributes.addFlashAttribute("success", 
+            redirectAttributes.addFlashAttribute(SUCCESS_ATTR, 
                 "Assignment created successfully");
         } else {
-            redirectAttributes.addFlashAttribute("error", 
+            redirectAttributes.addFlashAttribute(ERROR_ATTR, 
                 "Failed to create assignment - time conflict");
         }
         
-        return "redirect:/gates/dashboard";
+        return DASHBOARD_REDIRECT;
     }
 
     @PostMapping("/assignments/delete/{id}")
@@ -206,14 +212,14 @@ public class GateDashboardController {
         
         boolean deleted = assignmentService.deleteAssignment(gateId, id);
         if (deleted) {
-            redirectAttributes.addFlashAttribute("success", 
+            redirectAttributes.addFlashAttribute(SUCCESS_ATTR, 
                 "Assignment deleted successfully");
         } else {
-            redirectAttributes.addFlashAttribute("error", 
+            redirectAttributes.addFlashAttribute(ERROR_ATTR, 
                 "Failed to delete assignment");
         }
         
-        return "redirect:/gates/dashboard";
+        return DASHBOARD_REDIRECT;
     }
 
     @GetMapping("/assignments/print")
@@ -257,12 +263,12 @@ public class GateDashboardController {
 
         Optional<GateModel> gate = gateManagementService.getGateById(gateId);
         if (gate.isPresent()) {
-            model.addAttribute("pageTitle", "Gate Schedule - AGMS");
+            model.addAttribute(PAGE_TITLE_ATTR, "Gate Schedule - AGMS");
             model.addAttribute("gate", gate.get());
             model.addAttribute("assignments", assignmentService.getAssignmentsForGate(gateId));
             return "gates/schedule";
         }
         
-        return "redirect:/gates/dashboard";
+        return DASHBOARD_REDIRECT;
     }
 }

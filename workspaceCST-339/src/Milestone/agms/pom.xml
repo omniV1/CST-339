@@ -26,6 +26,12 @@
         <tag/>
         <url/>
     </scm>
+    <properties>
+        <!-- ...existing properties... -->
+        <sonar.host.url>http://localhost:9000</sonar.host.url>
+        <sonar.token>${env.SONAR_TOKEN}</sonar.token>
+        <sonar.login>${env.SONAR_TOKEN}</sonar.login>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>

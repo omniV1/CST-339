@@ -6,8 +6,6 @@ import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,10 +34,19 @@ import jakarta.validation.Valid;
  * Controller handling all flight operations related endpoints in the AGMS system.
  * Provides REST endpoints for managing flights, aircraft, and maintenance operations.
  */
-@Controller
+@Controller 
 @RequestMapping("/operations")
 public class FlightOperationsController {
     private static final Logger logger = LoggerFactory.getLogger(FlightOperationsController.class);
+    
+    // Add constants for repeated literals
+    private static final String SUCCESS_KEY = "success";
+    private static final String MESSAGE_KEY = "message";
+    private static final String FLIGHT_NUMBER_KEY = "flightNumber";
+    private static final String AIRCRAFT_KEY = "aircraft"; // Add new constant
+    private static final String STATISTICS_KEY = "statistics"; // Add new constant
+    private static final String ACTIVE_FLIGHTS_KEY = "activeFlights"; // Add new constant
+    private static final String AVAILABLE_AIRCRAFT_KEY = "availableAircraft"; // Add new constant
     
     private final FlightOperationsService flightOperationsService;
 
@@ -47,6 +54,7 @@ public class FlightOperationsController {
      * Constructor injection of FlightOperationsService
      * @param flightOperationsService Service handling flight operations logic
      */
+    
     public FlightOperationsController(FlightOperationsService flightOperationsService) {
         this.flightOperationsService = flightOperationsService;
     }
@@ -61,34 +69,22 @@ public class FlightOperationsController {
      */
     @GetMapping("/dashboard")
     public String showDashboard(Model model, HttpSession session) {
-        // Verify operations manager role
         String userRole = (String) session.getAttribute("userRole");
         if (!"OPERATIONS_MANAGER".equals(userRole)) {
-            logger.warn("Unauthorized access attempt to operations dashboard");
             return "redirect:/login";
         }
 
         try {
-            // Get flight operations data
             List<Map<String, Object>> activeFlights = flightOperationsService.getActiveFlights();
-            logger.info("Retrieved {} active flights", activeFlights.size());
-            
             Map<String, Integer> statistics = flightOperationsService.getOperationalStatistics();
             List<AircraftModel> aircraft = flightOperationsService.getAllAircraft();
-            
-            List<AircraftModel> availableAircraft = aircraft.stream()
-                .filter(AircraftModel::isAvailableForService)
-                .collect(Collectors.toList());
-            
-            logger.info("Dashboard data: activeFlights={}, totalAircraft={}, availableAircraft={}", 
-                activeFlights.size(), aircraft.size(), availableAircraft.size());
+            List<AircraftModel> availableAircraft = flightOperationsService.getAvailableAircraft();
 
-            // Add all necessary data to the model
-            model.addAttribute("activeFlights", activeFlights);
-            model.addAttribute("statistics", statistics);
-            model.addAttribute("aircraft", aircraft);
-            model.addAttribute("availableAircraft", availableAircraft);
-            
+            model.addAttribute(ACTIVE_FLIGHTS_KEY, activeFlights);
+            model.addAttribute(STATISTICS_KEY, statistics);
+            model.addAttribute(AIRCRAFT_KEY, aircraft);
+            model.addAttribute(AVAILABLE_AIRCRAFT_KEY, availableAircraft);
+
             return "dashboard/operations";
         } catch (Exception e) {
             logger.error("Error loading dashboard data", e);
@@ -106,9 +102,9 @@ public class FlightOperationsController {
     public ResponseEntity<Map<String, Object>> getDashboardData() {
         Map<String, Object> dashboardData = new HashMap<>();
         
-        dashboardData.put("statistics", flightOperationsService.getOperationalStatistics());
-        dashboardData.put("activeFlights", flightOperationsService.getActiveFlights());
-        dashboardData.put("aircraft", flightOperationsService.getAllAircraft());
+        dashboardData.put(STATISTICS_KEY, flightOperationsService.getOperationalStatistics());
+        dashboardData.put(ACTIVE_FLIGHTS_KEY, flightOperationsService.getActiveFlights());
+        dashboardData.put(AIRCRAFT_KEY, flightOperationsService.getAllAircraft());
         
         return ResponseEntity.ok(dashboardData);
     }
@@ -122,7 +118,7 @@ public class FlightOperationsController {
      * @return Response indicating success or failure
      */
     @PostMapping("/aircraft/update")
-    public ResponseEntity<?> updateAircraftStatus(
+    public ResponseEntity<Map<String, Object>> updateAircraftStatus(
             @RequestParam String registrationNumber,
             @RequestParam AircraftModel.AircraftStatus status,
             @RequestParam String location) {
@@ -141,7 +137,6 @@ public class FlightOperationsController {
      * @return Response containing creation status and flight details
      */
     @PostMapping("/flights/create")
-    @ResponseBody
     public ResponseEntity<Map<String, Object>> createFlight(@RequestBody @Valid FlightModel flight) {
         logger.info("Received request to create new flight with details: flightNumber={}, airlineCode={}, origin={}, destination={}, assignedAircraft={}", 
             flight.getFlightNumber(),
@@ -157,8 +152,8 @@ public class FlightOperationsController {
             // Validate flight data
             if (flight.getFlightNumber() == null || flight.getAirlineCode() == null) {
                 logger.warn("Invalid flight data: missing required fields");
-                response.put("success", false);
-                response.put("message", "Missing required flight information");
+                response.put(SUCCESS_KEY, false);
+                response.put(MESSAGE_KEY, "Missing required flight information");
                 return ResponseEntity.badRequest().body(response);
             }
 
@@ -171,21 +166,19 @@ public class FlightOperationsController {
                 List<Map<String, Object>> activeFlights = flightOperationsService.getActiveFlights();
                 logger.info("Current active flights count: {}", activeFlights.size());
                 
-                response.put("success", true);
-                response.put("message", "Flight created successfully");
-                response.put("flightNumber", flight.getFlightNumber());
+                response.put(SUCCESS_KEY, true);
+                response.put(MESSAGE_KEY, "Flight created successfully");
+                response.put(FLIGHT_NUMBER_KEY, flight.getFlightNumber());
                 return ResponseEntity.ok(response);
             } else {
                 logger.warn("Failed to create flight: {}", flight.getFlightNumber());
-                response.put("success", false);
-                response.put("message", "Failed to create flight");
+                response.put(SUCCESS_KEY, false);
+                response.put(MESSAGE_KEY, "Failed to create flight");
                 return ResponseEntity.badRequest().body(response);
             }
         } catch (Exception e) {
             logger.error("Error creating flight: {} - {}", flight.getFlightNumber(), e.getMessage(), e);
-            response.put("success", false);
-            response.put("message", "Error creating flight: " + e.getMessage());
-            return ResponseEntity.badRequest().body(response);
+            return createErrorResponse("Error creating flight: " + e.getMessage());
         }
     }
 
@@ -198,7 +191,6 @@ public class FlightOperationsController {
      * @return Response indicating update success or failure
      */
     @PostMapping("/flights/status")
-    @ResponseBody
     public ResponseEntity<Map<String, Object>> updateFlightStatus(
             @RequestParam String flightNumber,
             @RequestParam String status,
@@ -212,20 +204,18 @@ public class FlightOperationsController {
             boolean updated = flightOperationsService.updateFlightStatus(flightNumber, status, location);
             
             if (updated) {
-                response.put("success", true);
-                response.put("message", "Flight status updated successfully");
+                response.put(SUCCESS_KEY, true);
+                response.put(MESSAGE_KEY, "Flight status updated successfully");
             } else {
-                response.put("success", false);
-                response.put("message", "Failed to update flight status");
+                response.put(SUCCESS_KEY, false);
+                response.put(MESSAGE_KEY, "Failed to update flight status");
             }
             
             return ResponseEntity.ok(response);
             
         } catch (Exception e) {
             logger.error("Error updating flight status: {}", e.getMessage());
-            response.put("success", false);
-            response.put("message", "Error updating flight status: " + e.getMessage());
-            return ResponseEntity.badRequest().body(response);
+            return createErrorResponse("Error updating flight status: " + e.getMessage());
         }
     }
 
@@ -236,21 +226,18 @@ public class FlightOperationsController {
      * @return Response indicating update success or failure
      */
     @PutMapping("/flights/update")
-    @ResponseBody
     public ResponseEntity<Map<String, Object>> updateFlight(@RequestBody @Valid FlightModel flight) {
         logger.info("Received request to update flight: {}", flight.getFlightNumber());
         Map<String, Object> response = new HashMap<>();
         
         try {
             boolean updated = flightOperationsService.updateFlight(flight);
-            response.put("success", updated);
-            response.put("message", updated ? "Flight updated successfully" : "Failed to update flight");
+            response.put(SUCCESS_KEY, updated);
+            response.put(MESSAGE_KEY, updated ? "Flight updated successfully" : "Failed to update flight");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             logger.error("Error updating flight", e);
-            response.put("success", false);
-            response.put("message", "Error updating flight: " + e.getMessage());
-            return ResponseEntity.badRequest().body(response);
+            return createErrorResponse("Error updating flight: " + e.getMessage());
         }
     }
 
@@ -261,7 +248,7 @@ public class FlightOperationsController {
      * @return Flight details or 404 if not found
      */
     @GetMapping("/flights/{flightNumber}")
-    public ResponseEntity<?> getFlightDetails(@PathVariable String flightNumber) {
+    public ResponseEntity<Map<String, Object>> getFlightDetails(@PathVariable String flightNumber) {
         Map<String, Object> details = flightOperationsService.getFlightDetails(flightNumber);
         return ResponseEntity.ok(details);
     }
@@ -273,21 +260,18 @@ public class FlightOperationsController {
      * @return Response indicating deletion success or failure
      */
     @DeleteMapping("/flights/{flightNumber}")
-    @ResponseBody
     public ResponseEntity<Map<String, Object>> deleteFlight(@PathVariable String flightNumber) {
         logger.info("Received request to delete flight: {}", flightNumber);
         Map<String, Object> response = new HashMap<>();
         
         try {
             boolean deleted = flightOperationsService.deleteFlight(flightNumber);
-            response.put("success", deleted);
-            response.put("message", deleted ? "Flight deleted successfully" : "Failed to delete flight");
+            response.put(SUCCESS_KEY, deleted);
+            response.put(MESSAGE_KEY, deleted ? "Flight deleted successfully" : "Failed to delete flight");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             logger.error("Error deleting flight", e);
-            response.put("success", false);
-            response.put("message", "Error deleting flight: " + e.getMessage());
-            return ResponseEntity.badRequest().body(response);
+            return createErrorResponse("Error deleting flight: " + e.getMessage());
         }
     }
 
@@ -301,7 +285,6 @@ public class FlightOperationsController {
      * @return Response indicating scheduling success or failure
      */
     @PostMapping("/aircraft/maintenance")
-    @ResponseBody
     public ResponseEntity<Map<String, Object>> scheduleMaintenance(
             @RequestParam String registrationNumber,
             @RequestParam String maintenanceDate,
@@ -325,21 +308,17 @@ public class FlightOperationsController {
                 description
             );
             
-            response.put("success", scheduled);
-            response.put("message", scheduled ? 
+            response.put(SUCCESS_KEY, scheduled);
+            response.put(MESSAGE_KEY, scheduled ? 
                 "Maintenance scheduled successfully" : 
                 "Failed to schedule maintenance");
             return ResponseEntity.ok(response);
         } catch (DateTimeParseException e) {
             logger.error("Error parsing maintenance date: {}", maintenanceDate, e);
-            response.put("success", false);
-            response.put("message", "Invalid date format. Please use format: YYYY-MM-DD HH:mm:ss");
-            return ResponseEntity.badRequest().body(response);
+            return createErrorResponse("Invalid date format. Please use format: YYYY-MM-DD HH:mm:ss");
         } catch (Exception e) {
             logger.error("Error scheduling maintenance", e);
-            response.put("success", false);
-            response.put("message", "Error scheduling maintenance: " + e.getMessage());
-            return ResponseEntity.badRequest().body(response);
+            return createErrorResponse("Error scheduling maintenance: " + e.getMessage());
         }
     }
 
@@ -350,13 +329,15 @@ public class FlightOperationsController {
      * @return Aircraft details or 404 if not found
      */
     @GetMapping("/aircraft/{registrationNumber}")
-    @ResponseBody
-    public ResponseEntity<?> getAircraftDetails(@PathVariable String registrationNumber) {
-        Optional<AircraftModel> aircraft = flightOperationsService.getAircraft(registrationNumber);
-        if (aircraft.isPresent()) {
-            return ResponseEntity.ok(aircraft.get());
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<Map<String, Object>> getAircraftDetails(@PathVariable String registrationNumber) {
+        return flightOperationsService.getAircraft(registrationNumber)
+            .map(aircraft -> {
+                Map<String, Object> response = new HashMap<>();
+                response.put(SUCCESS_KEY, true); // Use constant instead of string literal
+                response.put(AIRCRAFT_KEY, aircraft);
+                return ResponseEntity.ok(response);
+            })
+            .orElse(ResponseEntity.notFound().build());
     }
 
     /**
@@ -367,12 +348,25 @@ public class FlightOperationsController {
      * @param errorMessage Message for failed operation
      * @return Standardized response entity
      */
-    private ResponseEntity<?> createResponse(boolean success, String successMessage, 
+    private ResponseEntity<Map<String, Object>> createResponse(boolean success, String successMessage, 
                                            String errorMessage) {
-        return ResponseEntity.ok(Map.of(
-            "success", success,
-            "message", success ? successMessage : errorMessage
-        ));
+        Map<String, Object> response = new HashMap<>();
+        response.put(SUCCESS_KEY, success);
+        response.put(MESSAGE_KEY, success ? successMessage : errorMessage);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Helper method for creating error responses
+     * 
+     * @param message Error message
+     * @return Standardized error response entity
+     */
+    private ResponseEntity<Map<String, Object>> createErrorResponse(String message) {
+        Map<String, Object> response = new HashMap<>();
+        response.put(SUCCESS_KEY, false);
+        response.put(MESSAGE_KEY, message);
+        return ResponseEntity.badRequest().body(response);
     }
 
     /**
@@ -381,8 +375,7 @@ public class FlightOperationsController {
      * @return ResponseEntity containing list of maintenance records or 404 if not found
      */
     @GetMapping("/aircraft/{registrationNumber}/maintenance")
-    @ResponseBody
-    public ResponseEntity<?> getMaintenanceHistory(@PathVariable String registrationNumber) {
+    public ResponseEntity<Map<String, Object>> getMaintenanceHistory(@PathVariable String registrationNumber) {
         logger.info("Retrieving maintenance history for aircraft: {}", registrationNumber);
         
         try {
@@ -390,13 +383,12 @@ public class FlightOperationsController {
             if (history.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
-            return ResponseEntity.ok(history);
+            Map<String, Object> response = new HashMap<>();
+            response.put("history", history);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             logger.error("Error retrieving maintenance history for {}", registrationNumber, e);
-            return ResponseEntity.badRequest().body(Map.of(
-                "success", false,
-                "message", "Error retrieving maintenance history: " + e.getMessage()
-            ));
+            return createErrorResponse("Error retrieving maintenance history: " + e.getMessage());
         }
     }
 }

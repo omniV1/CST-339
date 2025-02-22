@@ -28,6 +28,11 @@ import jakarta.servlet.http.HttpSession;
 public class AirlineDashboardController {
     private static final Logger logger = LoggerFactory.getLogger(AirlineDashboardController.class);
     
+    // Add constants for repeated literals
+    private static final String PAGE_TITLE_ATTR = "pageTitle";
+    private static final String DASHBOARD_VIEW = "dashboard/airline";
+    private static final String LOGIN_REDIRECT = "redirect:/login";
+    
     private final GateOperationsService gateOperationsService;
     private final GateManagementService gateManagementService;
     
@@ -55,13 +60,13 @@ public class AirlineDashboardController {
         String userRole = (String) session.getAttribute("userRole");
         if (!"AIRLINE_STAFF".equals(userRole)) {
             logger.warn("Unauthorized access attempt to airline staff dashboard");
-            return "redirect:/login";
+            return LOGIN_REDIRECT;
         }
         
         logger.info("Loading airline staff dashboard");
         
         // Add page title and basic gate information
-        model.addAttribute("pageTitle", "Airline Staff Dashboard - AGMS");
+        model.addAttribute(PAGE_TITLE_ATTR, "Airline Staff Dashboard - AGMS");
         model.addAttribute("gateStatuses", gateOperationsService.getAllGateStatuses());
         
         // Get today's flight schedule information
@@ -72,7 +77,7 @@ public class AirlineDashboardController {
         model.addAttribute("statistics", gateOperationsService.getStatistics());
         
         logger.info("Airline staff dashboard loaded successfully");
-        return "dashboard/airline";
+        return DASHBOARD_VIEW;
     }
     
     /**
@@ -83,7 +88,7 @@ public class AirlineDashboardController {
     public String viewGateSchedule(@PathVariable String gateId, Model model) {
         logger.info("Viewing schedule for gate: {}", gateId);
         
-        model.addAttribute("pageTitle", "Gate Schedule - AGMS");
+        model.addAttribute(PAGE_TITLE_ATTR, "Gate Schedule - AGMS");
         model.addAttribute("gate", gateManagementService.getGateById(gateId));
         model.addAttribute("status", gateOperationsService.getAllGateStatuses().get(gateId));
         
@@ -122,7 +127,7 @@ public class AirlineDashboardController {
     public String viewAlerts(Model model) {
         logger.info("Accessing airline staff alerts");
         
-        model.addAttribute("pageTitle", "Operational Alerts - AGMS");
+        model.addAttribute(PAGE_TITLE_ATTR, "Operational Alerts - AGMS");
         
         // In a real implementation, this would load airline-specific
         // alerts and notifications
@@ -138,7 +143,7 @@ public class AirlineDashboardController {
     public String viewPerformance(Model model) {
         logger.info("Accessing airline performance metrics");
         
-        model.addAttribute("pageTitle", "Gate Performance - AGMS");
+        model.addAttribute(PAGE_TITLE_ATTR, "Gate Performance - AGMS");
         model.addAttribute("statistics", gateOperationsService.getStatistics());
         
         // In a real implementation, this would calculate and display

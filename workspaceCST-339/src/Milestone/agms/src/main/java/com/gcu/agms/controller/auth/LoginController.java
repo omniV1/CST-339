@@ -26,6 +26,10 @@ import jakarta.validation.Valid;
 public class LoginController {
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
     private static final String LOGIN_REDIRECT = "redirect:/auth/login";
+    private static final String ERROR_ATTR = "error"; // Add this constant
+    private static final String SUCCESS_ATTR = "successMessage";
+    private static final String PAGE_TITLE_ATTR = "pageTitle";
+    private static final String LOGIN_MODEL_ATTR = "loginModel";
     
     private final LoginService loginService;
     
@@ -44,10 +48,10 @@ public class LoginController {
      */
     @GetMapping({"/login", ""}) // Handle /login and root path
     public String displayLogin(Model model) {
-        if (!model.containsAttribute("loginModel")) {
-            model.addAttribute("loginModel", new LoginModel());
+        if (!model.containsAttribute(LOGIN_MODEL_ATTR)) {
+            model.addAttribute(LOGIN_MODEL_ATTR, new LoginModel());
         }
-        model.addAttribute("pageTitle", "Login - AGMS");
+        model.addAttribute(PAGE_TITLE_ATTR, "Login - AGMS");
         return "login";
     }
     
@@ -70,13 +74,13 @@ public class LoginController {
         // Validate form data
         if (bindingResult.hasErrors()) {
             logger.warn("Login form validation failed");
-            redirectAttributes.addFlashAttribute("error", "Please fill in all required fields");
+            redirectAttributes.addFlashAttribute(ERROR_ATTR, "Please fill in all required fields");
             return LOGIN_REDIRECT;
         }
         
         // Validate credential format
         if (!loginService.validateCredentials(loginModel)) {
-            redirectAttributes.addFlashAttribute("error", "Invalid username or password format");
+            redirectAttributes.addFlashAttribute(ERROR_ATTR, "Invalid username or password format");
             return LOGIN_REDIRECT;
         }
         
@@ -98,7 +102,7 @@ public class LoginController {
                 };
             })
             .orElseGet(() -> {
-                redirectAttributes.addFlashAttribute("error", "Invalid username or password");
+                redirectAttributes.addFlashAttribute(ERROR_ATTR, "Invalid username or password");
                 return LOGIN_REDIRECT;
             });
     }
@@ -113,7 +117,7 @@ public class LoginController {
     public String logout(HttpSession session, RedirectAttributes redirectAttributes) {
         logger.info("Processing logout request");
         session.invalidate();
-        redirectAttributes.addFlashAttribute("successMessage", 
+        redirectAttributes.addFlashAttribute(SUCCESS_ATTR, 
             "You have been successfully logged out");
         return LOGIN_REDIRECT;
     }

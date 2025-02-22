@@ -8,6 +8,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -125,4 +126,94 @@ class InMemoryFlightOperationsServiceTest {
         assertNotNull(details);
         assertEquals("AA123", ((FlightModel)details.get("flight")).getFlightNumber());
     }
+
+    @Test
+    @DisplayName("Should handle invalid aircraft registration")
+    void testInvalidAircraftRegistration() {
+        // Create empty aircraft without required fields
+        AircraftModel emptyAircraft = new AircraftModel();
+        // Should fail because registrationNumber is required
+        assertFalse(flightOperationsService.registerAircraft(emptyAircraft));
+        
+        // Test null and nonexistent lookups
+        Optional<AircraftModel> nullResult = flightOperationsService.getAircraft(null);
+        assertFalse(nullResult.isPresent());
+        Optional<AircraftModel> nonexistentResult = flightOperationsService.getAircraft("NONEXISTENT");
+        assertFalse(nonexistentResult.isPresent());
+    }
+
+    @Test
+    @DisplayName("Should handle invalid maintenance scheduling")
+    void testInvalidMaintenanceScheduling() {
+        assertFalse(flightOperationsService.scheduleMaintenance(
+            "NONEXISTENT",
+            LocalDateTime.now(),
+            "ROUTINE",
+            "Test maintenance"
+        ));
+        
+        assertTrue(flightOperationsService.getMaintenanceRecords("NONEXISTENT").isEmpty());
+    }
+
+    @Test
+    @DisplayName("Should handle invalid aircraft status update")
+    void testInvalidAircraftStatusUpdate() {
+        assertFalse(flightOperationsService.updateAircraftStatus(
+            "NONEXISTENT",
+            AircraftModel.AircraftStatus.MAINTENANCE,
+            "Gate A1"
+        ));
+    }
+
+
+    @Test
+    @DisplayName("Should update and delete flight")
+    void testUpdateAndDeleteFlight() {
+        // Create initial flight
+        FlightModel flight = new FlightModel();
+        flight.setFlightNumber("AA123");
+        flight.setAirlineCode("AA");
+        flight.setOrigin("JFK");
+        flight.setDestination("LAX");
+        assertTrue(flightOperationsService.createFlight(flight));
+        
+        // Update flight
+        flight.setDestination("SFO");
+        assertTrue(flightOperationsService.updateFlight(flight));
+        
+        // Verify update
+        Map<String, Object> details = flightOperationsService.getFlightDetails("AA123");
+        FlightModel updated = (FlightModel)details.get("flight");
+        assertEquals("SFO", updated.getDestination());
+        
+        // Delete flight
+        assertTrue(flightOperationsService.deleteFlight("AA123"));
+        Map<String, Object> details2 = flightOperationsService.getFlightDetails("AA123"); 
+        assertNull(details2.get("flight"));
+    }
+
+    @Test
+    @DisplayName("Should update flight status")
+    void testUpdateFlightStatus() {
+        // Create flight
+        FlightModel flight = new FlightModel();
+        flight.setFlightNumber("AA123");
+        flight.setAirlineCode("AA");
+        flight.setCurrentLocation("Gate A1"); // Add current location
+        assertTrue(flightOperationsService.createFlight(flight));
+        
+        // Update status
+        assertTrue(flightOperationsService.updateFlightStatus("AA123", "DEPARTED", "Gate A1"));
+        
+        // Verify status update
+        Map<String, Object> details = flightOperationsService.getFlightDetails("AA123");
+        FlightModel updated = (FlightModel)details.get("flight");
+        assertEquals(FlightModel.FlightStatus.DEPARTED, updated.getStatus());
+        assertEquals("Gate A1", updated.getCurrentLocation());
+        
+        // Test invalid status update
+        assertFalse(flightOperationsService.updateFlightStatus("NONEXISTENT", "DEPARTED", "Gate A1"));
+    }
+
+    
 }

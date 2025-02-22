@@ -145,25 +145,16 @@ class AdminDashboardControllerTest {
     @Test
     @DisplayName("Should create new gate successfully")
     void testCreateGate() throws Exception {
-        // Create a more complete test gate
-        GateModel gate = new GateModel();
-        gate.setGateId("T1G1");
-        gate.setTerminal("1");
-        gate.setGateNumber("1");
-        gate.setGateType(GateModel.GateType.DOMESTIC);
-        gate.setGateSize(GateModel.GateSize.MEDIUM);
-        gate.setIsActive(true);
-        gate.setHasJetBridge(true);
-        gate.setCapacity(100);
-        
+        GateModel gate = createTestGate("T1G1");
         when(gateManagementService.createGate(any(GateModel.class))).thenReturn(true);
 
         mockMvc.perform(post("/admin/gates/create")
                .session(session)
                .flashAttr("gateModel", gate))
-               .andExpect(status().is3xxRedirection())
-               .andExpect(redirectedUrl("/admin/gates"))
-               .andExpect(flash().attribute("success", "Gate " + gate.getGateId() + " created successfully"));
+               .andExpect(status().is3xxRedirection())  // Verify redirect status
+               .andExpect(redirectedUrl("/admin/gates"))  // Verify redirect URL
+               .andExpect(flash().attribute("success", 
+                   "Gate " + gate.getGateId() + " created successfully"));
 
         verify(gateManagementService).createGate(any(GateModel.class));
     }

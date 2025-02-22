@@ -22,6 +22,12 @@ public interface FlightOperationsService {
     boolean scheduleMaintenance(String registrationNumber, LocalDateTime maintenanceDate, String maintenanceType, String description);
     List<MaintenanceRecord> getMaintenanceRecords(String registrationNumber);
 
+    /**
+     * Gets a list of all available aircraft (not in maintenance or currently assigned)
+     * @return List of available aircraft
+     */
+    List<AircraftModel> getAvailableAircraft();
+
     // Flight Management
     boolean createFlight(FlightModel flight); // Add this method
     boolean updateFlight(FlightModel flight);

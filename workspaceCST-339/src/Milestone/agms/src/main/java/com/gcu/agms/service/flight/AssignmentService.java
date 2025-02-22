@@ -169,4 +169,17 @@ public class AssignmentService {
         
         return currentAssignments;
     }
+
+    public Optional<AssignmentModel> getCurrentAssignment(String gateId) {
+        List<AssignmentModel> assignments = getAssignmentsForGate(gateId);
+        return assignments.stream()
+            .filter(this::isCurrentAssignment)
+            .findFirst();
+    }
+
+    private boolean isCurrentAssignment(AssignmentModel assignment) {
+        LocalDateTime now = LocalDateTime.now();
+        return assignment.getStartTime().isBefore(now) && 
+               assignment.getEndTime().isAfter(now);
+    }
 }

@@ -1,20 +1,27 @@
+# Help documentation
 HELP.md
+
+# Build directories
 target/
+build/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+!**/src/main/**/build/
+!**/src/test/**/build/
 
+# IDE files
 ### STS ###
 .apt_generated
 .classpath
 .factorypath
 .project
-.settings
+.settings/
 .springBeans
-.sts4-cache
+.sts4-cache/
 
 ### IntelliJ IDEA ###
-.idea
+.idea/
 *.iws
 *.iml
 *.ipr
@@ -25,17 +32,18 @@ target/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
 
 ### VS Code ###
 .vscode/
 
-### ENVIRONMENT ###
+# Configuration files
+### Properties ###
+*.properties
+!src/main/resources/application-example.properties
+
+### Environment files ###
 .env
 .env.local
-
-
-### Properties ###
-.properties
+.env.development
+.env.test
+.env.production

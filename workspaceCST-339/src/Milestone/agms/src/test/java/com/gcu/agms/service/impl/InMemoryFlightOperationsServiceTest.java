@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -398,9 +397,11 @@ class InMemoryFlightOperationsServiceTest {
         // Test bulk create
         assertTrue(service.createFlights(flights));
         
-        // Test bulk status update
+        // Test bulk status update using Stream.toList()
         assertTrue(service.updateFlightStatuses(
-            flights.stream().map(FlightModel::getFlightNumber).collect(Collectors.toList()),
+            flights.stream()
+                  .map(FlightModel::getFlightNumber)
+                  .toList(),
             FlightModel.FlightStatus.DELAYED.name(),
             "Weather delay"
         ));

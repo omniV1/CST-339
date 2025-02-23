@@ -83,17 +83,17 @@ public class InMemoryUserService implements UserService {
             return false;
         }
 
-        // Password validation - using character class checks instead of backtracking-prone patterns
+        // Password validation using character class checks
         String password = user.getPassword();
         if (password.length() < 8) {
             return false;
         }
 
-        // Use non-backtracking patterns for each requirement
-        boolean hasUpper = password.matches(".*?[A-Z].*");
-        boolean hasLower = password.matches(".*?[a-z].*");
-        boolean hasDigit = password.matches(".*?\\d.*");
-        boolean hasSpecial = password.matches(".*?[@#$%^&+=!].*");
+        // Use possessive quantifiers, anchors, and concise character classes
+        boolean hasUpper = password.matches("^[^A-Z]*+[A-Z][\\s\\S]*+$");
+        boolean hasLower = password.matches("^[^a-z]*+[a-z][\\s\\S]*+$");
+        boolean hasDigit = password.matches("^\\D*+\\d[\\s\\S]*+$");  // Using \D and \d
+        boolean hasSpecial = password.matches("^[^@#$%^&+=!]*+[@#$%^&+=!][\\s\\S]*+$");
 
         return hasUpper && hasLower && hasDigit && hasSpecial;
     }

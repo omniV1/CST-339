@@ -179,7 +179,7 @@ public class GateModel {
                 requiredFeatures.add(GateFeature.FUEL_PIT);
             }
             case NARROW_BODY -> requiredFeatures.add(GateFeature.FUEL_PIT);
-            case REGIONAL_JET -> {} // REGIONAL_JET doesn't require additional features
+            case REGIONAL_JET -> {}
         }
 
         return features.containsAll(requiredFeatures);

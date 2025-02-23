@@ -1,20 +1,10 @@
-# Airport Gate Management System (AGMS)
-## Design Report - Milestone 3
-### CST-339: Java Enterprise Application Development
 
-**Date:** January 29, 2025  
-**Version:** 3.0  
-**Author:** Owen Lindsey  
-**Course:** CST-339 - Java Programming III  
-**Professor:** Professor Robert Estey
-
----
 
 # Airport Gate Management System (AGMS)
 ## Design Report - Milestone 3
 ### CST-339: Java Enterprise Application Development
 
-**Date:** February 12, 2025  
+**Date:** February 23, 2025  
 **Version:** 3.0  
 **Author:** Owen Lindsey  
 **Course:** CST-339 - Java Programming III  
@@ -64,6 +54,19 @@ This milestone represents significant progress in implementing core Spring funct
 - ✅ Established consistent error handling
 - ✅ Implemented logging using SLF4J
 
+### DevOps Integration
+- ✅ Containerized application using Docker
+- ✅ Created multi-container setup with docker-compose
+- ✅ Integrated SonarQube for static code analysis
+- ✅ Implemented automated quality gates
+- ✅ Added continuous code quality monitoring
+
+### Infrastructure Improvements
+- ✅ Created production-ready Docker configuration
+- ✅ Added MySQL container for persistent storage
+- ✅ Implemented volume management for data persistence
+- ✅ Created container networking setup
+- ✅ Added environment-specific configurations
 ## Key Technical Decisions
 
 ### Spring Implementation
@@ -97,6 +100,7 @@ The application now fully embraces Spring's dependency injection and Bean manage
 - MySQL (planned)
 - Bootstrap 5
 - Modern web browser (Chrome, Firefox, Safari, Edge)
+- enviornment files
 
 ---
 

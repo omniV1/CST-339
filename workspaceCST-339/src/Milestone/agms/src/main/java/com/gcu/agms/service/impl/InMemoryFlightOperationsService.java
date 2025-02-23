@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -332,9 +331,9 @@ public class InMemoryFlightOperationsService implements FlightOperationsService 
     public List<FlightModel> searchFlights(String origin, String destination, String airline) {
         return flights.values().stream()
             .filter(f -> (origin == null || f.getOrigin().equals(origin)) &&
-                        (destination == null || f.getDestination().equals(destination)) &&
+                        (destination == null || f.getDestination().equals(destination)) &&  
                         (airline == null || f.getAirlineCode().equals(airline)))
-            .collect(Collectors.toList());
+            .toList(); // Changed from collect(Collectors.toList())
     }
 
     @Override

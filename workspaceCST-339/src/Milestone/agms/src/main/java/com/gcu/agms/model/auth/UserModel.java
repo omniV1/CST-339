@@ -73,7 +73,7 @@ public class UserModel implements Serializable {
     private String email;
 
     @NotEmpty(message = "Phone number is required")
-    @Pattern(regexp = "^\\+?[1-9][0-9]{7,14}$", message = "Please provide a valid phone number")
+    @Pattern(regexp = "^\\+?[1-9]\\d{7,14}$", message = "Please provide a valid phone number")
     private String phoneNumber;
 
     // User message/notification field

@@ -18,7 +18,7 @@ class DashboardControllerTest {
     private MockHttpSession session;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         controller = new DashboardController();
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         session = new MockHttpSession();

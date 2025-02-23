@@ -25,7 +25,7 @@ class InMemoryAssignmentServiceTest {
     private InMemoryAssignmentService service;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         service = new InMemoryAssignmentService();
         service.initialize();
     }

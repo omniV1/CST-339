@@ -1,5 +1,6 @@
 package com.gcu.agms.model.gate;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 
 import jakarta.validation.constraints.NotEmpty;
@@ -32,16 +33,23 @@ public class AssignmentModel {
 
     private String assignedBy;
     private LocalDateTime createdAt;
+    private String createdBy;
     private LocalDateTime updatedAt;
     private boolean cancelled = false;
+    private Clock clock = Clock.systemDefaultZone();
 
     /**
      * Checks if this assignment has a time conflict with another assignment
      */
     public boolean hasConflict(AssignmentModel other) {
-        return !this.cancelled && 
-               !other.cancelled &&
-               !(this.endTime.isBefore(other.startTime) || 
+        // Return false if either assignment is cancelled or is invalid
+        if (this.cancelled || other == null || other.cancelled || 
+            !isValid() || !other.isValid()) {
+            return false;
+        }
+        
+        // No conflict if one assignment ends before the other starts
+        return !(this.endTime.isBefore(other.startTime) || 
                  this.startTime.isAfter(other.endTime));
     }
 
@@ -49,10 +57,11 @@ public class AssignmentModel {
      * Checks if this assignment is currently active
      */
     public boolean isActive() {
-        LocalDateTime now = LocalDateTime.now();
-        return !cancelled && 
-               now.isAfter(startTime) && 
-               now.isBefore(endTime);
+        if (!isValid()) {
+            return false;
+        }
+        LocalDateTime now = LocalDateTime.now(clock);
+        return !cancelled && startTime.isBefore(now) && endTime.isAfter(now);
     }
 
     /**
@@ -67,17 +76,31 @@ public class AssignmentModel {
      */
     public void updateStatus(AssignmentStatus newStatus) {
         this.status = newStatus;
-        this.updatedAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now(clock);
     }
 
     /**
      * Initializes timestamps for a new assignment
      */
     public void initializeTimestamps() {
-        LocalDateTime now = LocalDateTime.now();
         if (this.createdAt == null) {
-            this.createdAt = now;
+            this.createdAt = LocalDateTime.now(clock);
         }
-        this.updatedAt = now;
+        this.updatedAt = LocalDateTime.now(clock);
+    }
+
+    /**
+     * Validates that all required fields are present
+     */
+    private boolean isValid() {
+        return startTime != null && endTime != null;
+    }
+    
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
     }
 }

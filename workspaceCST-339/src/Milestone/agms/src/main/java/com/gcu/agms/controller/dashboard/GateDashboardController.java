@@ -97,12 +97,12 @@ public class GateDashboardController {
         List<GateModel> gates = gateManagementService.getAllGates();
         model.addAttribute("gates", gates);
         
-        // Add assignments for each gate
+        // Add assignments for each gate using expression notation
         Map<String, List<AssignmentModel>> gateAssignments = new HashMap<>();
-        gates.forEach(gate -> {
-            gateAssignments.put(gate.getGateId(), 
-                assignmentService.getAssignmentsForGate(gate.getGateId()));
-        });
+        gates.forEach(gate -> gateAssignments.put(
+            gate.getGateId(), 
+            assignmentService.getAssignmentsForGate(gate.getGateId())
+        ));
         model.addAttribute("gateAssignments", gateAssignments);
         
         logger.info("Gate manager dashboard loaded successfully");

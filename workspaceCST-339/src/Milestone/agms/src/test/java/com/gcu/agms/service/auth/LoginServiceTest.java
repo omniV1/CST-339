@@ -30,7 +30,7 @@ class LoginServiceTest {
     private LoginService loginService; // Changed from LoginServiceTest to LoginService
     
     @BeforeEach
-    void setUp() {
+    protected void setUp() {
         MockitoAnnotations.openMocks(this);
     }
     
@@ -97,8 +97,8 @@ class LoginServiceTest {
         assertFalse(loginService.validateCredentials(null));
     }
     
-    @ParameterizedTest(name = "Should not validate credentials: {0}")
-    @MethodSource("invalidCredentialsProvider")
+    @ParameterizedTest(name = "Should not validate credentials: {0}")  
+    @MethodSource("invalidCredentialsProvider") // Simplified reference
     @DisplayName("Should validate credential edge cases")
     void testCredentialValidationEdgeCases(String testCase, LoginModel loginModel) {
         // Act
@@ -108,7 +108,8 @@ class LoginServiceTest {
         assertFalse(result, "Should reject " + testCase);
     }
     
-    private static Stream<Object[]> invalidCredentialsProvider() {
+    // Change to public static
+    public static Stream<Object[]> invalidCredentialsProvider() {
         return Stream.of(
             new Object[]{"empty credentials", createLoginModel("", "")},
             new Object[]{"null username", createLoginModel(null, "password123")},
@@ -120,6 +121,7 @@ class LoginServiceTest {
         );
     }
     
+    // Keep helper method private
     private static LoginModel createLoginModel(String username, String password) {
         LoginModel model = new LoginModel();
         model.setUsername(username);

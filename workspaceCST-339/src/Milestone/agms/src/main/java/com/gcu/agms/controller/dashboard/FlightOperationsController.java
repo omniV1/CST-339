@@ -9,9 +9,8 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,7 +19,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.gcu.agms.model.flight.AircraftModel;
 import com.gcu.agms.model.flight.FlightModel;
@@ -34,7 +33,7 @@ import jakarta.validation.Valid;
  * Controller handling all flight operations related endpoints in the AGMS system.
  * Provides REST endpoints for managing flights, aircraft, and maintenance operations.
  */
-@Controller 
+@RestController  // Changed from @Controller
 @RequestMapping("/operations")
 public class FlightOperationsController {
     private static final Logger logger = LoggerFactory.getLogger(FlightOperationsController.class);
@@ -63,33 +62,28 @@ public class FlightOperationsController {
      * Displays the main operations dashboard
      * Requires OPERATIONS_MANAGER role for access
      * 
-     * @param model Spring MVC model for view data
      * @param session HTTP session for user role verification
-     * @return View name or redirect to login if unauthorized
+     * @return ResponseEntity containing dashboard data or unauthorized status
      */
     @GetMapping("/dashboard")
-    public String showDashboard(Model model, HttpSession session) {
+    public ResponseEntity<Map<String, Object>> showDashboard(HttpSession session) {
+        // Check authorization
         String userRole = (String) session.getAttribute("userRole");
         if (!"OPERATIONS_MANAGER".equals(userRole)) {
-            return "redirect:/login";
+            Map<String, Object> response = new HashMap<>();
+            response.put(SUCCESS_KEY, false);                  // Use constant
+            response.put(MESSAGE_KEY, "Unauthorized access");  // Use constant
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
 
-        try {
-            List<Map<String, Object>> activeFlights = flightOperationsService.getActiveFlights();
-            Map<String, Integer> statistics = flightOperationsService.getOperationalStatistics();
-            List<AircraftModel> aircraft = flightOperationsService.getAllAircraft();
-            List<AircraftModel> availableAircraft = flightOperationsService.getAvailableAircraft();
+        // Create dashboard data
+        Map<String, Object> dashboardData = new HashMap<>();
+        dashboardData.put(ACTIVE_FLIGHTS_KEY, flightOperationsService.getActiveFlights());
+        dashboardData.put(STATISTICS_KEY, flightOperationsService.getOperationalStatistics());
+        dashboardData.put(AIRCRAFT_KEY, flightOperationsService.getAllAircraft());
+        dashboardData.put(AVAILABLE_AIRCRAFT_KEY, flightOperationsService.getAvailableAircraft());
 
-            model.addAttribute(ACTIVE_FLIGHTS_KEY, activeFlights);
-            model.addAttribute(STATISTICS_KEY, statistics);
-            model.addAttribute(AIRCRAFT_KEY, aircraft);
-            model.addAttribute(AVAILABLE_AIRCRAFT_KEY, availableAircraft);
-
-            return "dashboard/operations";
-        } catch (Exception e) {
-            logger.error("Error loading dashboard data", e);
-            throw e;
-        }
+        return ResponseEntity.ok(dashboardData);
     }
 
     /**
@@ -98,7 +92,7 @@ public class FlightOperationsController {
      * @return ResponseEntity containing dashboard statistics, active flights, and aircraft data
      */
     @GetMapping("/dashboard/data")
-    @ResponseBody
+    // Removed @ResponseBody since @RestController includes it
     public ResponseEntity<Map<String, Object>> getDashboardData() {
         Map<String, Object> dashboardData = new HashMap<>();
         

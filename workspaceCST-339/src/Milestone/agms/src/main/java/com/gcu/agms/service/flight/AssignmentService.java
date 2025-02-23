@@ -38,6 +38,7 @@ import jakarta.annotation.PostConstruct;
 @Service
 public class AssignmentService {
     private static final Logger logger = LoggerFactory.getLogger(AssignmentService.class);
+    private static final String SYSTEM_USER = "system";  // Added constant
     
     private final GateManagementService gateManagementService;
     
@@ -56,20 +57,38 @@ public class AssignmentService {
     }
     
     private void createSampleAssignments() {
-        // Create some sample assignments for testing
-        AssignmentModel assignment1 = new AssignmentModel();
-        assignment1.setGateId("T1G1");
-        assignment1.setFlightNumber("AA123");
-        assignment1.setStartTime(LocalDateTime.now().minusHours(1));
-        assignment1.setEndTime(LocalDateTime.now().plusHours(1));
-        createAssignment(assignment1);
+        // Create some sample assignments for different gates
+        createSampleAssignment("T1G1", "AA123", 
+            LocalDateTime.now().plusHours(1), 
+            LocalDateTime.now().plusHours(3), 
+            SYSTEM_USER);  // Use constant
+
+        createSampleAssignment("T2G3", "UA456", 
+            LocalDateTime.now().plusHours(2), 
+            LocalDateTime.now().plusHours(4), 
+            SYSTEM_USER);  // Use constant
+
+        createSampleAssignment("T3G2", "DL789", 
+            LocalDateTime.now().plusHours(3), 
+            LocalDateTime.now().plusHours(5), 
+            SYSTEM_USER);  // Use constant
+
+        logger.info("Sample assignments created");
+    }
+    
+    private void createSampleAssignment(String gateId, String flightNumber, 
+                                  LocalDateTime startTime, LocalDateTime endTime, 
+                                  String createdBy) {
+        AssignmentModel assignment = new AssignmentModel();
+        assignment.setGateId(gateId);
+        assignment.setFlightNumber(flightNumber);
+        assignment.setStartTime(startTime);
+        assignment.setEndTime(endTime);
+        assignment.setCreatedBy(createdBy);
+        assignment.setCreatedAt(LocalDateTime.now());
         
-        AssignmentModel assignment2 = new AssignmentModel();
-        assignment2.setGateId("T2G1");
-        assignment2.setFlightNumber("UA456");
-        assignment2.setStartTime(LocalDateTime.now().plusHours(1));
-        assignment2.setEndTime(LocalDateTime.now().plusHours(3));
-        createAssignment(assignment2);
+        createAssignment(assignment);
+        logger.debug("Created sample assignment for gate {} and flight {}", gateId, flightNumber);
     }
     
     public boolean createAssignment(AssignmentModel assignment) {
@@ -133,10 +152,39 @@ public class AssignmentService {
     }
     
     public boolean updateAssignment(String gateId, Long assignmentId, AssignmentModel updated) {
-        return updateAssignmentField(gateId, assignmentId, assignment -> {
-            updated.setId(assignmentId);
-            assignmentsByGate.get(gateId).set(assignmentsByGate.get(gateId).indexOf(assignment), updated);
-        });
+        logger.info("Attempting to update assignment {} for gate {}", assignmentId, gateId);
+        
+        List<AssignmentModel> assignments = assignmentsByGate.get(gateId);
+        if (assignments != null) {
+            // Find existing assignment
+            Optional<AssignmentModel> existing = assignments.stream()
+                .filter(a -> a.getId().equals(assignmentId))
+                .findFirst();
+                
+            if (existing.isPresent()) {
+                // Check for conflicts with OTHER assignments (excluding current)
+                boolean hasConflict = assignments.stream()
+                    .filter(a -> !a.getId().equals(assignmentId)) // Exclude current assignment
+                    .anyMatch(a -> !a.isCancelled() && a.hasConflict(updated));
+                    
+                if (hasConflict) {
+                    logger.warn("Update failed: time conflict detected");
+                    return false;
+                }
+                
+                // Update the assignment
+                updated.setId(assignmentId);
+                updated.setUpdatedAt(LocalDateTime.now());
+                int index = assignments.indexOf(existing.get());
+                assignments.set(index, updated);
+                
+                logger.info("Assignment successfully updated");
+                return true;
+            }
+        }
+        
+        logger.warn("Assignment not found for update");
+        return false;
     }
 
     public boolean deleteAssignment(String gateId, Long assignmentId) {
@@ -144,7 +192,7 @@ public class AssignmentService {
             assignmentsByGate.get(gateId).remove(assignment));
     }
 
-    private boolean updateAssignmentField(String gateId, Long assignmentId, java.util.function.Consumer<AssignmentModel> updater) {
+    protected boolean updateAssignmentField(String gateId, Long assignmentId, java.util.function.Consumer<AssignmentModel> updater) {
         List<AssignmentModel> assignments = assignmentsByGate.get(gateId);
         if (assignments != null) {
             for (AssignmentModel assignment : assignments) {
@@ -160,12 +208,10 @@ public class AssignmentService {
     public Map<String, AssignmentModel> getCurrentAssignments() {
         Map<String, AssignmentModel> currentAssignments = new HashMap<>();
         
-        assignmentsByGate.forEach((gateId, assignments) -> {
-            assignments.stream()
-                .filter(a -> !a.isCancelled() && a.isActive())
-                .findFirst()
-                .ifPresent(assignment -> currentAssignments.put(gateId, assignment));
-        });
+        assignmentsByGate.forEach((gateId, assignments) -> assignments.stream()
+            .filter(a -> !a.isCancelled() && a.isActive())
+            .findFirst()
+            .ifPresent(assignment -> currentAssignments.put(gateId, assignment)));
         
         return currentAssignments;
     }
@@ -177,7 +223,7 @@ public class AssignmentService {
             .findFirst();
     }
 
-    private boolean isCurrentAssignment(AssignmentModel assignment) {
+    protected boolean isCurrentAssignment(AssignmentModel assignment) {
         LocalDateTime now = LocalDateTime.now();
         return assignment.getStartTime().isBefore(now) && 
                assignment.getEndTime().isAfter(now);

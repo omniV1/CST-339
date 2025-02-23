@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,10 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.gcu.agms.model.flight.AircraftModel;
@@ -52,8 +50,21 @@ class FlightOperationsControllerTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(flightOperationsController).build();
+        try (AutoCloseable ignored = MockitoAnnotations.openMocks(this)) {
+            mockMvc = MockMvcBuilders.standaloneSetup(flightOperationsController)
+                                    .setControllerAdvice()
+                                    .addFilter((request, response, chain) -> {
+                                        response.setCharacterEncoding("UTF-8");
+                                        chain.doFilter(request, response);
+                                    })
+                                    .build();
+            
+            assertNotNull(flightOperationsController, "Controller should be initialized");
+            assertNotNull(flightOperationsService, "Service should be mocked");
+            assertNotNull(mockMvc, "MockMvc should be configured");
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize test", e);
+        }
     }
 
     @Test
@@ -124,8 +135,8 @@ class FlightOperationsControllerTest {
                 .param("flightNumber", "FAIL123")
                 .param("status", "INVALID")
                 .param("location", "XXX"))
-                .andExpect(status().isOk())  // Changed from isBadRequest()
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.success").value(false));
     }
 
@@ -158,8 +169,8 @@ class FlightOperationsControllerTest {
                 .param("maintenanceDate", "2025-02-08 20:00:00")
                 .param("maintenanceType", "INVALID")
                 .param("description", ""))
-                .andExpect(status().isOk())  // Changed from isBadRequest()
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.success").value(false));
     }
 
@@ -181,8 +192,8 @@ class FlightOperationsControllerTest {
 
         mockMvc.perform(delete("/operations/flights/FAIL123")
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())  // Changed from isBadRequest() since controller returns 200
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.message").exists());
     }
@@ -266,24 +277,24 @@ class FlightOperationsControllerTest {
         List<Map<String, Object>> activeFlights = Arrays.asList(new HashMap<>());
         Map<String, Integer> statistics = new HashMap<>();
         List<AircraftModel> aircraft = Arrays.asList(new AircraftModel());
-        List<AircraftModel> availableAircraft = Arrays.asList(new AircraftModel()); // Add this
+        List<AircraftModel> availableAircraft = Arrays.asList(new AircraftModel());
         
         when(flightOperationsService.getActiveFlights()).thenReturn(activeFlights);
         when(flightOperationsService.getOperationalStatistics()).thenReturn(statistics);
         when(flightOperationsService.getAllAircraft()).thenReturn(aircraft);
-        when(flightOperationsService.getAvailableAircraft()).thenReturn(availableAircraft); // Add this
+        when(flightOperationsService.getAvailableAircraft()).thenReturn(availableAircraft);
 
-        // Create session with correct role
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("userRole", "OPERATIONS_MANAGER");
 
-        mockMvc.perform(get("/operations/dashboard").session(session))
+        mockMvc.perform(get("/operations/dashboard").session(session)
+                .accept(MediaType.APPLICATION_JSON))  // Add accept header
                .andExpect(status().isOk())
-               .andExpect(view().name("dashboard/operations"))
-               .andExpect(model().attributeExists("activeFlights"))
-               .andExpect(model().attributeExists("statistics"))
-               .andExpect(model().attributeExists("aircraft"))
-               .andExpect(model().attributeExists("availableAircraft"));
+               .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))  // Changed to contentTypeCompatibleWith
+               .andExpect(jsonPath("$.activeFlights").exists())
+               .andExpect(jsonPath("$.statistics").exists())
+               .andExpect(jsonPath("$.aircraft").exists())
+               .andExpect(jsonPath("$.availableAircraft").exists());
     }
 
     @Test
@@ -292,9 +303,12 @@ class FlightOperationsControllerTest {
         MockHttpSession session = new MockHttpSession();
         session.setAttribute("userRole", "PUBLIC");
 
-        mockMvc.perform(get("/operations/dashboard").session(session))
-               .andExpect(status().is3xxRedirection())
-               .andExpect(redirectedUrl("/login"));
+        mockMvc.perform(get("/operations/dashboard").session(session)
+                .accept(MediaType.APPLICATION_JSON))  // Add accept header
+               .andExpect(status().isUnauthorized()) // Use 401 instead of redirect
+               .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))  // Add content type check
+               .andExpect(jsonPath("$.success").value(false))
+               .andExpect(jsonPath("$.message").exists());
     }
 
     @Test

@@ -50,7 +50,7 @@ public class GateModel {
     
     // Basic gate information with validation
     @NotEmpty(message = "Gate ID is required")
-    @Pattern(regexp = "^T[1-4]G[0-9]{1,2}$", 
+    @Pattern(regexp = "^T[1-4]G\\d{1,2}$", 
              message = "Gate ID must be in format T#G# (e.g., T1G1)")
     private String gateId;
     
@@ -59,7 +59,7 @@ public class GateModel {
     private String terminal;
     
     @NotEmpty(message = "Gate number is required")
-    @Pattern(regexp = "^[0-9]{1,2}$", message = "Gate number must be 1-2 digits")
+    @Pattern(regexp = "^\\d{1,2}$", message = "Gate number must be 1-2 digits")
     private String gateNumber;
     
     // Operational characteristics
@@ -179,7 +179,7 @@ public class GateModel {
                 requiredFeatures.add(GateFeature.FUEL_PIT);
             }
             case NARROW_BODY -> requiredFeatures.add(GateFeature.FUEL_PIT);
-            case REGIONAL_JET -> {} // No additional features required
+            case REGIONAL_JET -> {} // REGIONAL_JET doesn't require additional features
         }
 
         return features.containsAll(requiredFeatures);

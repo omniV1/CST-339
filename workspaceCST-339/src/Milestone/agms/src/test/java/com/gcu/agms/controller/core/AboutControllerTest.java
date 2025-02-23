@@ -20,7 +20,7 @@ class AboutControllerTest {
     private AboutController aboutController;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         aboutController = new AboutController();
         mockMvc = MockMvcBuilders
             .standaloneSetup(aboutController)

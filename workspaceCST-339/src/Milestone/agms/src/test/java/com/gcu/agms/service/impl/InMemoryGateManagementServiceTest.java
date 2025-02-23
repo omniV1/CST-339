@@ -23,7 +23,7 @@ class InMemoryGateManagementServiceTest {
     private InMemoryGateManagementService service;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         service = new InMemoryGateManagementService();
         service.initialize(); // Initialize sample data
     }

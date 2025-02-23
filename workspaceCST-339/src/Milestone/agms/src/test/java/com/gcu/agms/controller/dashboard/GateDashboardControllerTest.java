@@ -44,31 +44,38 @@ class GateDashboardControllerTest {
     private MockHttpSession session;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
+        // Initialize mocks
         gateOperationsService = mock(GateOperationsService.class);
         gateManagementService = mock(GateManagementService.class);
         assignmentService = mock(AssignmentService.class);
         
+        // Initialize controller with mocked services
         controller = new GateDashboardController(
             gateOperationsService,
             gateManagementService, 
             assignmentService
         );
 
+        // Configure view resolver
         InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
         viewResolver.setPrefix("/WEB-INF/views/");
         viewResolver.setSuffix(".html");
 
+        // Setup MockMvc
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                                 .setViewResolvers(viewResolver)
                                 .build();
 
+        // Setup session
         session = new MockHttpSession();
         session.setAttribute("userRole", "GATE_MANAGER");
 
         // Setup default mock behaviors
-        when(gateManagementService.getAllGates()).thenReturn(Arrays.asList(new GateModel()));
-        when(gateOperationsService.getAllGateStatuses()).thenReturn(new HashMap<>());
+        when(gateManagementService.getAllGates())
+            .thenReturn(Arrays.asList(new GateModel()));
+        when(gateOperationsService.getAllGateStatuses())
+            .thenReturn(new HashMap<>());
     }
 
     @Test

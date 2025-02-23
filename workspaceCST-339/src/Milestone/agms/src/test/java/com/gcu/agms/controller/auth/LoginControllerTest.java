@@ -33,7 +33,7 @@ class LoginControllerTest {
     private MockHttpSession session;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         loginService = mock(LoginService.class);
         controller = new LoginController(loginService);
         

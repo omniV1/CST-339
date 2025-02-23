@@ -29,10 +29,16 @@
     <properties>
         <!-- ...existing properties... -->
         <sonar.host.url>http://localhost:9000</sonar.host.url>
-        <sonar.token>${env.SONAR_TOKEN}</sonar.token>
-        <sonar.login>${env.SONAR_TOKEN}</sonar.login>
+        <sonar.projectKey>AGMS</sonar.projectKey>
+        <sonar.projectName>AGMS</sonar.projectName>
+        <sonar.token>${SONAR_TOKEN}</sonar.token>
     </properties>
     <dependencies>
+    <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
@@ -40,11 +46,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

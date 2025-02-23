@@ -40,7 +40,7 @@ class AdminDashboardControllerTest {
     private MockHttpSession session;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         userService = mock(UserService.class);
         gateOperationsService = mock(GateOperationsService.class);
         gateManagementService = mock(GateManagementService.class);

@@ -1,6 +1,7 @@
 package com.gcu.agms;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,7 +30,7 @@ class AgmsApplicationTest {
         assertNotNull(applicationContext, "Application context should be available after startup");
         assertNotNull(applicationContext.getBean(AgmsApplication.class), 
             "Main application bean should be available");
-        assertNotNull(applicationContext.getStartupDate(), 
-            "Application should have a startup date");
+        assertTrue(applicationContext.getStartupDate() > 0, 
+            "Application should have a valid startup timestamp");
     }
 }

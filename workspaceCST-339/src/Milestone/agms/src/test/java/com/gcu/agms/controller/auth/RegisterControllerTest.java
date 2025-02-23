@@ -34,7 +34,7 @@ class RegisterControllerTest {
    
 
     @BeforeEach
-    void setUp() {
+    protected void setUp() {
         userService = mock(UserService.class);
         authCodeService = mock(AuthorizationCodeService.class);
         controller = new RegisterController(userService, authCodeService);

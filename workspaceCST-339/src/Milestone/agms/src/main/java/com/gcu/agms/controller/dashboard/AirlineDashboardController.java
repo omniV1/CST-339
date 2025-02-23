@@ -1,5 +1,7 @@
 package com.gcu.agms.controller.dashboard;
 
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.gcu.agms.service.flight.FlightOperationsService;
 import com.gcu.agms.service.gate.GateManagementService;
 import com.gcu.agms.service.gate.GateOperationsService;
 
@@ -35,6 +38,7 @@ public class AirlineDashboardController {
     
     private final GateOperationsService gateOperationsService;
     private final GateManagementService gateManagementService;
+    private final FlightOperationsService flightOperationsService;
     
     /**
      * Constructor injection of required services.
@@ -44,9 +48,11 @@ public class AirlineDashboardController {
      */
     public AirlineDashboardController(
             GateOperationsService gateOperationsService,
-            GateManagementService gateManagementService) {
+            GateManagementService gateManagementService,
+            FlightOperationsService flightOperationsService) {
         this.gateOperationsService = gateOperationsService;
         this.gateManagementService = gateManagementService;
+        this.flightOperationsService = flightOperationsService;
     }
     
     /**
@@ -68,13 +74,13 @@ public class AirlineDashboardController {
         // Add page title and basic gate information
         model.addAttribute(PAGE_TITLE_ATTR, "Airline Staff Dashboard - AGMS");
         model.addAttribute("gateStatuses", gateOperationsService.getAllGateStatuses());
-        
-        // Get today's flight schedule information
-        // Note: In a real implementation, this would filter for the specific airline
         model.addAttribute("gates", gateManagementService.getAllGates());
         
         // Add performance metrics
         model.addAttribute("statistics", gateOperationsService.getStatistics());
+        
+        // Add active flights
+        model.addAttribute("activeFlights", flightOperationsService.getActiveFlights());
         
         logger.info("Airline staff dashboard loaded successfully");
         return DASHBOARD_VIEW;
@@ -150,5 +156,41 @@ public class AirlineDashboardController {
         // airline-specific performance metrics
         
         return "airline/performance";
+    }
+
+    @PostMapping("/flights/{flightNumber}/status")
+    public String updateFlightStatus(
+            @PathVariable String flightNumber,
+            @RequestParam String newStatus,
+            @RequestParam String location,
+            RedirectAttributes redirectAttributes) {
+        
+        logger.info("Updating status for flight {} to {} at {}", 
+                    flightNumber, newStatus, location);
+        
+        boolean updated = flightOperationsService.updateFlightStatus(
+            flightNumber, newStatus, location);
+            
+        if (updated) {
+            redirectAttributes.addFlashAttribute("success", 
+                "Flight status updated successfully");
+        } else {
+            redirectAttributes.addFlashAttribute("error", 
+                "Failed to update flight status");
+        }
+        
+        return "redirect:/airline/dashboard";
+    }
+
+    @GetMapping("/flights/{flightNumber}")
+    public String showFlightDetails(@PathVariable String flightNumber, Model model) {
+        logger.info("Viewing details for flight: {}", flightNumber);
+        
+        Map<String, Object> flightDetails = flightOperationsService.getFlightDetails(flightNumber);
+        
+        model.addAttribute(PAGE_TITLE_ATTR, "Flight Details - AGMS");
+        model.addAttribute("flight", flightDetails.get("flight"));
+        
+        return "flight/details";
     }
 }

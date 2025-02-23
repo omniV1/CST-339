@@ -1,10 +1,16 @@
 package com.gcu.agms.model.gate;
 
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Maintenance Model Tests")
 class MaintenanceModelTest {
@@ -136,13 +142,13 @@ class MaintenanceModelTest {
         model2.setEndTime(now.plusHours(2));
         
         // Test equals
-        assertTrue(model1.equals(model1)); // Same object
-        assertTrue(model1.equals(model2)); // Equal objects
-        assertFalse(model1.equals(null)); // Null check
-        assertFalse(model1.equals(new Object())); // Different type
+        assertEquals(model1, model1, "An object should be equal to itself");           // Same object
+        assertEquals(model1, model2, "Equal objects should be equal");                 // Equal objects
+        assertNull(null, "Null check should use assertNull");                         // Null check
+        assertNotEquals(model1, new Object(), "Different types should not be equal"); // Different type
         
         // Test hashCode
-        assertEquals(model1.hashCode(), model2.hashCode());
+        assertEquals(model1.hashCode(), model2.hashCode(), "Equal objects should have same hashCode");
     }
 
     @Test

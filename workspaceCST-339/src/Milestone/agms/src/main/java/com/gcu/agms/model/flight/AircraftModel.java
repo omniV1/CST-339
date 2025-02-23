@@ -59,7 +59,8 @@ public class AircraftModel {
         AVAILABLE("Available for service", "success"),
         IN_SERVICE("Currently in service", "primary"),
         MAINTENANCE("Under maintenance", "warning"),
-        GROUNDED("Aircraft is grounded", "danger");
+        GROUNDED("Aircraft is grounded", "danger"),
+        ACTIVE("Active", "success");
 
         private final String description;
         private final String cssClass;

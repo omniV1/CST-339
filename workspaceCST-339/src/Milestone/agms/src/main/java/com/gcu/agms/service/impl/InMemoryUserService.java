@@ -62,9 +62,52 @@ public class InMemoryUserService implements UserService {
         return user;
     }
 
+    private boolean validateUser(UserModel user) {
+        if (user == null || 
+            user.getUsername() == null || user.getUsername().trim().isEmpty() ||
+            user.getPassword() == null || user.getPassword().trim().isEmpty() ||
+            user.getEmail() == null || 
+            user.getFirstName() == null || user.getFirstName().trim().isEmpty() ||
+            user.getLastName() == null || user.getLastName().trim().isEmpty() ||
+            user.getPhoneNumber() == null) {
+            return false;
+        }
+
+        // Email validation - using safe regex pattern
+        if (!user.getEmail().matches("^[\\w+.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
+            return false;
+        }
+
+        // Phone validation - using safe regex pattern
+        if (!user.getPhoneNumber().matches("^\\+?[1-9]\\d{7,14}$")) {
+            return false;
+        }
+
+        // Password validation - using character class checks instead of backtracking-prone patterns
+        String password = user.getPassword();
+        if (password.length() < 8) {
+            return false;
+        }
+
+        // Use non-backtracking patterns for each requirement
+        boolean hasUpper = password.matches(".*?[A-Z].*");
+        boolean hasLower = password.matches(".*?[a-z].*");
+        boolean hasDigit = password.matches(".*?\\d.*");
+        boolean hasSpecial = password.matches(".*?[@#$%^&+=!].*");
+
+        return hasUpper && hasLower && hasDigit && hasSpecial;
+    }
+
     @Override
     public boolean registerUser(UserModel newUser) {
         logger.info("Attempting to register new user: {}", newUser.getUsername());
+        
+        // Validate user data
+        if (!validateUser(newUser)) {
+            logger.warn("Registration failed: Invalid user data");
+            return false;
+        }
+
         if (findByUsername(newUser.getUsername()).isPresent()) {
             logger.warn("Registration failed: Username already exists");
             return false;
@@ -79,20 +122,32 @@ public class InMemoryUserService implements UserService {
 
     @Override
     public Optional<UserModel> findByUsername(String username) {
-        logger.debug("Searching for user: {}", username);
+        if (username == null) {
+            return Optional.empty();
+        }
+        
+        // Trim username before searching
+        String trimmedUsername = username.trim();
+        
         return users.stream()
-                   .filter(user -> user.getUsername().equals(username))
-                   .findFirst();
+            .filter(user -> user.getUsername().equals(trimmedUsername))
+            .findFirst();
     }
 
     @Override
     public boolean authenticate(String username, String password) {
-        logger.info("Attempting to authenticate user: {}", username);
-        Optional<UserModel> user = findByUsername(username);
-        boolean authenticated = user.map(u -> u.getPassword().equals(password))
-                                  .orElse(false);
-        logger.info("Authentication {}: {}", authenticated ? "successful" : "failed", username);
-        return authenticated;
+        if (username == null || password == null) {
+            return false;
+        }
+        
+        // Trim username before looking up
+        String trimmedUsername = username.trim();
+        
+        Optional<UserModel> user = findByUsername(trimmedUsername);
+        if (user.isPresent()) {
+            return user.get().getPassword().equals(password);
+        }
+        return false;
     }
 
     @Override
@@ -126,6 +181,13 @@ public class InMemoryUserService implements UserService {
     @Override
     public boolean updateUser(UserModel userModel) {
         logger.info("Attempting to update user: {}", userModel.getUsername());
+
+        // Validate update data
+        if (!validateUser(userModel)) {
+            logger.warn("Update failed: Invalid user data");
+            return false;  
+        }
+
         Optional<UserModel> existingUser = users.stream()
                                           .filter(user -> user.getId().equals(userModel.getId()))
                                           .findFirst();

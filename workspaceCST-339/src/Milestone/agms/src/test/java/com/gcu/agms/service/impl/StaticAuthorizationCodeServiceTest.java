@@ -14,7 +14,7 @@ class StaticAuthorizationCodeServiceTest {
     private StaticAuthorizationCodeService authCodeService;
 
     @BeforeEach
-    void setUp() {
+    protected void setUp() {
         authCodeService = new StaticAuthorizationCodeService();
     }
 

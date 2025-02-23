@@ -29,7 +29,7 @@ class RegistrationServiceTest {
     private RegistrationService registrationService;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         MockitoAnnotations.openMocks(this);
         registrationService = new RegistrationService(userService, authCodeService);
     }

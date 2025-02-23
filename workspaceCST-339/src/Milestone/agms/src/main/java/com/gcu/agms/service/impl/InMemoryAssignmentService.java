@@ -24,6 +24,7 @@ import jakarta.annotation.PostConstruct;
 @Service
 public class InMemoryAssignmentService {
     private static final Logger logger = LoggerFactory.getLogger(InMemoryAssignmentService.class);
+    private static final String SYSTEM_USER = "system";  // Added constant
     
     // Store assignments by gate ID for easy lookup
     private final Map<String, List<AssignmentModel>> assignmentsByGate = new HashMap<>();
@@ -42,11 +43,11 @@ public class InMemoryAssignmentService {
     private void createSampleAssignments() {
         // Create some sample assignments for different gates
         createSampleAssignment("T1G1", "AA123", LocalDateTime.now().plusHours(1), 
-                             LocalDateTime.now().plusHours(3), "system");
+                             LocalDateTime.now().plusHours(3), SYSTEM_USER);  // Use constant
         createSampleAssignment("T2G3", "UA456", LocalDateTime.now().plusHours(2), 
-                             LocalDateTime.now().plusHours(4), "system");
+                             LocalDateTime.now().plusHours(4), SYSTEM_USER);  // Use constant
         createSampleAssignment("T3G2", "DL789", LocalDateTime.now().plusHours(3), 
-                             LocalDateTime.now().plusHours(5), "system");
+                             LocalDateTime.now().plusHours(5), SYSTEM_USER);  // Use constant
                              
         logger.info("Sample assignments created");
     }

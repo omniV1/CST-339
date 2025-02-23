@@ -4,9 +4,15 @@ import java.time.LocalDateTime;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@ToString
 public class FlightModel {
     @NotEmpty(message = "Flight number is required")
     private String flightNumber;
@@ -40,18 +46,17 @@ public class FlightModel {
     private String remarks;
 
     public enum FlightStatus {
-        // Update enum constants to include all three parameters:
-        // Format: NAME(display label, CSS class, description)
-        SCHEDULED("Scheduled", "info", "Flight is scheduled"),
-        BOARDING("Boarding", "primary", "Boarding in progress"),
-        DEPARTED("Departed", "success", "Flight has departed"),
-        EN_ROUTE("En Route", "primary", "Flight is in the air"),
-        APPROACHING("Approaching", "warning", "Approaching destination"),
-        LANDED("Landed", "success", "Flight has landed"),
-        ARRIVED("Arrived", "success", "Flight has arrived at gate"),
-        DELAYED("Delayed", "warning", "Flight is delayed"),
-        CANCELLED("Cancelled", "danger", "Flight is cancelled"),
-        DIVERTED("Diverted", "danger", "Flight has been diverted");
+        SCHEDULED("Scheduled", FlightCssClasses.INFO, "Flight is scheduled"),
+        BOARDING("Boarding", FlightCssClasses.PRIMARY, "Boarding in progress"),
+        DEPARTED("Departed", FlightCssClasses.SUCCESS, "Flight has departed"),
+        EN_ROUTE("En Route", FlightCssClasses.PRIMARY, "Flight is in the air"),
+        APPROACHING("Approaching", FlightCssClasses.WARNING, "Approaching destination"),
+        LANDED("Landed", FlightCssClasses.SUCCESS, "Flight has landed"),
+        ARRIVED("Arrived", FlightCssClasses.SUCCESS, "Flight has arrived at gate"),
+        DELAYED("Delayed", FlightCssClasses.WARNING, "Flight is delayed"),
+        CANCELLED("Cancelled", FlightCssClasses.DANGER, "Flight is cancelled"),
+        DIVERTED("Diverted", FlightCssClasses.DANGER, "Flight has been diverted"),
+        COMPLETED("Completed", FlightCssClasses.SUCCESS, "Flight has completed");
 
         private final String label;
         private final String cssClass;
@@ -63,14 +68,12 @@ public class FlightModel {
             this.description = description;
         }
 
-        // Ensure all getter methods are properly defined
         public String getLabel() { return label; }
         public String getCssClass() { return cssClass; }
         public String getDescription() { return description; }
     }
 
-
-    // Helper method to check if flight is active (meaning it's in progress)
+    // Helper methods
     public boolean isActive() {
         return status == FlightStatus.BOARDING ||
                status == FlightStatus.DEPARTED ||
@@ -78,16 +81,13 @@ public class FlightModel {
                status == FlightStatus.APPROACHING;
     }
 
-    // Helper method to check if flight is delayed
     public boolean isDelayed() {
         if (status == FlightStatus.DELAYED) return true;
 
-        // Check if actual departure is later than scheduled
         if (actualDeparture != null && scheduledDeparture != null) {
             return actualDeparture.isAfter(scheduledDeparture);
         }
 
-        // Check if actual arrival is later than scheduled
         if (actualArrival != null && scheduledArrival != null) {
             return actualArrival.isAfter(scheduledArrival);
         }

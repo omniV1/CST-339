@@ -29,10 +29,13 @@ public interface FlightOperationsService {
     List<AircraftModel> getAvailableAircraft();
 
     // Flight Management
-    boolean createFlight(FlightModel flight); // Add this method
+    boolean createFlight(FlightModel flight);
+    boolean createFlights(List<FlightModel> flights);
     boolean updateFlight(FlightModel flight);
+    boolean updateFlightStatuses(List<String> flightNumbers, String status, String reason);
     Map<String, Object> getFlightDetails(String flightNumber);
     List<Map<String, Object>> getActiveFlights();
+    List<FlightModel> searchFlights(String origin, String destination, String airline);
     Map<String, Integer> getOperationalStatistics();
     boolean updateFlightStatus(String flightNumber, String status, String location);
     boolean deleteFlight(String flightNumber);

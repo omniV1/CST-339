@@ -39,13 +39,10 @@ public class RegistrationService {
         logger.info("Processing registration for user: {}", userModel.getUsername());
         
         // Validate role and authorization code if required
-        if (requiresAuthCode(userModel.getRole())) {
-            if (!authCodeService.isValidAuthCode(userModel.getAuthCode(), 
-                                               userModel.getRole())) {
-                logger.warn("Invalid authorization code for role: {}", 
-                          userModel.getRole());
-                return false;
-            }
+        if (requiresAuthCode(userModel.getRole()) && 
+            !authCodeService.isValidAuthCode(userModel.getAuthCode(), userModel.getRole())) {
+            logger.warn("Invalid authorization code for role: {}", userModel.getRole());
+            return false;
         }
         
         // Set initial user properties

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -99,9 +98,10 @@ public class InMemoryGateManagementService implements GateManagementService {
     @Override
     public List<GateModel> getGatesByTerminal(String terminal) {
         logger.debug("Retrieving gates for terminal: {}", terminal);
+        
         return gates.values().stream()
                    .filter(gate -> gate.getTerminal().equals(terminal))
-                   .collect(Collectors.toList());
+                   .toList();
     }
     
     @PostConstruct

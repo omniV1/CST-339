@@ -22,7 +22,7 @@ class InMemoryGateOperationsServiceTest {
     private InMemoryGateOperationsService gateOperationsService;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         gateOperationsService = new InMemoryGateOperationsService();
         gateOperationsService.initializeData();
     }

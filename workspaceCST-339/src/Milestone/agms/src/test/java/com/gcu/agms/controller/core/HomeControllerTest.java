@@ -18,7 +18,7 @@ class HomeControllerTest {
     private HomeController controller;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         controller = new HomeController();
         
         // Configure view resolver

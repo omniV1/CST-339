@@ -90,7 +90,7 @@ The application now fully embraces Spring's dependency injection and Bean manage
 
 ## Project Links
 - **GitHub Repository:** https://github.com/omniV1/CST-339/tree/main/workspaceCST-339/src/Milestone
-- **Screencast Demo:** https://www.youtube.com/watch?v=Yzfabtl3ii4
+- **Screencast Demo:** https://www.youtube.com/watch?v=GyHBIv8vaHg
 - **Javadoc:** https://github.com/omniV1/CST-339/tree/main/workspaceCST-339/src/Milestone/agms/docs/apidocs
 - **Testing** https://github.com/omniV1/CST-339/tree/main/workspaceCST-339/src/Milestone/agms/src/test/java/com/gcu/agms/service
 ## Technical Requirements

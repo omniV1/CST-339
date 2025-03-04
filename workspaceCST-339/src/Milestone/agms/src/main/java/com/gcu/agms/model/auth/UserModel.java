@@ -1,5 +1,6 @@
 package com.gcu.agms.model.auth;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -30,6 +31,7 @@ import lombok.Data;
  */
 @Data
 public class UserModel implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     // Database and audit fields - Required by UML for entity tracking

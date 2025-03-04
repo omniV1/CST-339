@@ -111,7 +111,7 @@ public class InMemoryGateManagementService implements GateManagementService {
         for (int terminal = 1; terminal <= 4; terminal++) {
             for (int gate = 1; gate <= 5; gate++) {
                 GateModel gateModel = new GateModel();
-                String gateId = String.format("T%dG%d", terminal, gate);
+                String gateId = "T%dG%d".formatted(terminal, gate);
                 gateModel.setGateId(gateId);
                 gateModel.setTerminal(String.valueOf(terminal));
                 gateModel.setGateNumber(String.valueOf(gate));

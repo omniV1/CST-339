@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layouts/MainLayout :: layout(~{::div})}">
+<body>
+    <div th:fragment="content">
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-8 offset-md-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Generate Authorization Code</h3>
+                        </div>
+                        <div class="card-body">
+                            <form th:action="@{/admin/auth-codes/create}" 
+                                  th:object="${authCode}" 
+                                  method="post">
+                                
+                                <!-- Role field -->
+                                <div class="mb-3">
+                                    <label for="role" class="form-label">Role</label>
+                                    <select class="form-select" id="role" th:field="*{role}" required>
+                                        <option value="">Select role</option>
+                                        <option th:each="role : ${roles}"
+                                                th:if="${role.name() == 'ADMIN' || role.name() == 'OPERATIONS_MANAGER'}"
+                                                th:value="${role}"
+                                                th:text="${role.getDisplayName()}">
+                                            Role
+                                        </option>
+                                    </select>
+                                    <div class="form-text">
+                                        Select the role this authorization code will grant access to.
+                                    </div>
+                                </div>
+                                
+                                <!-- Description field -->
+                                <div class="mb-3">
+                                    <label for="description" class="form-label">Description</label>
+                                    <input type="text" class="form-control" id="description" 
+                                           th:field="*{description}" required
+                                           placeholder="e.g., For IT staff, Temporary access">
+                                    <div class="form-text">
+                                        Provide a description of this code's purpose.
+                                    </div>
+                                </div>
+                                
+                                <!-- Expiration date field -->
+                                <div class="mb-3">
+                                    <label for="expiresAt" class="form-label">Expiration Date</label>
+                                    <input type="datetime-local" class="form-control" id="expiresAt" 
+                                           name="expiresAt">
+                                    <div class="form-text">
+                                        When this code will expire. Leave blank for no expiration.
+                                    </div>
+                                </div>
+                                
+                                <!-- Submit and Cancel buttons -->
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-key me-2"></i>Generate Code
+                                    </button>
+                                    <a href="/admin/auth-codes" class="btn btn-secondary">Cancel</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

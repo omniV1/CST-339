@@ -76,40 +76,42 @@ public class AdminDashboardController {
      * overview of system status.
      */
     @GetMapping("/dashboard")
-    public String showDashboard(Model model, HttpSession session) {
-        // Verify admin role
-        String userRole = (String) session.getAttribute("userRole");
-        if (!"ADMIN".equals(userRole)) {
-            logger.warn("Unauthorized access attempt to admin dashboard");
-            return "redirect:/login";
-        }
-        
-        logger.info("Loading admin dashboard");
-        
-        model.addAttribute(PAGE_TITLE_ATTR, "Admin Dashboard - AGMS");
-        
-        // Add user statistics
-        model.addAttribute(USERS_ATTR, userService.getAllUsers());
-        model.addAttribute("totalUsers", userService.getAllUsers().size());
-        
-        // Add gate operations statistics
-        model.addAttribute("gateStatuses", gateOperationsService.getAllGateStatuses());
-        model.addAttribute(GATE_STATS_ATTR, gateOperationsService.getStatistics());
-        
-        // Add gate management information
-        model.addAttribute(GATES_ATTR, gateManagementService.getAllGates());
-        model.addAttribute(GATE_MODEL_ATTR, new GateModel());
-        
-        // Terminal-specific gate information
-        for (int i = 1; i <= 4; i++) {
-            model.addAttribute("terminal" + i + "Gates", 
-                gateManagementService.getGatesByTerminal(String.valueOf(i)));
-        }
-        
-        logger.info("Admin dashboard loaded successfully");
-        return DASHBOARD_VIEW;
+public String showDashboard(Model model, HttpSession session) {
+    // Verify admin role
+    String userRole = (String) session.getAttribute("userRole");
+    if (!"ADMIN".equals(userRole)) {
+        logger.warn("Unauthorized access attempt to admin dashboard");
+        return "redirect:/login";
     }
     
+    logger.info("Loading admin dashboard");
+    
+    model.addAttribute(PAGE_TITLE_ATTR, "Admin Dashboard - AGMS");
+    
+    // Add user statistics
+    model.addAttribute(USERS_ATTR, userService.getAllUsers());
+    model.addAttribute("totalUsers", userService.getAllUsers().size());
+    
+    // Add gate operations statistics
+    model.addAttribute("gateStatuses", gateOperationsService.getAllGateStatuses());
+    model.addAttribute(GATE_STATS_ATTR, gateOperationsService.getStatistics());
+    
+    // Add gate management information
+    model.addAttribute(GATES_ATTR, gateManagementService.getAllGates());
+    model.addAttribute(GATE_MODEL_ATTR, new GateModel());
+    
+    // Terminal-specific gate information
+    for (int i = 1; i <= 4; i++) {
+        model.addAttribute("terminal" + i + "Gates", 
+            gateManagementService.getGatesByTerminal(String.valueOf(i)));
+    }
+    
+    // Add authorization code management access
+    model.addAttribute("hasAuthCodeManagement", true);
+    
+    logger.info("Admin dashboard loaded successfully");
+    return DASHBOARD_VIEW;
+}
     /**
      * Displays the system-wide gate management interface.
      * Provides administrators with full control over gate configuration and management.
@@ -295,4 +297,6 @@ public class AdminDashboardController {
         
         return DASHBOARD_REDIRECT;
     }
+
+    
 }

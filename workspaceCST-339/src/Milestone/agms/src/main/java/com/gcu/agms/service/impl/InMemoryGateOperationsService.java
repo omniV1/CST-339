@@ -31,7 +31,7 @@ public class InMemoryGateOperationsService implements GateOperationsService {
         // Create sample gates for each terminal
         for (int terminal = 1; terminal <= 4; terminal++) {
             for (int gate = 1; gate <= 5; gate++) {
-                String gateId = String.format("T%dG%d", terminal, gate);
+                String gateId = "T%dG%d".formatted(terminal, gate);
                 GateStatus status = getRandomGateStatus();
                 gateStatuses.put(gateId, status);
                 logger.debug("Initialized gate {} with status {}", gateId, status);

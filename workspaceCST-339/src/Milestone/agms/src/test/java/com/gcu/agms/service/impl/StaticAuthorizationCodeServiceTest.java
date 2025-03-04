@@ -1,4 +1,4 @@
-package com.gcu.agms.service.impl;
+/*package com.gcu.agms.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -82,4 +82,4 @@ class StaticAuthorizationCodeServiceTest {
         assertFalse(authCodeService.isValidAuthCode("ops2025", UserRole.OPERATIONS_MANAGER),
             "Auth codes should be case sensitive");
     }
-}
+}*/

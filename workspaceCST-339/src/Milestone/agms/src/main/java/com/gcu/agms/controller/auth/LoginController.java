@@ -22,7 +22,7 @@ import jakarta.validation.Valid;
  * as required by Milestone 3.
  */
 @Controller
-@RequestMapping({"/", "/auth"}) // Handle both root and /auth paths
+@RequestMapping({"/auth"}) // Handle both root and /auth paths
 public class LoginController {
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
     private static final String LOGIN_REDIRECT = "redirect:/auth/login";

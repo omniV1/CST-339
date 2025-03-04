@@ -1,5 +1,6 @@
 package com.gcu.agms.model.gate;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,34 +15,6 @@ import lombok.Data;
  * Represents a physical gate in the Airport Gate Management System (AGMS).
  * This model follows the UML class diagram specifications while incorporating
  * practical validation and operational requirements.
- */
-/**
- * Represents a gate in an airport with various attributes and capabilities.
- * This model includes validation annotations for ensuring proper data integrity.
- * 
- * Attributes:
- * - id: Database identifier for the gate.
- * - gateId: Unique identifier for the gate, must follow the format T#G# (e.g., T1G1).
- * - terminal: Terminal number where the gate is located, must be between 1 and 4.
- * - gateNumber: Number of the gate, must be 1-2 digits.
- * - gateType: Type of flights the gate can handle (Domestic, International, Both).
- * - gateSize: Size of the gate determining aircraft compatibility (Small, Medium, Large).
- * - status: Current operational status of the gate.
- * - isActive: Indicates if the gate is currently active.
- * - hasJetBridge: Indicates if the gate has a jet bridge.
- * - features: List of features and capabilities available at the gate.
- * - capacity: Capacity of the gate.
- * 
- * Enums:
- * - GateType: Represents the kind of flights the gate can handle.
- * - GateSize: Determines aircraft compatibility based on gate size.
- * - GateFeature: Represents available facilities and features at the gate.
- * 
- * Methods:
- * - isCompatibleWith(AircraftType aircraftType): Checks if the gate is compatible with a specific aircraft type.
- * - hasRequiredFeatures(AircraftType aircraftType): Helper method to check if the gate has all required features for an aircraft type.
- * - getCapacity(): Returns the capacity of the gate.
- * - setCapacity(int capacity): Sets the capacity of the gate.
  */
 @Data   
 public class GateModel {
@@ -81,6 +54,10 @@ public class GateModel {
     
     @NotNull(message = "Capacity must be specified")
     private int capacity;
+    
+    // Timestamps for database operations
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     /**
      * Gate types representing the kind of flights the gate can handle

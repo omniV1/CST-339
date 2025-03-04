@@ -29,7 +29,6 @@ import com.gcu.agms.model.gate.GateModel;
 import com.gcu.agms.service.flight.AssignmentService;
 import com.gcu.agms.service.gate.GateManagementService;
 import com.gcu.agms.service.gate.GateOperationsService;
-import com.gcu.agms.service.gate.GateOperationsService.GateStatus;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -68,6 +67,11 @@ public class GateDashboardController {
         this.gateOperationsService = gateOperationsService;
         this.gateManagementService = gateManagementService;
         this.assignmentService = assignmentService;
+        
+        logger.info("GateDashboardController initialized with services: {}, {}, {}", 
+            gateOperationsService.getClass().getSimpleName(),
+            gateManagementService.getClass().getSimpleName(),
+            assignmentService.getClass().getSimpleName());
     }
     
     /**
@@ -90,19 +94,26 @@ public class GateDashboardController {
         model.addAttribute(PAGE_TITLE_ATTR, "Gate Management Dashboard - AGMS");
         
         // Get current gate statuses and statistics
-        model.addAttribute("gateStatuses", gateOperationsService.getAllGateStatuses());
-        model.addAttribute("statistics", gateOperationsService.getStatistics());
+        Map<String, GateOperationsService.GateStatus> gateStatuses = gateOperationsService.getAllGateStatuses();
+        logger.debug("Retrieved {} gate statuses", gateStatuses.size());
+        model.addAttribute("gateStatuses", gateStatuses);
+        
+        Map<String, Integer> statistics = gateOperationsService.getStatistics();
+        logger.debug("Retrieved statistics: {}", statistics);
+        model.addAttribute("statistics", statistics);
         
         // Get gates and their assignments
         List<GateModel> gates = gateManagementService.getAllGates();
+        logger.debug("Retrieved {} gates", gates.size());
         model.addAttribute("gates", gates);
         
-        // Add assignments for each gate using expression notation
+        // Add assignments for each gate
         Map<String, List<AssignmentModel>> gateAssignments = new HashMap<>();
-        gates.forEach(gate -> gateAssignments.put(
-            gate.getGateId(), 
-            assignmentService.getAssignmentsForGate(gate.getGateId())
-        ));
+        for (GateModel gate : gates) {
+            List<AssignmentModel> assignments = assignmentService.getAssignmentsForGate(gate.getGateId());
+            logger.debug("Gate {} has {} assignments", gate.getGateId(), assignments.size());
+            gateAssignments.put(gate.getGateId(), assignments);
+        }
         model.addAttribute("gateAssignments", gateAssignments);
         
         logger.info("Gate manager dashboard loaded successfully");
@@ -137,7 +148,7 @@ public class GateDashboardController {
     @PostMapping("/status/{gateId}")
     public String updateGateStatus(
             @PathVariable String gateId,
-            @RequestParam GateStatus newStatus,
+            @RequestParam GateOperationsService.GateStatus newStatus,
             RedirectAttributes redirectAttributes) {
         logger.info("Updating status for gate {} to {}", gateId, newStatus);
         

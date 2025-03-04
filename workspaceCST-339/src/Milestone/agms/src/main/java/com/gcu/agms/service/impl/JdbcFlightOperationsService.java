@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.gcu.agms.model.flight.AircraftModel;
 import com.gcu.agms.model.flight.FlightModel;
 import com.gcu.agms.model.maintenance.MaintenanceRecord;
+import com.gcu.agms.repository.AircraftRepository;
 import com.gcu.agms.repository.FlightRepository;
 import com.gcu.agms.service.flight.FlightOperationsService;
 
@@ -29,64 +30,112 @@ public class JdbcFlightOperationsService implements FlightOperationsService {
     private static final Logger logger = LoggerFactory.getLogger(JdbcFlightOperationsService.class);
     
     private final FlightRepository flightRepository;
-    
+    private final AircraftRepository aircraftRepository;
+
     /**
-     * Constructor with repository dependency injection.
+     * Constructor with repositories dependency injection.
      * 
      * @param flightRepository Repository for flight data access
+     * @param aircraftRepository Repository for aircraft data access
      */
-    public JdbcFlightOperationsService(FlightRepository flightRepository) {
+    public JdbcFlightOperationsService(
+            FlightRepository flightRepository,
+            AircraftRepository aircraftRepository) {
         this.flightRepository = flightRepository;
+        this.aircraftRepository = aircraftRepository;
         logger.info("Initialized JDBC Flight Operations Service");
     }
 
     @Override
     public boolean registerAircraft(AircraftModel aircraft) {
-        // This operation will be implemented with a dedicated aircraft repository
-        logger.info("Aircraft registration not yet implemented in database");
-        return false;
+        logger.info("Registering new aircraft: {}", aircraft.getRegistrationNumber());
+        
+        // Validate required fields
+        if (aircraft.getRegistrationNumber() == null || aircraft.getModel() == null || aircraft.getType() == null) {
+            logger.warn("Invalid aircraft data - missing required fields");
+            return false;
+        }
+        
+        // Check if aircraft already exists
+        if (aircraftRepository.existsByRegistrationNumber(aircraft.getRegistrationNumber())) {
+            logger.warn("Aircraft with registration number already exists: {}", aircraft.getRegistrationNumber());
+            return false;
+        }
+        
+        // Set default status if not provided
+        if (aircraft.getStatus() == null) {
+            aircraft.setStatus(AircraftModel.AircraftStatus.AVAILABLE);
+        }
+        
+        try {
+            aircraftRepository.save(aircraft);
+            logger.info("Aircraft registered successfully: {}", aircraft.getRegistrationNumber());
+            return true;
+        } catch (Exception e) {
+            logger.error("Error registering aircraft: {}", e.getMessage(), e);
+            return false;
+        }
     }
 
     @Override
     public Optional<AircraftModel> getAircraft(String registrationNumber) {
-        // This operation will be implemented with a dedicated aircraft repository
-        logger.info("Aircraft retrieval not yet implemented in database");
-        return Optional.empty();
+        logger.debug("Retrieving aircraft with registration number: {}", registrationNumber);
+        return aircraftRepository.findByRegistrationNumber(registrationNumber);
     }
 
     @Override
     public List<AircraftModel> getAllAircraft() {
-        // This operation will be implemented with a dedicated aircraft repository
-        logger.info("Aircraft listing not yet implemented in database");
-        return new ArrayList<>();
+        logger.debug("Retrieving all aircraft");
+        return aircraftRepository.findAll();
     }
 
     @Override
     public boolean updateAircraftStatus(String registrationNumber, AircraftModel.AircraftStatus newStatus, String location) {
-        // This operation will be implemented with a dedicated aircraft repository
-        logger.info("Aircraft status update not yet implemented in database");
-        return false;
+        logger.info("Updating status for aircraft: {} to {} at {}", registrationNumber, newStatus, location);
+        
+        if (registrationNumber == null || newStatus == null) {
+            logger.warn("Invalid parameters for aircraft status update");
+            return false;
+        }
+        
+        return aircraftRepository.updateStatus(registrationNumber, newStatus.name(), location);
     }
 
     @Override
     public boolean scheduleMaintenance(String registrationNumber, LocalDateTime maintenanceDate, String maintenanceType, String description) {
-        // This operation will be implemented with dedicated aircraft and maintenance repositories
-        logger.info("Maintenance scheduling not yet implemented in database");
-        return false;
+        logger.info("Scheduling maintenance for aircraft: {} on {}", registrationNumber, maintenanceDate);
+        
+        // Set aircraft status to MAINTENANCE
+        boolean statusUpdated = aircraftRepository.updateStatus(
+            registrationNumber, 
+            AircraftModel.AircraftStatus.MAINTENANCE.name(),
+            "Maintenance"
+        );
+        
+        // Update next maintenance date
+        boolean maintenanceScheduled = aircraftRepository.updateMaintenanceDate(
+            registrationNumber,
+            maintenanceDate
+        );
+        
+        // In a full implementation, we would also create a maintenance record
+        // But for now, we'll just update the aircraft status and maintenance date
+        
+        return statusUpdated && maintenanceScheduled;
     }
 
     @Override
     public List<MaintenanceRecord> getMaintenanceRecords(String registrationNumber) {
-        // This operation will be implemented with a dedicated maintenance repository
-        logger.info("Maintenance records retrieval not yet implemented in database");
+        // In a full implementation, this would retrieve maintenance records from a dedicated repository
+        // For now, returning an empty list
+        logger.info("Retrieving maintenance records for aircraft: {}", registrationNumber);
         return new ArrayList<>();
     }
 
     @Override
     public List<AircraftModel> getAvailableAircraft() {
-        // This operation will be implemented with a dedicated aircraft repository
-        logger.info("Available aircraft listing not yet implemented in database");
-        return new ArrayList<>();
+        logger.debug("Retrieving available aircraft");
+        return aircraftRepository.findAvailableAircraft();
     }
 
     @Override
@@ -270,19 +319,15 @@ public class JdbcFlightOperationsService implements FlightOperationsService {
         
         Map<String, Integer> stats = new HashMap<>();
         
-        // Count total flights
+        // Flight stats
         stats.put("totalFlights", flightRepository.countAll());
-        
-        // Count active flights
         stats.put("activeFlights", flightRepository.countActiveFlights());
-        
-        // Count delayed flights
         stats.put("delayedFlights", flightRepository.countDelayedFlights());
         
-        // Aircraft stats - placeholders until implemented
-        stats.put("totalAircraft", 0);
-        stats.put("availableAircraft", 0);
-        stats.put("maintenanceCount", 0);
+        // Aircraft stats
+        stats.put("totalAircraft", aircraftRepository.countAll());
+        stats.put("availableAircraft", aircraftRepository.countByStatus("AVAILABLE"));
+        stats.put("maintenanceCount", aircraftRepository.countByStatus("MAINTENANCE"));
         
         logger.info("Operational statistics calculated: {}", stats);
         return stats;

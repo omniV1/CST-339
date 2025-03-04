@@ -54,6 +54,7 @@ public class AircraftModel {
     public boolean isAvailableForService() {
         return status == AircraftStatus.AVAILABLE;
     }
+    private Long id;
 
     public enum AircraftStatus {
         AVAILABLE("Available for service", "success"),
@@ -78,4 +79,19 @@ public class AircraftModel {
             return cssClass;
         }
     }
+    /**
+ * Getter for the database ID
+ * @return The database ID
+ */
+public Long getId() {
+    return id;
+}
+
+/**
+ * Setter for the database ID
+ * @param id The database ID to set
+ */
+public void setId(Long id) {
+    this.id = id;
+}
 }

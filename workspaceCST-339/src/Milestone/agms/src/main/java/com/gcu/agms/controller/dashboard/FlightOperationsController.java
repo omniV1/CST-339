@@ -24,7 +24,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.gcu.agms.model.flight.AircraftModel;
 import com.gcu.agms.model.flight.FlightModel;
+import com.gcu.agms.model.gate.AssignmentModel;
+import com.gcu.agms.model.gate.AssignmentStatus;
 import com.gcu.agms.model.maintenance.MaintenanceRecord;
+import com.gcu.agms.service.flight.AssignmentService;
 import com.gcu.agms.service.flight.FlightOperationsService;
 
 import jakarta.servlet.http.HttpSession;
@@ -32,9 +35,9 @@ import jakarta.validation.Valid;
 
 /**
  * Controller handling all flight operations related endpoints in the AGMS system.
- * Provides endpoints for managing flights, aircraft, and maintenance operations.
+ * Provides endpoints for managing flights, aircraft, gate assignments, and maintenance operations.
  */
-@Controller  // Changed from @RestController to @Controller
+@Controller
 @RequestMapping("/operations")
 public class FlightOperationsController {
     private static final Logger logger = LoggerFactory.getLogger(FlightOperationsController.class);
@@ -43,20 +46,27 @@ public class FlightOperationsController {
     private static final String SUCCESS_KEY = "success";
     private static final String MESSAGE_KEY = "message";
     private static final String FLIGHT_NUMBER_KEY = "flightNumber";
-    private static final String AIRCRAFT_KEY = "aircraft"; // Add new constant
-    private static final String STATISTICS_KEY = "statistics"; // Add new constant
-    private static final String ACTIVE_FLIGHTS_KEY = "activeFlights"; // Add new constant
-    private static final String AVAILABLE_AIRCRAFT_KEY = "availableAircraft"; // Add new constant
+    private static final String AIRCRAFT_KEY = "aircraft";
+    private static final String STATISTICS_KEY = "statistics";
+    private static final String ACTIVE_FLIGHTS_KEY = "activeFlights";
+    private static final String AVAILABLE_AIRCRAFT_KEY = "availableAircraft";
+    private static final String ASSIGNMENTS_KEY = "assignments";
     
     private final FlightOperationsService flightOperationsService;
+    private final AssignmentService assignmentService;
 
     /**
-     * Constructor injection of FlightOperationsService
+     * Constructor injection of required services.
+     * 
      * @param flightOperationsService Service handling flight operations logic
+     * @param assignmentService Service handling gate assignment operations
      */
-    
-    public FlightOperationsController(FlightOperationsService flightOperationsService) {
+    public FlightOperationsController(
+            FlightOperationsService flightOperationsService,
+            AssignmentService assignmentService) {
         this.flightOperationsService = flightOperationsService;
+        this.assignmentService = assignmentService;
+        logger.info("Initialized FlightOperationsController with services");
     }
 
     /**
@@ -341,6 +351,188 @@ public class FlightOperationsController {
     }
 
     /**
+     * Retrieves maintenance history for an aircraft
+     * @param registrationNumber The registration number of the aircraft
+     * @return ResponseEntity containing list of maintenance records or 404 if not found
+     */
+    @GetMapping("/aircraft/{registrationNumber}/maintenance")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getMaintenanceHistory(@PathVariable String registrationNumber) {
+        logger.info("Retrieving maintenance history for aircraft: {}", registrationNumber);
+        
+        try {
+            List<MaintenanceRecord> history = flightOperationsService.getMaintenanceRecords(registrationNumber);
+            if (history.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            Map<String, Object> response = new HashMap<>();
+            response.put("history", history);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Error retrieving maintenance history for {}", registrationNumber, e);
+            return createErrorResponse("Error retrieving maintenance history: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Retrieves all assignments for a gate.
+     * 
+     * @param gateId The gate ID to get assignments for
+     * @return Response containing the list of assignments
+     */
+    @GetMapping("/gates/{gateId}/assignments")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getGateAssignments(@PathVariable String gateId) {
+        logger.info("Retrieving assignments for gate: {}", gateId);
+        
+        Map<String, Object> response = new HashMap<>();
+        List<AssignmentModel> assignments = assignmentService.getAssignmentsForGate(gateId);
+        response.put(ASSIGNMENTS_KEY, assignments);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Creates a new gate assignment.
+     * 
+     * @param assignment The assignment data
+     * @return Response indicating success or failure
+     */
+    @PostMapping("/gates/assignments/create")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> createAssignment(@RequestBody @Valid AssignmentModel assignment) {
+        logger.info("Creating new assignment for gate: {}", assignment.getGateId());
+        
+        Map<String, Object> response = new HashMap<>();
+        boolean created = assignmentService.createAssignment(assignment);
+        
+        if (created) {
+            response.put(SUCCESS_KEY, true);
+            response.put(MESSAGE_KEY, "Gate assignment created successfully");
+        } else {
+            response.put(SUCCESS_KEY, false);
+            response.put(MESSAGE_KEY, "Failed to create assignment - time conflict detected");
+        }
+        
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Updates an existing gate assignment.
+     * 
+     * @param gateId The gate ID containing the assignment
+     * @param assignmentId The ID of the assignment to update
+     * @param updated The updated assignment data
+     * @return Response indicating success or failure
+     */
+    @PutMapping("/gates/{gateId}/assignments/{assignmentId}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> updateAssignment(
+            @PathVariable String gateId,
+            @PathVariable Long assignmentId,
+            @RequestBody @Valid AssignmentModel updated) {
+        logger.info("Updating assignment {} for gate {}", assignmentId, gateId);
+        
+        Map<String, Object> response = new HashMap<>();
+        boolean updated_ok = assignmentService.updateAssignment(gateId, assignmentId, updated);
+        
+        if (updated_ok) {
+            response.put(SUCCESS_KEY, true);
+            response.put(MESSAGE_KEY, "Assignment updated successfully");
+        } else {
+            response.put(SUCCESS_KEY, false);
+            response.put(MESSAGE_KEY, "Failed to update assignment - not found or conflict detected");
+        }
+        
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Deletes a gate assignment.
+     * 
+     * @param gateId The gate ID containing the assignment
+     * @param assignmentId The ID of the assignment to delete
+     * @return Response indicating success or failure
+     */
+    @DeleteMapping("/gates/{gateId}/assignments/{assignmentId}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> deleteAssignment(
+            @PathVariable String gateId,
+            @PathVariable Long assignmentId) {
+        logger.info("Deleting assignment {} from gate {}", assignmentId, gateId);
+        
+        Map<String, Object> response = new HashMap<>();
+        boolean deleted = assignmentService.deleteAssignment(gateId, assignmentId);
+        
+        if (deleted) {
+            response.put(SUCCESS_KEY, true);
+            response.put(MESSAGE_KEY, "Assignment deleted successfully");
+        } else {
+            response.put(SUCCESS_KEY, false);
+            response.put(MESSAGE_KEY, "Failed to delete assignment - not found");
+        }
+        
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Updates the status of a gate assignment.
+     * 
+     * @param gateId The gate ID containing the assignment
+     * @param assignmentId The ID of the assignment to update
+     * @param status The new status
+     * @return Response indicating success or failure
+     */
+    @PutMapping("/gates/{gateId}/assignments/{assignmentId}/status/{status}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> updateAssignmentStatus(
+            @PathVariable String gateId,
+            @PathVariable Long assignmentId,
+            @PathVariable String status) {
+        logger.info("Updating status of assignment {} to {}", assignmentId, status);
+        
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            AssignmentStatus newStatus = AssignmentStatus.valueOf(status);
+            
+            boolean updated = assignmentService.updateAssignmentField(
+                gateId, 
+                assignmentId, 
+                assignment -> assignment.updateStatus(newStatus)
+            );
+            
+            if (updated) {
+                response.put(SUCCESS_KEY, true);
+                response.put(MESSAGE_KEY, "Assignment status updated successfully");
+            } else {
+                response.put(SUCCESS_KEY, false);
+                response.put(MESSAGE_KEY, "Failed to update assignment status - not found");
+            }
+        } catch (IllegalArgumentException e) {
+            response.put(SUCCESS_KEY, false);
+            response.put(MESSAGE_KEY, "Invalid status value: " + status);
+        }
+        
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Gets current assignments for all gates.
+     * 
+     * @return Response containing current assignments for all gates
+     */
+    @GetMapping("/gates/assignments/current")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getCurrentAssignments() {
+        logger.info("Retrieving current assignments for all gates");
+        
+        Map<String, Object> response = new HashMap<>();
+        Map<String, AssignmentModel> currentAssignments = assignmentService.getCurrentAssignments();
+        response.put("currentAssignments", currentAssignments);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
      * Helper method to create standardized response entities
      * 
      * @param success Operation success flag
@@ -367,29 +559,5 @@ public class FlightOperationsController {
         response.put(SUCCESS_KEY, false);
         response.put(MESSAGE_KEY, message);
         return ResponseEntity.badRequest().body(response);
-    }
-
-    /**
-     * Retrieves maintenance history for an aircraft
-     * @param registrationNumber The registration number of the aircraft
-     * @return ResponseEntity containing list of maintenance records or 404 if not found
-     */
-    @GetMapping("/aircraft/{registrationNumber}/maintenance")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> getMaintenanceHistory(@PathVariable String registrationNumber) {
-        logger.info("Retrieving maintenance history for aircraft: {}", registrationNumber);
-        
-        try {
-            List<MaintenanceRecord> history = flightOperationsService.getMaintenanceRecords(registrationNumber);
-            if (history.isEmpty()) {
-                return ResponseEntity.notFound().build();
-            }
-            Map<String, Object> response = new HashMap<>();
-            response.put("history", history);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            logger.error("Error retrieving maintenance history for {}", registrationNumber, e);
-            return createErrorResponse("Error retrieving maintenance history: " + e.getMessage());
-        }
     }
 }

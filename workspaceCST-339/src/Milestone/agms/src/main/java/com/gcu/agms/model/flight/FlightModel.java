@@ -14,6 +14,9 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString
 public class FlightModel {
+    // Add ID field for database operations
+    private Long id;
+    
     @NotEmpty(message = "Flight number is required")
     private String flightNumber;
 

@@ -990,6 +990,7 @@ classDiagram
 **Domain Model Classes**
 
 ```mermaid
+%%{init: {'theme': 'forest', 'themeVariables': { 'fontSize': '15px' }, 'flowchart': { 'orientation': 'LR' }}}%%
 classDiagram
     class UserModel {
         -Long id

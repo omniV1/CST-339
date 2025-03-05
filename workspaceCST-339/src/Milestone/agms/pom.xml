@@ -149,13 +149,15 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-clean-plugin</artifactId>
+                <version>3.4.1</version>
                 <configuration>
+                    <force>true</force> <!-- Move it here, outside filesets -->
                     <filesets>
                         <fileset>
-                            <directory>target</directory>
-                            <followSymlinks>false</followSymlinks>
-                            <useDefaultExcludes>true</useDefaultExcludes>
-                            <force>true</force>
+                            <directory>${basedir}/some-directory</directory>
+                            <includes>
+                                <include>**/*.tmp</include>
+                            </includes>
                         </fileset>
                     </filesets>
                 </configuration>

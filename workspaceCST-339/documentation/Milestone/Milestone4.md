@@ -1234,15 +1234,15 @@ graph TD
 ### User Interface Screenshots
 
 #### Admin Dashboard
-![Admin Dashboard](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Milestone/Screenshots/AdminDashboardScreenshot.png)
+![Admin Dashboard](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Milestone/Screenshots/AdminDashboard.png)
 *The administrative dashboard provides a comprehensive system overview with access to all management functions.*
 
 #### User Management
-![User Management](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Milestone/Screenshots/UserManagementScreenshot.png)
+![User Management](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Milestone/Screenshots/UserManagement.png)
 *The user management interface allows administrators to view, add, edit, and delete system users.*
 
 #### Gate Management Dashboard
-![Gate Dashboard](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Milestone/Screenshots/GateDashboardScreenshot.png)
+![Gate Dashboard](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Milestone/Screenshots/GateManagementDashboard.png)
 *The gate management dashboard shows all gates and their current status with assignment information.*
 
 #### Flight Operations Dashboard
@@ -1250,7 +1250,7 @@ graph TD
 *The operations dashboard displays real-time flight information and controls for flight management.*
 
 #### Airline Staff Dashboard
-![Airline Dashboard](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Milestone/Screenshots/AirlineDashboardScreenshot.png)
+![Airline Dashboard](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Milestone/Screenshots/AirlineStaffDashboard.png)
 *The airline staff dashboard shows flight schedules and gate assignments for airline personnel.*
 
 ## Conclusion

@@ -1245,7 +1245,7 @@ graph TD
 *The gate management dashboard shows all gates and their current status with assignment information.*
 
 #### Flight Operations Dashboard
-![Operations Dashboard](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Milestone/Screenshots/OperationsDashboardScreenshot.png)
+![Operations Dashboard](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Milestone/Screenshots/FlightOperationsDashboard.png)
 *The operations dashboard displays real-time flight information and controls for flight management.*
 
 #### Airline Staff Dashboard

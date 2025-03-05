@@ -990,6 +990,7 @@ classDiagram
 **Domain Model Classes**
 
 ```mermaid
+classDiagram
     class UserModel {
         -Long id
         -String username

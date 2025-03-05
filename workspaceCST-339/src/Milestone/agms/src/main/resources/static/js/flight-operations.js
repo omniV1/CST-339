@@ -39,7 +39,27 @@ document.addEventListener('DOMContentLoaded', function() {
     if (statusForm) {
         statusForm.addEventListener('submit', handleAircraftStatusUpdate);
     }
+
+    // Fix for the aircraft status modal
+    const aircraftStatusModal = document.getElementById('aircraftStatusModal');
+    if (aircraftStatusModal) {
+        // Fix for when clicking on the X button
+        const closeButtons = aircraftStatusModal.querySelectorAll('.btn-close, .btn[data-bs-dismiss="modal"]');
+        closeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Force cleanup after modal is closed
+                forceCleanupModal();
+            });
+        });
+        
+        // Also handle the hidden.bs.modal event
+        aircraftStatusModal.addEventListener('hidden.bs.modal', function() {
+            // Force cleanup after modal is hidden
+            forceCleanupModal();
+        });
+    }
 });
+
 function showUpdateStatusModal(flightNumber) {
     // Set the flight number in the modal
     document.getElementById('statusFlightNumber').value = flightNumber;
@@ -284,8 +304,7 @@ function initializeMaintenanceForm() {
 }
 
 /**
- * Handles maintenance form submission
- * @param {Event} e - The form submission event
+ * Enhanced handle maintenance submit
  */
 function handleMaintenanceSubmit(e) {
     e.preventDefault();
@@ -305,16 +324,18 @@ function handleMaintenanceSubmit(e) {
 
     try {
         // Format the date string exactly as the server expects it
-        // This will create a string like "2025-02-08 20:00:00"
         const formattedDateTime = `${dateValue} ${timeValue}:00`;
         console.log('Formatted date string:', formattedDateTime);
         
         // Create the data to send
         const submitData = new FormData();
         submitData.append('registrationNumber', formData.get('registrationNumber'));
-        submitData.append('maintenanceDate', formattedDateTime);  // This is now properly formatted
+        submitData.append('maintenanceDate', formattedDateTime);
         submitData.append('maintenanceType', formData.get('maintenanceType'));
         submitData.append('description', formData.get('description'));
+
+        // Close modal FIRST before making the API request
+        forceCleanupModals();
 
         // Log what we're sending
         console.log('Sending maintenance data:');
@@ -337,7 +358,7 @@ function handleMaintenanceSubmit(e) {
         .then(data => {
             console.log('Server response:', data);
             if (data.success) {
-                closeModalCompletely('maintenanceModal');
+                // Use window.location.reload() instead
                 window.location.reload();
             } else {
                 alert('Failed to schedule maintenance: ' + data.message);
@@ -390,8 +411,11 @@ function showMaintenanceModal(registrationNumber) {
  * Displays the aircraft status modal
  * @param {string} registration - The aircraft registration number
  */
-function showAircraftStatusModal(registration) {
+window.showAircraftStatusModal = function(registration) {
     console.log('Opening status modal for aircraft:', registration);
+    
+    // First ensure any existing modals are properly cleaned up
+    forceCleanupModal();
     
     const modal = document.getElementById('aircraftStatusModal');
     if (modal) {
@@ -406,7 +430,8 @@ function showAircraftStatusModal(registration) {
                 modal.querySelector('input[name="location"]').value = aircraft.currentLocation || '';
                 
                 // Show modal and load history
-                new bootstrap.Modal(modal).show();
+                const modalInstance = new bootstrap.Modal(modal);
+                modalInstance.show();
                 loadMaintenanceHistory(registration);
             })
             .catch(error => {
@@ -414,7 +439,7 @@ function showAircraftStatusModal(registration) {
                 alert('Failed to load aircraft details');
             });
     }
-}
+};
 
 /**
  * Initializes the flight details viewer
@@ -732,3 +757,242 @@ function closeModalCompletely(modalId) {
         }
     }
 }
+
+// Helper function to force modal cleanup
+function forceCleanupModal() {
+    // Remove modal-open class and inline styles from body
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+    
+    // Remove any modal backdrop elements
+    const backdrops = document.querySelectorAll('.modal-backdrop');
+    backdrops.forEach(backdrop => {
+        backdrop.remove();
+    });
+}
+
+/**
+ * Comprehensive modal cleanup function
+ * This completely removes any traces of modals and backdrops
+ */
+function forceCleanupAllModals() {
+  console.log("Forcing complete modal cleanup");
+  
+  try {
+    // 1. Try to use Bootstrap API first if available
+    if (typeof bootstrap !== 'undefined') {
+      const modalElements = document.querySelectorAll('.modal');
+      modalElements.forEach(modalEl => {
+        try {
+          const bsModal = bootstrap.Modal.getInstance(modalEl);
+          if (bsModal) {
+            bsModal.hide();
+          }
+        } catch (e) {
+          console.warn('Bootstrap API modal cleanup failed:', e);
+        }
+      });
+    }
+    
+    // 2. Remove modal classes from body
+    document.body.classList.remove('modal-open');
+    document.body.removeAttribute('style');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+    
+    // 3. Remove all modal backdrops
+    const backdrops = document.querySelectorAll('.modal-backdrop');
+    backdrops.forEach(backdrop => {
+      backdrop.classList.remove('show');
+      backdrop.classList.remove('fade');
+      backdrop.parentNode.removeChild(backdrop);
+    });
+    
+    // 4. Reset all modals
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+      modal.classList.remove('show');
+      modal.style.display = 'none';
+      modal.setAttribute('aria-hidden', 'true');
+      modal.removeAttribute('aria-modal');
+      modal.removeAttribute('role');
+      modal.removeAttribute('style');
+    });
+    
+    // 5. HTML and document root cleanup
+    document.documentElement.classList.remove('modal-open');
+    document.documentElement.style.overflow = '';
+    document.documentElement.style.paddingRight = '';
+    
+    // 6. Force reflow/repaint
+    window.scrollTo(0, window.scrollY);
+  } catch (e) {
+    console.error("Error during modal cleanup:", e);
+  }
+}
+
+/**
+ * Specialized function to close a modal with proper cleanup
+ * @param {string} modalId - ID of the modal to close
+ */
+function closeModalSafely(modalId) {
+  console.log(`Closing modal ${modalId} safely`);
+  
+  try {
+    // First try to use Bootstrap's API
+    const modalElement = document.getElementById(modalId);
+    if (!modalElement) return;
+    
+    // Try Bootstrap approach first
+    if (typeof bootstrap !== 'undefined') {
+      try {
+        const bsModal = bootstrap.Modal.getInstance(modalElement);
+        if (bsModal) {
+          bsModal.hide();
+          // Still run our cleanup with delay
+          setTimeout(forceCleanupAllModals, 300);
+          return;
+        }
+      } catch (e) {
+        console.warn('Bootstrap modal API not available:', e);
+      }
+    }
+    
+    // Manual approach
+    modalElement.classList.remove('show');
+    modalElement.style.display = 'none';
+    modalElement.setAttribute('aria-hidden', 'true');
+    modalElement.removeAttribute('aria-modal');
+    modalElement.removeAttribute('role');
+    
+    // Always run a complete cleanup after a delay
+    setTimeout(forceCleanupAllModals, 300);
+  } catch (e) {
+    console.error("Error closing modal:", e, modalId);
+    // Run cleanup anyway as last resort
+    forceCleanupAllModals();
+  }
+}
+
+// Add event listeners when the DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('Setting up modal event handlers');
+  
+  // Event handler for modal close buttons
+  document.addEventListener('click', function(event) {
+    const target = event.target;
+    
+    // Check if the clicked element is a close button of any kind
+    if (target.classList.contains('btn-close') || 
+        target.hasAttribute('data-bs-dismiss') ||
+        target.closest('[data-bs-dismiss="modal"]')) {
+      
+      console.log('Modal close button clicked');
+      setTimeout(forceCleanupAllModals, 300);
+    }
+  });
+  
+  // Handle modal backdrop clicks
+  document.addEventListener('mousedown', function(event) {
+    if (event.target.classList.contains('modal')) {
+      console.log('Modal backdrop clicked');
+      setTimeout(forceCleanupAllModals, 300);
+    }
+  });
+  
+  // Handle Escape key press
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      console.log('ESC key pressed, cleaning up modals');
+      setTimeout(forceCleanupAllModals, 300);
+    }
+  });
+  
+  // Setup all maintenance form handlers with safety checks
+  const maintenanceForm = document.getElementById('maintenanceForm');
+  if (maintenanceForm) {
+    maintenanceForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      try {
+        // Get form data safely
+        const formData = new FormData(maintenanceForm);
+        
+        // Close modal first
+        forceCleanupAllModals();
+        
+        // Then submit the data
+        fetch('/operations/aircraft/maintenance', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Reload without animation
+            window.location.href = window.location.pathname;
+          } else {
+            alert('Failed to schedule maintenance: ' + data.message);
+          }
+        })
+        .catch(error => {
+          console.error('Error scheduling maintenance:', error);
+          alert('Error scheduling maintenance');
+        });
+      } catch (e) {
+        console.error('Error processing form:', e);
+        alert('An error occurred while submitting the form');
+      }
+    });
+  }
+  
+  // Add special handling for all ajax forms
+  document.querySelectorAll('form[data-ajax="true"]').forEach(form => {
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Close any modals first
+      forceCleanupAllModals();
+      
+      // Then process form normally
+      const formData = new FormData(form);
+      const url = form.getAttribute('action') || window.location.pathname;
+      const method = form.getAttribute('method') || 'POST';
+      
+      fetch(url, {
+        method: method,
+        body: new URLSearchParams(formData)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          window.location.href = window.location.pathname;
+        } else {
+          alert(data.message || 'Operation failed');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred');
+      });
+    });
+  });
+  
+  // Check for stuck modals on load
+  setTimeout(function() {
+    const backdrop = document.querySelector('.modal-backdrop');
+    if (backdrop && !document.querySelector('.modal.show')) {
+      console.log('Found stuck backdrop on page load, cleaning up');
+      forceCleanupAllModals();
+    }
+  }, 500);
+});
+
+// Replace all existing closeModal functions with our safe version
+window.closeModal = closeModalSafely;
+window.forceCleanupModal = forceCleanupAllModals;
+window.closeModalCompletely = closeModalSafely;

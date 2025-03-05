@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,10 +19,11 @@ import com.gcu.agms.model.maintenance.MaintenanceRecord;
 import com.gcu.agms.repository.AircraftRepository;
 import com.gcu.agms.repository.FlightRepository;
 import com.gcu.agms.service.flight.FlightOperationsService;
+import com.gcu.agms.service.maintenance.MaintenanceRecordService;
 
 /**
  * JDBC implementation of the FlightOperationsService interface.
- * This service uses a database repository to access and manage flight data.
+ * This service uses database repositories to access and manage flight and maintenance data.
  */
 @Service("jdbcFlightOperationsService")
 @Primary
@@ -31,19 +33,23 @@ public class JdbcFlightOperationsService implements FlightOperationsService {
     
     private final FlightRepository flightRepository;
     private final AircraftRepository aircraftRepository;
+    private final MaintenanceRecordService maintenanceRecordService;
 
     /**
      * Constructor with repositories dependency injection.
      * 
      * @param flightRepository Repository for flight data access
      * @param aircraftRepository Repository for aircraft data access
+     * @param maintenanceRecordService Service for maintenance record operations
      */
     public JdbcFlightOperationsService(
             FlightRepository flightRepository,
-            AircraftRepository aircraftRepository) {
+            AircraftRepository aircraftRepository,
+            MaintenanceRecordService maintenanceRecordService) {
         this.flightRepository = flightRepository;
         this.aircraftRepository = aircraftRepository;
-        logger.info("Initialized JDBC Flight Operations Service");
+        this.maintenanceRecordService = maintenanceRecordService;
+        logger.info("Initialized JDBC Flight Operations Service with maintenance support");
     }
 
     @Override
@@ -118,18 +124,34 @@ public class JdbcFlightOperationsService implements FlightOperationsService {
             maintenanceDate
         );
         
-        // In a full implementation, we would also create a maintenance record
-        // But for now, we'll just update the aircraft status and maintenance date
+        // Create a maintenance record
+        MaintenanceRecord record = new MaintenanceRecord();
+        record.setRecordId(UUID.randomUUID().toString());
+        record.setRegistrationNumber(registrationNumber);
+        record.setScheduledDate(maintenanceDate);
         
-        return statusUpdated && maintenanceScheduled;
+        // Parse the maintenance type string to enum
+        try {
+            MaintenanceRecord.MaintenanceType type = MaintenanceRecord.MaintenanceType.valueOf(maintenanceType);
+            record.setType(type);
+        } catch (IllegalArgumentException e) {
+            // Default to ROUTINE if the type is invalid
+            record.setType(MaintenanceRecord.MaintenanceType.ROUTINE);
+        }
+        
+        record.setStatus(MaintenanceRecord.MaintenanceStatus.SCHEDULED);
+        record.setDescription(description);
+        
+        // Save the maintenance record
+        MaintenanceRecord savedRecord = maintenanceRecordService.createMaintenanceRecord(record);
+        
+        return statusUpdated && maintenanceScheduled && (savedRecord != null);
     }
 
     @Override
     public List<MaintenanceRecord> getMaintenanceRecords(String registrationNumber) {
-        // In a full implementation, this would retrieve maintenance records from a dedicated repository
-        // For now, returning an empty list
         logger.info("Retrieving maintenance records for aircraft: {}", registrationNumber);
-        return new ArrayList<>();
+        return maintenanceRecordService.getMaintenanceRecordsByAircraft(registrationNumber);
     }
 
     @Override
@@ -138,6 +160,7 @@ public class JdbcFlightOperationsService implements FlightOperationsService {
         return aircraftRepository.findAvailableAircraft();
     }
 
+    // Other methods remain unchanged
     @Override
     public boolean createFlight(FlightModel flight) {
         logger.info("Creating new flight: {}", flight.getFlightNumber());

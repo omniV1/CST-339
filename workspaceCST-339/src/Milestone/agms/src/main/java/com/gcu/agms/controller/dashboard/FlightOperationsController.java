@@ -29,6 +29,7 @@ import com.gcu.agms.model.gate.AssignmentStatus;
 import com.gcu.agms.model.maintenance.MaintenanceRecord;
 import com.gcu.agms.service.flight.AssignmentService;
 import com.gcu.agms.service.flight.FlightOperationsService;
+import com.gcu.agms.service.maintenance.MaintenanceRecordService;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -54,18 +55,22 @@ public class FlightOperationsController {
     
     private final FlightOperationsService flightOperationsService;
     private final AssignmentService assignmentService;
+    private final MaintenanceRecordService maintenanceRecordService;
 
     /**
      * Constructor injection of required services.
      * 
      * @param flightOperationsService Service handling flight operations logic
      * @param assignmentService Service handling gate assignment operations
+     * @param maintenanceRecordService Service handling maintenance record operations
      */
     public FlightOperationsController(
             FlightOperationsService flightOperationsService,
-            AssignmentService assignmentService) {
+            AssignmentService assignmentService,
+            MaintenanceRecordService maintenanceRecordService) {
         this.flightOperationsService = flightOperationsService;
         this.assignmentService = assignmentService;
+        this.maintenanceRecordService = maintenanceRecordService;
         logger.info("Initialized FlightOperationsController with services");
     }
 
@@ -357,20 +362,88 @@ public class FlightOperationsController {
      */
     @GetMapping("/aircraft/{registrationNumber}/maintenance")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getMaintenanceHistory(@PathVariable String registrationNumber) {
+    public ResponseEntity<List<MaintenanceRecord>> getMaintenanceHistory(@PathVariable String registrationNumber) {
         logger.info("Retrieving maintenance history for aircraft: {}", registrationNumber);
         
         try {
             List<MaintenanceRecord> history = flightOperationsService.getMaintenanceRecords(registrationNumber);
+            
             if (history.isEmpty()) {
-                return ResponseEntity.notFound().build();
+                logger.info("No maintenance records found for aircraft: {}", registrationNumber);
+            } else {
+                logger.info("Found {} maintenance records for aircraft: {}", history.size(), registrationNumber);
             }
-            Map<String, Object> response = new HashMap<>();
-            response.put("history", history);
-            return ResponseEntity.ok(response);
+            
+            return ResponseEntity.ok(history);
         } catch (Exception e) {
             logger.error("Error retrieving maintenance history for {}", registrationNumber, e);
-            return createErrorResponse("Error retrieving maintenance history: " + e.getMessage());
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+    
+    /**
+     * Updates the status of a maintenance record
+     * 
+     * @param recordId The record ID of the maintenance record
+     * @param status The new status
+     * @return Response indicating update success or failure
+     */
+    @PostMapping("/maintenance/{recordId}/status")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> updateMaintenanceStatus(
+            @PathVariable String recordId,
+            @RequestParam String status) {
+        
+        logger.info("Updating maintenance record status - Record ID: {}, Status: {}", recordId, status);
+        
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            MaintenanceRecord.MaintenanceStatus newStatus = MaintenanceRecord.MaintenanceStatus.valueOf(status);
+            boolean updated = maintenanceRecordService.updateMaintenanceStatus(recordId, newStatus);
+            
+            response.put(SUCCESS_KEY, updated);
+            response.put(MESSAGE_KEY, updated ? 
+                "Maintenance status updated successfully" : 
+                "Failed to update maintenance status");
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            logger.error("Invalid maintenance status: {}", status, e);
+            return createErrorResponse("Invalid maintenance status");
+        } catch (Exception e) {
+            logger.error("Error updating maintenance status", e);
+            return createErrorResponse("Error updating maintenance status: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Completes a maintenance record
+     * 
+     * @param recordId The record ID of the maintenance record
+     * @param notes Optional notes about the completion
+     * @return Response indicating completion success or failure
+     */
+    @PostMapping("/maintenance/{recordId}/complete")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> completeMaintenanceRecord(
+            @PathVariable String recordId,
+            @RequestParam(required = false) String notes) {
+        
+        logger.info("Completing maintenance record - Record ID: {}", recordId);
+        
+        Map<String, Object> response = new HashMap<>();
+        
+        try {
+            boolean completed = maintenanceRecordService.completeMaintenanceRecord(recordId, LocalDateTime.now(), notes);
+            
+            response.put(SUCCESS_KEY, completed);
+            response.put(MESSAGE_KEY, completed ? 
+                "Maintenance record completed successfully" : 
+                "Failed to complete maintenance record");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.error("Error completing maintenance record", e);
+            return createErrorResponse("Error completing maintenance record: " + e.getMessage());
         }
     }
 

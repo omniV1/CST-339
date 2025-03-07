@@ -66,9 +66,25 @@
     <artifactId>jaxb-api</artifactId>
     <version>2.3.1</version>
 </dependency>
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.33</version>
+</dependency>
+<!-- Spring Data JDBC -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jdbc</artifactId>
+</dependency>
+<dependency>
+    <groupId>com.github.ulisesbocchio</groupId>
+    <artifactId>jasypt-spring-boot-starter</artifactId>
+    <version>3.0.5</version>
+</dependency>
 	</dependencies>
 
 	<build>
+			<finalName>cst339activity</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

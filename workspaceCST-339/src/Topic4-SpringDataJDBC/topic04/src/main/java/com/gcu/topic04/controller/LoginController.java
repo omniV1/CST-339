@@ -32,7 +32,7 @@ public class LoginController {
 	 * 
 	 * @return View name hello
 	 */
-	@GetMapping("/")
+	@GetMapping("")
 	public String display(Model model) {
 
 		model.addAttribute("title", "Login Form");
@@ -42,7 +42,7 @@ public class LoginController {
 
 	// Bind to the LoginModel Bean
 	// @Valid - looks at the Bean for Size validation
-	@PostMapping("/doLogin")
+	@PostMapping("")
 	public String doLogin(@Valid LoginModel loginModel, BindingResult bindingResult, Model model) {
 
 		// Calls test method interface - implementation in OrdersBusinessService

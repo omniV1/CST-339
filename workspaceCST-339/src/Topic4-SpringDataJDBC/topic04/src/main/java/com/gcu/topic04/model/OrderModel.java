@@ -8,6 +8,10 @@ public class OrderModel {
 	private float price;
 	private int quantity;
 
+	// Default constructor
+	public OrderModel() {}
+
+	// Constructor for converting from entity
 	public OrderModel(Long id, String orderNo, String productName, float price, int quantity) {
 		super();
 		this.id = id;

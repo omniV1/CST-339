@@ -18,7 +18,7 @@ This milestone represents a significant advancement in our Airport Gate Manageme
 ## Project Links
 - **GitHub Repository:** https://github.com/omniV1/CST-339/tree/main/workspaceCST-339/src/Milestone
 
-- **Screencast Demo:** https://youtu.be/YufCtOIwq80
+- **Screencast Demo:** https://www.youtube.com/watch?v=6lrvijlZVx8
 
 - **Javadoc:** https://github.com/omniV1/CST-339/tree/main/workspaceCST-339/src/Milestone/agms/docs/apidocs
 

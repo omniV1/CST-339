@@ -43,13 +43,13 @@ In this part of the activity, I performed the following tasks:
 ### Screenshots
 
 **Orders Page Display:**
-![Orders Page]()
+![Orders Page](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic5-SpringDataMongoDB/Screenshots/Orders.png)
 
 **JSON API Response:**
-![JSON Response]()
+![JSON Response](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic5-SpringDataMongoDB/Screenshots/Json.png)
 
 **XML API Response:**
-![XML Response]()
+![XML Response](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic5-SpringDataMongoDB/Screenshots/Xml.png)
 
 ## Part 2: Adding New Queries in the MongoDB Repository
 
@@ -70,10 +70,10 @@ In this part of the activity, I implemented the following:
 ### Screenshots
 
 **REST API Response with Valid ID:**
-![Valid ID Response]()
+![Valid ID Response](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic5-SpringDataMongoDB/Screenshots/ByIdOrderValid.png)
 
 **REST API Response with Invalid ID:**
-![Invalid ID Response]()
+![Invalid ID Response](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/documentation/Topic5-SpringDataMongoDB/Screenshots/InvalidOrderID.png)
 
 ## Research Questions
 

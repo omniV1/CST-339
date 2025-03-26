@@ -8,14 +8,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
 import com.gcu.agms.model.gate.GateModel;
@@ -25,93 +22,52 @@ import com.gcu.agms.repository.GateRepository;
 /**
  * JDBC implementation of the GateRepository interface.
  * This class handles data access operations for gates using Spring JDBC.
+ * It extends the BaseJdbcRepository for common JDBC operations.
  */
 @Repository
-public class JdbcGateRepository implements GateRepository {
-
-    private static final Logger logger = LoggerFactory.getLogger(JdbcGateRepository.class);
-    private final JdbcTemplate jdbcTemplate;
+public class JdbcGateRepository extends BaseJdbcRepository<GateModel, Long> implements GateRepository {
     
     /**
      * Constructor with JdbcTemplate dependency injection.
      * @param jdbcTemplate The JDBC template for database operations
      */
     public JdbcGateRepository(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-        logger.info("Initialized JdbcGateRepository");
+        super(jdbcTemplate);
     }
     
     @Override
     public List<GateModel> findAll() {
         logger.debug("Finding all gates");
         String sql = "SELECT * FROM gate";
-        
-        try {
-            return jdbcTemplate.query(sql, new GateRowMapper());
-        } catch (DataAccessException e) {
-            logger.error("Database error finding all gates: {}", e.getMessage(), e);
-            return List.of();
-        }
+        return executeQuery(sql, new GateRowMapper());
     }
     
     @Override
     public Optional<GateModel> findById(Long id) {
         logger.debug("Finding gate by ID: {}", id);
         String sql = "SELECT * FROM gate WHERE id = ?";
-        
-        try {
-            List<GateModel> results = jdbcTemplate.query(sql, new GateRowMapper(), id);
-            return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
-        } catch (EmptyResultDataAccessException e) {
-            logger.debug("No gate found with ID: {}", id);
-            return Optional.empty();
-        } catch (DataAccessException e) {
-            logger.error("Database error finding gate by ID: {}", e.getMessage(), e);
-            return Optional.empty();
-        }
+        return executeFindOne(sql, new GateRowMapper(), id);
     }
     
     @Override
     public Optional<GateModel> findByGateId(String gateId) {
         logger.debug("Finding gate by gate ID: {}", gateId);
         String sql = "SELECT * FROM gate WHERE gate_id = ?";
-        
-        try {
-            List<GateModel> results = jdbcTemplate.query(sql, new GateRowMapper(), gateId);
-            return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
-        } catch (EmptyResultDataAccessException e) {
-            logger.debug("No gate found with gate ID: {}", gateId);
-            return Optional.empty();
-        } catch (DataAccessException e) {
-            logger.error("Database error finding gate by gate ID: {}", e.getMessage(), e);
-            return Optional.empty();
-        }
+        return executeFindOne(sql, new GateRowMapper(), gateId);
     }
     
     @Override
     public List<GateModel> findByTerminal(String terminal) {
         logger.debug("Finding gates by terminal: {}", terminal);
         String sql = "SELECT * FROM gate WHERE terminal = ?";
-        
-        try {
-            return jdbcTemplate.query(sql, new GateRowMapper(), terminal);
-        } catch (DataAccessException e) {
-            logger.error("Database error finding gates by terminal: {}", e.getMessage(), e);
-            return List.of();
-        }
+        return executeQuery(sql, new GateRowMapper(), terminal);
     }
     
     @Override
     public List<GateModel> findByStatus(String status) {
         logger.debug("Finding gates by status: {}", status);
         String sql = "SELECT * FROM gate WHERE status = ?";
-        
-        try {
-            return jdbcTemplate.query(sql, new GateRowMapper(), status);
-        } catch (DataAccessException e) {
-            logger.error("Database error finding gates by status: {}", e.getMessage(), e);
-            return List.of();
-        }
+        return executeQuery(sql, new GateRowMapper(), status);
     }
     
     @Override
@@ -160,7 +116,7 @@ public class JdbcGateRepository implements GateRepository {
                 gate.setId(key.longValue());
             }
             
-        } catch (DataAccessException e) {
+        } catch (Exception e) {
             logger.error("Database error inserting gate: {}", e.getMessage(), e);
         }
         
@@ -188,7 +144,7 @@ public class JdbcGateRepository implements GateRepository {
                 Timestamp.valueOf(LocalDateTime.now()),
                 gate.getId()
             );
-        } catch (DataAccessException e) {
+        } catch (Exception e) {
             logger.error("Database error updating gate: {}", e.getMessage(), e);
         }
         
@@ -198,56 +154,29 @@ public class JdbcGateRepository implements GateRepository {
     @Override
     public void deleteById(Long id) {
         logger.debug("Deleting gate with ID: {}", id);
-        
         String sql = "DELETE FROM gate WHERE id = ?";
-        
-        try {
-            jdbcTemplate.update(sql, id);
-        } catch (DataAccessException e) {
-            logger.error("Database error deleting gate: {}", e.getMessage(), e);
-        }
+        executeUpdate(sql, id);
     }
     
     @Override
     public boolean existsByGateId(String gateId) {
         logger.debug("Checking if gate exists with gateId: {}", gateId);
         String sql = "SELECT COUNT(*) FROM gate WHERE gate_id = ?";
-        
-        try {
-            Integer count = jdbcTemplate.queryForObject(sql, Integer.class, gateId);
-            return count != null && count > 0;
-        } catch (DataAccessException e) {
-            logger.error("Database error checking if gate exists: {}", e.getMessage(), e);
-            return false;
-        }
+        return executeExists(sql, gateId);
     }
     
     @Override
     public int countByStatus(String status) {
         logger.debug("Counting gates by status: {}", status);
         String sql = "SELECT COUNT(*) FROM gate WHERE status = ?";
-        
-        try {
-            Integer count = jdbcTemplate.queryForObject(sql, Integer.class, status);
-            return count != null ? count : 0;
-        } catch (DataAccessException e) {
-            logger.error("Database error counting gates by status: {}", e.getMessage(), e);
-            return 0;
-        }
+        return executeCount(sql, status);
     }
     
     @Override
     public int countAll() {
         logger.debug("Counting all gates");
         String sql = "SELECT COUNT(*) FROM gate";
-        
-        try {
-            Integer count = jdbcTemplate.queryForObject(sql, Integer.class);
-            return count != null ? count : 0;
-        } catch (DataAccessException e) {
-            logger.error("Database error counting all gates: {}", e.getMessage(), e);
-            return 0;
-        }
+        return executeCount(sql);
     }
     
     /**
@@ -255,7 +184,7 @@ public class JdbcGateRepository implements GateRepository {
      */
     private static class GateRowMapper implements RowMapper<GateModel> {
         @Override
-        public GateModel mapRow(ResultSet rs, int rowNum) throws SQLException {
+        public GateModel mapRow(@NonNull ResultSet rs, int rowNum) throws SQLException {
             GateModel gate = new GateModel();
             gate.setId(rs.getLong("id"));
             gate.setGateId(rs.getString("gate_id"));

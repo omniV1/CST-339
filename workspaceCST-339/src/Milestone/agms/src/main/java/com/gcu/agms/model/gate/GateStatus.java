@@ -1,17 +1,13 @@
 package com.gcu.agms.model.gate;
 
+import com.gcu.agms.model.common.Status;
+
 /**
  * Defines all possible states a gate can be in within the AGMS system.
- * According to the UML class diagram, this enum maintains a many-to-one relationship
- * with the Gate class, where each gate must have exactly one status at any time.
- * 
- * The statuses represent different operational states of a gate:
- * - AVAILABLE: Ready for assignment
- * - OCCUPIED: Currently in use by a flight
- * - MAINTENANCE: Under maintenance and unavailable
- * - CLOSED: Not operational
+ * This enum now implements the common Status interface, which standardizes
+ * the way status information is accessed across different domains.
  */
-public enum GateStatus {
+public enum GateStatus implements Status {
     AVAILABLE("Available", "success", "Gate is available for assignment"),
     OCCUPIED("Occupied", "warning", "Gate is currently in use"),
     MAINTENANCE("Maintenance", "danger", "Gate is under maintenance"),
@@ -28,14 +24,17 @@ public enum GateStatus {
         this.description = description;
     }
 
+    @Override
     public String getLabel() {
         return label;
     }
 
+    @Override
     public String getCssClass() {
         return cssClass;
     }
 
+    @Override
     public String getDescription() {
         return description;
     }

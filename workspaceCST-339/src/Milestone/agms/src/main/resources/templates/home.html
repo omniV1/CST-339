@@ -3,236 +3,243 @@
       th:replace="~{layouts/MainLayout :: layout(~{::div})}">
 <body>
     <div th:fragment="content" class="home-page">
-        <!-- Hero Section Update - Keep your existing hero section -->
-        <section class="hero-section rounded-3 p-5 mb-5 text-center">
-            <div class="container">
-                <h1 class="display-4 fw-bold mb-3" style="color: var(--agms-primary);">
-                    Welcome to the Airport Gate Management System
-                </h1>
-                <p class="lead mb-4" style="color: var(--agms-text-primary);">
-                    Efficient airport gate management for modern aviation
-                </p>
-                <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
-                    <a th:href="@{/auth/register}" class="btn btn-agms-primary btn-lg px-4">Register</a>
-                    <a th:href="@{/auth/login}" class="btn btn-outline-secondary btn-lg px-4">Login</a>
+        <!-- Hero Section with Feature Icons -->
+        <section class="bg-light rounded-3 py-4 mb-4">
+            <div class="container-fluid px-4">
+                <div class="row align-items-center">
+                    <!-- Main Heading -->
+                    <div class="col-lg-5 mb-4 mb-lg-0">
+                        <h1 class="display-5 fw-bold mb-3" style="color: var(--agms-primary);">
+                            Airport Gate Management System
+                        </h1>
+                        <p class="lead mb-4" style="color: var(--agms-text-primary);">
+                            Efficient airport gate management for modern aviation
+                        </p>
+                        <div class="d-flex gap-3">
+                            <a th:href="@{/auth/register}" class="btn btn-agms-primary px-4 py-2">Register</a>
+                            <a th:href="@{/auth/login}" class="btn btn-outline-secondary px-4 py-2">Login</a>
+                        </div>
+                    </div>
+                    
+                    <!-- Feature Icons -->
+                    <div class="col-lg-7">
+                        <div class="row g-4 text-center">
+                            <!-- Flight Tracking -->
+                            <div class="col-6 col-md-3">
+                                <div class="p-3">
+                                    <div class="feature-icon navbar-agms rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" 
+                                        style="width: 60px; height: 60px;">
+                                        <i class="fas fa-plane-departure text-light fa-lg"></i>
+                                    </div>
+                                    <h5>Flight Tracking</h5>
+                                </div>
+                            </div>
+                            
+                            <!-- Gate Management -->
+                            <div class="col-6 col-md-3">
+                                <div class="p-3">
+                                    <div class="feature-icon navbar-agms rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" 
+                                        style="width: 60px; height: 60px;">
+                                        <i class="fas fa-door-open text-light fa-lg"></i>
+                                    </div>
+                                    <h5>Gate Management</h5>
+                                </div>
+                            </div>
+                            
+                            <!-- Analytics -->
+                            <div class="col-6 col-md-3">
+                                <div class="p-3">
+                                    <div class="feature-icon navbar-agms rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" 
+                                        style="width: 60px; height: 60px;">
+                                        <i class="fas fa-chart-line text-light fa-lg"></i>
+                                    </div>
+                                    <h5>Analytics</h5>
+                                </div>
+                            </div>
+                            
+                            <!-- Efficiency -->
+                            <div class="col-6 col-md-3">
+                                <div class="p-3">
+                                    <div class="feature-icon navbar-agms rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" 
+                                        style="width: 60px; height: 60px;">
+                                        <i class="fas fa-bolt text-light fa-lg"></i>
+                                    </div>
+                                    <h5>Efficiency</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Feature Cards Section - Keep your existing features section -->
-        <section class="container px-4 py-5">
-            <div class="row g-4 row-cols-1 row-cols-md-3">
-                <!-- Feature Cards with centered icons -->
-                <div class="col">
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon navbar-agms rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" 
-                                 style="width: 60px; height: 60px;">
-                                <i class="fas fa-plane-departure text-light"></i>
+        <!-- Stats and Testimonials Section -->
+        <section class="py-4 mb-4">
+            <div class="container-fluid px-4">
+                <div class="row g-4">
+                    <!-- Stats -->
+                    <div class="col-lg-6">
+                        <h3 class="mb-4" style="color: var(--agms-primary);">AGMS by the Numbers</h3>
+                        <div class="row g-4 text-center">
+                            <div class="col-6 col-md-3">
+                                <h2 class="display-5 fw-bold" style="color: var(--agms-primary);">35+</h2>
+                                <p class="text-muted">Airports</p>
                             </div>
-                            <h5 class="card-title mb-3">Real-time Flight Tracking</h5>
-                            <p class="card-text text-muted">
-                                Monitor flight schedules and gate assignments in real-time for efficient operations.
-                            </p>
+                            <div class="col-6 col-md-3">
+                                <h2 class="display-5 fw-bold" style="color: var(--agms-primary);">12K+</h2>
+                                <p class="text-muted">Gates</p>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <h2 class="display-5 fw-bold" style="color: var(--agms-primary);">98.7%</h2>
+                                <p class="text-muted">Uptime</p>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <h2 class="display-5 fw-bold" style="color: var(--agms-primary);">27%</h2>
+                                <p class="text-muted">Efficiency</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <div class="col">
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon navbar-agms rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" 
-                                 style="width: 60px; height: 60px;">
-                                <i class="fas fa-door-open text-light"></i>
+                    
+                    <!-- Testimonials -->
+                    <div class="col-lg-6">
+                        <h3 class="mb-4" style="color: var(--agms-primary);">What Our Clients Say</h3>
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body p-3">
+                                        <p class="card-text fst-italic mb-3">
+                                            "AGMS has transformed our gate operations with 25% fewer delays."
+                                        </p>
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded-circle me-2" style="width: 40px; height: 40px; background-color: var(--agms-primary);"></div>
+                                            <div>
+                                                <h6 class="mb-0" style="color: var(--agms-primary);">Sarah Johnson</h6>
+                                                <p class="text-muted small mb-0">Phoenix Sky Harbor</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <h5 class="card-title mb-3">Gate Management</h5>
-                            <p class="card-text text-muted">
-                                Optimize gate assignments and handle schedule changes with ease.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-body text-center p-4">
-                            <div class="feature-icon navbar-agms rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" 
-                                 style="width: 60px; height: 60px;">
-                                <i class="fas fa-chart-line text-light"></i>
+                            <div class="col-md-6">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body p-3">
+                                        <p class="card-text fst-italic mb-3">
+                                            "Intuitive dashboard with unprecedented visibility into operations."
+                                        </p>
+                                        <div class="d-flex align-items-center">
+                                            <div class="rounded-circle me-2" style="width: 40px; height: 40px; background-color: var(--agms-primary);"></div>
+                                            <div>
+                                                <h6 class="mb-0" style="color: var(--agms-primary);">Michael Torres</h6>
+                                                <p class="text-muted small mb-0">Southwest Airlines</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <h5 class="card-title mb-3">Performance Analytics</h5>
-                            <p class="card-text text-muted">
-                                Track and analyze gate utilization and operational efficiency.
-                            </p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
         
-       <!-- Benefits Section -->
-<section class="py-5">
-    <div class="container">
-        <h2 class="text-center mb-4" style="color: var(--agms-primary);">Why Choose Our Gate Management System</h2>
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body text-center p-4">
-                        <div class="feature-icon navbar-agms rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
-                            <i class="fas fa-bolt text-light"></i>
+        <!-- Key Benefits and CTA -->
+        <section class="py-4 mb-4">
+            <div class="container-fluid px-4">
+                <div class="row g-4">
+                    <!-- Key Benefits -->
+                    <div class="col-lg-8">
+                        <h3 class="mb-4" style="color: var(--agms-primary);">Key Benefits</h3>
+                        <div class="row row-cols-2 row-cols-md-4 g-4">
+                            <div class="col">
+                                <div class="text-center">
+                                    <div class="feature-icon rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" 
+                                        style="width: 50px; height: 50px; background-color: var(--agms-secondary);">
+                                        <i class="fas fa-sync text-dark"></i>
+                                    </div>
+                                    <h6>Seamless Integration</h6>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="text-center">
+                                    <div class="feature-icon rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" 
+                                        style="width: 50px; height: 50px; background-color: var(--agms-secondary);">
+                                        <i class="fas fa-chart-bar text-dark"></i>
+                                    </div>
+                                    <h6>Data-Driven Insights</h6>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="text-center">
+                                    <div class="feature-icon rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" 
+                                        style="width: 50px; height: 50px; background-color: var(--agms-secondary);">
+                                        <i class="fas fa-shield-alt text-dark"></i>
+                                    </div>
+                                    <h6>Enhanced Security</h6>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="text-center">
+                                    <div class="feature-icon rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" 
+                                        style="width: 50px; height: 50px; background-color: var(--agms-secondary);">
+                                        <i class="fas fa-mobile-alt text-dark"></i>
+                                    </div>
+                                    <h6>Mobile Access</h6>
+                                </div>
+                            </div>
                         </div>
-                        <h5 class="card-title mb-3">Increased Efficiency</h5>
-                        <p class="card-text text-muted">
-                            Reduce turnaround times by up to 30% with optimized gate assignments and resource management.
-                        </p>
                     </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body text-center p-4">
-                        <div class="feature-icon navbar-agms rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
-                            <i class="fas fa-chart-bar text-light"></i>
-                        </div>
-                        <h5 class="card-title mb-3">Data-Driven Decisions</h5>
-                        <p class="card-text text-muted">
-                            Make informed decisions with comprehensive analytics and customizable reporting tools.
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body text-center p-4">
-                        <div class="feature-icon navbar-agms rounded-circle mb-3 mx-auto d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
-                            <i class="fas fa-sync text-light"></i>
-                        </div>
-                        <h5 class="card-title mb-3">Seamless Integration</h5>
-                        <p class="card-text text-muted">
-                            Integrates with existing airport systems, including flight information displays and resource management tools.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Testimonials Section -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <h2 class="text-center mb-4" style="color: var(--agms-primary);">What Our Clients Say</h2>
-        <div class="row g-4">
-            <div class="col-md-6">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body p-4">
-                        <p class="card-text fst-italic mb-3">
-                            "AGMS has transformed our gate management operations. Real-time updates and analytics have helped us decrease delays by 25% in just six months."
-                        </p>
-                        <div class="d-flex align-items-center">
-                            <div class="rounded-circle me-3" style="width: 50px; height: 50px; background-color: var(--agms-primary);"></div>
-                            <div>
-                                <h5 class="mb-0" style="color: var(--agms-primary);">Sarah Johnson</h5>
-                                <p class="text-muted small mb-0">Operations Manager, Phoenix Sky Harbor International</p>
+                    
+                    <!-- CTA -->
+                    <div class="col-lg-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body p-4 d-flex flex-column justify-content-center" 
+                                style="background: linear-gradient(135deg, var(--agms-primary), var(--agms-secondary)); color: white; border-radius: 0.375rem;">
+                                <h3 class="card-title mb-3 text-center">Ready to Optimize?</h3>
+                                <p class="card-text text-center mb-4">Join leading airports around the world that trust AGMS</p>
+                                <div class="d-grid gap-2">
+                                    <a href="#" class="btn btn-light" style="color: var(--agms-primary);">Request Demo</a>
+                                    <a th:href="@{/contact}" class="btn btn-outline-light">Contact Sales</a>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="card h-100 shadow-sm border-0">
-                    <div class="card-body p-4">
-                        <p class="card-text fst-italic mb-3">
-                            "The intuitive dashboard and reporting capabilities have given us unprecedented visibility into our operations. Highly recommended for any airport looking to optimize gate usage."
-                        </p>
-                        <div class="d-flex align-items-center">
-                            <div class="rounded-circle me-3" style="width: 50px; height: 50px; background-color: var(--agms-primary);"></div>
-                            <div>
-                                <h5 class="mb-0" style="color: var(--agms-primary);">Michael Torres</h5>
-                                <p class="text-muted small mb-0">Director of Operations, Southwest Airlines</p>
-                            </div>
-                        </div>
+        </section>
+
+        <!-- Partners -->
+        <section class="py-4">
+            <div class="container-fluid px-4">
+                <h3 class="text-center mb-4" style="color: var(--agms-primary);">Trusted by Industry Leaders</h3>
+                <div class="row justify-content-center align-items-center g-4">
+                    <div class="col-4 col-md-2 text-center">
+                        <img src="/images/Phoenix_Sky_Harbor_International_Airport_Logo.svg" 
+                            alt="Phoenix Sky Harbor International Airport" 
+                            class="img-fluid" style="max-height: 60px;">
+                    </div>
+                    <div class="col-4 col-md-2 text-center">
+                        <img src="/images/LAX_blue_logo.svg" 
+                            alt="LAX" 
+                            class="img-fluid" style="max-height: 60px;">
+                    </div>
+                    <div class="col-4 col-md-2 text-center">
+                        <img src="/images/Savannah_HH_Airport_Logo.svg" 
+                            alt="Savannah Airport" 
+                            class="img-fluid" style="max-height: 60px;">
+                    </div>
+                    <div class="col-4 col-md-2 text-center">
+                        <img src="/images/Newport_News_Williamsburg_International_Airport.svg" 
+                            alt="Newport News Airport" 
+                            class="img-fluid" style="max-height: 60px;">
+                    </div>
+                    <div class="col-4 col-md-2 text-center">
+                        <img src="/images/Denver_International_Airport_Logo.svg" 
+                            alt="Denver International Airport" 
+                            class="img-fluid" style="max-height: 60px;">
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</section>
-
-<!-- Stats Section -->
-<section class="py-5">
-    <div class="container text-center">
-        <h2 class="mb-4" style="color: var(--agms-primary);">AGMS by the Numbers</h2>
-        <div class="row g-4">
-            <div class="col-6 col-md-3">
-                <h2 class="display-4 fw-bold" style="color: var(--agms-primary);">35+</h2>
-                <p class="text-muted">Airports Worldwide</p>
-            </div>
-            <div class="col-6 col-md-3">
-                <h2 class="display-4 fw-bold" style="color: var(--agms-primary);">12,000+</h2>
-                <p class="text-muted">Gates Managed Daily</p>
-            </div>
-            <div class="col-6 col-md-3">
-                <h2 class="display-4 fw-bold" style="color: var(--agms-primary);">98.7%</h2>
-                <p class="text-muted">System Uptime</p>
-            </div>
-            <div class="col-6 col-md-3">
-                <h2 class="display-4 fw-bold" style="color: var(--agms-primary);">27%</h2>
-                <p class="text-muted">Average Efficiency Increase</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- CTA Section -->
-<section class="py-5">
-    <div class="container">
-        <div class="py-5 px-4 text-center text-white rounded-3" style="background: linear-gradient(135deg, var(--agms-primary), var(--agms-secondary));">
-            <h2 class="display-6 fw-bold mb-3">Ready to Optimize Your Airport Operations?</h2>
-            <p class="lead mb-4">Join leading airports around the world that trust AGMS for efficient gate management and enhanced passenger experience.</p>
-            <div>
-                <a href="#" class="btn btn-light btn-lg me-2 fw-bold" style="color: var(--agms-primary);">Request Demo</a>
-                <a th:href="@{/contact}" class="btn btn-outline-light btn-lg fw-bold">Contact Sales</a>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Partners Section -->
-<section class="py-5">
-    <div class="container text-center">
-        <h2 class="mb-4" style="color: var(--agms-primary);">Trusted by Industry Leaders</h2>
-        <div class="row justify-content-center align-items-center g-4">
-            <div class="col-4 col-md-2">
-                <div class="bg-light p-3 rounded">
-                    <img src="/images/Phoenix_Sky_Harbor_International_Airport_Logo.svg" 
-                         alt="Phoenix Sky Harbor International Airport" 
-                         class="img-fluid">
-                </div>
-            </div>
-            <div class="col-4 col-md-2">
-                <div class="bg-light p-3 rounded">
-                    <img src="/images/LAX_blue_logo.svg" alt="Partner 2" class="img-fluid">
-                </div>
-            </div>
-            <div class="col-4 col-md-2">
-                <div class="bg-light p-3 rounded">
-                    <img src="/images/Savannah_HH_Airport_Logo.svg" alt="Partner 3" class="img-fluid">
-                </div>
-            </div>
-            <div class="col-4 col-md-2">
-                <div class="bg-light p-3 rounded">
-                    <img src="/images/Newport_News_Williamsburg_International_Airport.svg" alt="Partner 4" class="img-fluid">
-                </div>
-            </div>
-            <div class="col-4 col-md-2">
-                <div class="bg-light p-3 rounded">
-                    <img src="/images/Denver_International_Airport_Logo.svg" alt="Partner 5" class="img-fluid">
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+        </section>
     </div>
 </body>
 </html>

@@ -80,4 +80,6 @@ public class ServiceConfig {
     public GateManagementService gateManagementService(GateRepository gateRepository) {
         return new JdbcGateManagementService(gateRepository);
     }
+
+ 
 }

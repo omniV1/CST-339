@@ -212,6 +212,7 @@ public class JdbcAssignmentRepository implements AssignmentRepository {
         try {
             LocalDateTime now = LocalDateTime.now();
             
+            
             jdbcTemplate.update(connection -> {
                 PreparedStatement ps = connection.prepareStatement(sql, new String[]{"id"});
                 ps.setString(1, assignment.getGateId());

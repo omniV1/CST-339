@@ -215,18 +215,19 @@ Dependencies:
     </div>
 
     <!-- New Assignment Modal -->
-    <div class="modal fade" id="newAssignmentModal" tabindex="-1">
+    <div class="modal fade" id="newAssignmentModal" tabindex="-1" aria-labelledby="newAssignmentModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Create New Gate Assignment</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <h5 class="modal-title" id="newAssignmentModalLabel">Create New Gate Assignment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form th:action="@{/gates/assignments/create}" method="post">
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="gateId" class="form-label">Gate</label>
-                            <select class="form-control" id="gateId" name="gateId" required>
+                            <select class="form-select" id="gateId" name="gateId" required>
+                                <option value="">Select Gate</option>
                                 <option th:each="gate : ${gates}" 
                                         th:value="${gate.gateId}" 
                                         th:text="${gate.gateId}">

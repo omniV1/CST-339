@@ -200,19 +200,28 @@ public class GateDashboardController {
 
     @PostMapping("/assignments/create")
     public String createAssignment(@ModelAttribute AssignmentModel assignment,
-                                 RedirectAttributes redirectAttributes) {
+                                   RedirectAttributes redirectAttributes) {
         logger.info("Creating new assignment for gate: {}", assignment.getGateId());
+        
+        // Set the Admin username explicitly
+        assignment.setAssignedBy("admin");  // Make sure it's exactly "Admin" with capital A
+        assignment.setCreatedBy("admin");   // Case matters in MySQL foreign keys
+        
+        // Initialize timestamps if needed
+        if (assignment.getCreatedAt() == null) {
+            assignment.initializeTimestamps();
+        }
         
         boolean created = assignmentService.createAssignment(assignment);
         if (created) {
-            redirectAttributes.addFlashAttribute(SUCCESS_ATTR, 
+            redirectAttributes.addFlashAttribute("success", 
                 "Assignment created successfully");
         } else {
-            redirectAttributes.addFlashAttribute(ERROR_ATTR, 
+            redirectAttributes.addFlashAttribute("error", 
                 "Failed to create assignment - time conflict");
         }
         
-        return DASHBOARD_REDIRECT;
+        return "redirect:/gates/dashboard";
     }
 
     @PostMapping("/assignments/delete/{id}")

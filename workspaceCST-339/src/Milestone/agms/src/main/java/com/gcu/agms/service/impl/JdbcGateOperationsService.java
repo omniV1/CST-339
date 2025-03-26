@@ -11,10 +11,6 @@ import org.springframework.stereotype.Service;
 import com.gcu.agms.repository.GateRepository;
 import com.gcu.agms.service.gate.GateOperationsService;
 
-/**
- * JDBC implementation of the GateOperationsService interface.
- * This service uses a GateRepository to access gate status data from a database.
- */
 @Service("jdbcGateOperationsService")
 @Primary
 public class JdbcGateOperationsService implements GateOperationsService {
@@ -22,11 +18,6 @@ public class JdbcGateOperationsService implements GateOperationsService {
     
     private final GateRepository gateRepository;
     
-    /**
-     * Constructor with repository dependency injection.
-     * 
-     * @param gateRepository Repository for gate data access
-     */
     public JdbcGateOperationsService(GateRepository gateRepository) {
         this.gateRepository = gateRepository;
         logger.info("Initialized JDBC Gate Operations Service");
@@ -40,21 +31,32 @@ public class JdbcGateOperationsService implements GateOperationsService {
         
         // Retrieve all gates from database
         gateRepository.findAll().forEach(gate -> {
-            // Convert database status (com.gcu.agms.model.gate.GateStatus) to 
-            // service status (com.gcu.agms.service.gate.GateOperationsService.GateStatus)
+            // Convert database status to service status with enhanced error handling
             GateOperationsService.GateStatus status;
             String statusName = gate.getStatus().name();
             
             try {
+                // Try to convert directly
                 status = GateOperationsService.GateStatus.valueOf(statusName);
             } catch (IllegalArgumentException e) {
+                // If status doesn't exist in enum, map to an appropriate default
                 logger.warn("Unknown status for gate {}: {}", gate.getGateId(), statusName);
-                status = GateOperationsService.GateStatus.AVAILABLE; // Default to AVAILABLE
+                
+                // Map unknown statuses to appropriate values
+                status = switch(statusName) {
+                    case "CLOSED" -> GateOperationsService.GateStatus.MAINTENANCE;
+                    case "UNKNOWN" -> GateOperationsService.GateStatus.AVAILABLE;
+                    default -> GateOperationsService.GateStatus.AVAILABLE;
+                };
+                
+                logger.info("Mapped unknown status {} to {} for gate {}", 
+                    statusName, status, gate.getGateId());
             }
             
             statuses.put(gate.getGateId(), status);
         });
         
+        logger.debug("Retrieved {} gate statuses", statuses.size());
         return statuses;
     }
 

@@ -103,4 +103,5 @@ public class RepositoryConfig {
     public AuthorizationCodeRepository authorizationCodeRepository(JdbcTemplate jdbcTemplate) {
         return new JdbcAuthorizationCodeRepository(jdbcTemplate);
     }
+
 }

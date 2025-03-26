@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,27 +20,26 @@ import com.gcu.agms.model.gate.GateModel;
 import com.gcu.agms.model.gate.GateStatus;
 import com.gcu.agms.repository.GateRepository;
 
-/**
- * JDBC implementation of the GateRepository interface.
- * This class handles data access operations for gates using Spring JDBC.
- * It extends the BaseJdbcRepository for common JDBC operations.
- */
 @Repository
 public class JdbcGateRepository extends BaseJdbcRepository<GateModel, Long> implements GateRepository {
     
-    /**
-     * Constructor with JdbcTemplate dependency injection.
-     * @param jdbcTemplate The JDBC template for database operations
-     */
     public JdbcGateRepository(JdbcTemplate jdbcTemplate) {
         super(jdbcTemplate);
     }
     
     @Override
     public List<GateModel> findAll() {
-        logger.debug("Finding all gates");
-        String sql = "SELECT * FROM gate";
-        return executeQuery(sql, new GateRowMapper());
+        logger.debug("Finding all gates with enhanced error handling");
+        String sql = "SELECT * FROM gate ORDER BY terminal, gate_number";
+        
+        try {
+            List<GateModel> gates = jdbcTemplate.query(sql, new GateRowMapper());
+            logger.info("Successfully retrieved {} gates from database", gates.size());
+            return gates;
+        } catch (Exception e) {
+            logger.error("Database error retrieving all gates: {}", e.getMessage(), e);
+            return new ArrayList<>(); // Return empty list instead of throwing exception
+        }
     }
     
     @Override
@@ -179,31 +179,57 @@ public class JdbcGateRepository extends BaseJdbcRepository<GateModel, Long> impl
         return executeCount(sql);
     }
     
-    /**
+       /**
      * Row mapper for converting database rows to GateModel objects.
+     * Enhanced with error handling for enum parsing.
      */
     private static class GateRowMapper implements RowMapper<GateModel> {
         @Override
         public GateModel mapRow(@NonNull ResultSet rs, int rowNum) throws SQLException {
             GateModel gate = new GateModel();
-            gate.setId(rs.getLong("id"));
-            gate.setGateId(rs.getString("gate_id"));
-            gate.setTerminal(rs.getString("terminal"));
-            gate.setGateNumber(rs.getString("gate_number"));
             
-            // Parse enums from strings
-            gate.setGateType(GateModel.GateType.valueOf(rs.getString("gate_type")));
-            gate.setGateSize(GateModel.GateSize.valueOf(rs.getString("gate_size")));
-            gate.setStatus(GateStatus.valueOf(rs.getString("status")));
-            
-            // Handle boolean fields
-            gate.setIsActive(rs.getBoolean("is_active"));
-            gate.setHasJetBridge(rs.getBoolean("has_jet_bridge"));
-            
-            // Handle numeric fields
-            gate.setCapacity(rs.getInt("capacity"));
-            
-            return gate;
+            try {
+                gate.setId(rs.getLong("id"));
+                gate.setGateId(rs.getString("gate_id"));
+                gate.setTerminal(rs.getString("terminal"));
+                gate.setGateNumber(rs.getString("gate_number"));
+                
+                // Parse enums with proper error handling
+                try {
+                    gate.setGateType(GateModel.GateType.valueOf(rs.getString("gate_type")));
+                } catch (IllegalArgumentException e) {
+                    // Default to DOMESTIC if the type is invalid
+                    gate.setGateType(GateModel.GateType.DOMESTIC);
+                }
+                
+                try {
+                    gate.setGateSize(GateModel.GateSize.valueOf(rs.getString("gate_size")));
+                } catch (IllegalArgumentException e) {
+                    // Default to MEDIUM if the size is invalid
+                    gate.setGateSize(GateModel.GateSize.MEDIUM);
+                }
+                
+                try {
+                    gate.setStatus(GateStatus.valueOf(rs.getString("status")));
+                } catch (IllegalArgumentException e) {
+                    // Default to AVAILABLE if the status is invalid
+                    gate.setStatus(GateStatus.AVAILABLE);
+                }
+                
+                // Handle boolean fields
+                gate.setIsActive(rs.getBoolean("is_active"));
+                gate.setHasJetBridge(rs.getBoolean("has_jet_bridge"));
+                
+                // Handle numeric fields
+                gate.setCapacity(rs.getInt("capacity"));
+                
+                return gate;
+            } catch (SQLException e) {
+                // Log the error and re-throw
+                System.err.println("Error mapping gate row: " + e.getMessage() + 
+                                   " (Gate ID: " + rs.getString("gate_id") + ")");
+                throw e;
+            }
         }
     }
 }

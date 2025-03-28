@@ -2,25 +2,25 @@
 
 /* Color System */
 :root {
-    /* Primary Colors - Arizona Flag Theme */
-    --agms-primary: #300f00;     /* Arizona Red */
-    --agms-secondary: #ffc2c2;   /* Arizona Blue */
-    --agms-accent: #330800;      /* Arizona Gold/Yellow */
+    /* Primary Colors - Aviation Theme */
+    --agms-primary: #1a4b84;     /* Sky Blue - Primary brand color */
+    --agms-secondary: #2c3e50;   /* Naval Blue - Secondary color */
+    --agms-accent: #3498db;      /* Bright Sky Blue - Accent color */
     
-    /* Semantic Colors - Keeping these for functionality */
-    --agms-success: #2ECC71;
-    --agms-warning: #F1C40F;
-    --agms-danger: #E74C3C;
-    --agms-info: #3498DB;
+    /* Semantic Colors */
+    --agms-success: #27ae60;     /* Forest Green - Success state */
+    --agms-warning: #f39c12;     /* Amber - Warning state */
+    --agms-danger: #c0392b;      /* Dark Red - Danger state */
+    --agms-info: #5dade2;        /* Light Blue - Info state */
     
     /* Background Colors */
-    --agms-bg-light: #fff7f7;
-    --agms-bg-dark: #000000;    /* Darker Arizona Blue */
+    --agms-bg-light: #f5f8fa;    /* Cloud White - Light background */
+    --agms-bg-dark: #1c2833;     /* Night Sky - Dark background */
     
     /* Text Colors */
-    --agms-text-primary: #300f00;
-    --agms-text-secondary: #faf6f6;
-    --agms-text-light: #f3eded;
+    --agms-text-primary: #2c3e50;    /* Dark Blue - Primary text */
+    --agms-text-secondary: #7f8c8d;   /* Steel Gray - Secondary text */
+    --agms-text-light: #ecf0f1;       /* Off White - Light text */
 }
 
 /* Typography System */
@@ -50,15 +50,18 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Keep navbar styling consistent */
 .navbar-agms {
-    background-color: var(--agms-primary);
-    border-bottom: 3px solid var(--agms-accent);
+    background-color: var(--agms-primary) !important;
+    border-bottom: 3px solid var(--agms-accent) !important;
     padding: 1rem 0;
 }
+
+.navbar-agms .navbar-brand,
 .navbar-agms .nav-link {
-    color: var(--agms-text-light);
-    font-weight: 500;
-    padding: 0.5rem 1rem;
-    transition: color 0.2s ease;
+    color: white !important;
+}
+
+.navbar-agms .nav-link:hover {
+    color: var(--agms-accent) !important;
 }
 
 /* Button System */
@@ -78,6 +81,21 @@ h1, h2, h3, h4, h5, h6 {
 .btn-agms-primary:hover {
     background-color: var(--agms-secondary);
     transform: translateY(-1px);
+}
+
+/* Direct color applications */
+.btn-primary,
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: var(--agms-primary) !important;
+    border-color: var(--agms-primary) !important;
+    color: white !important;
+}
+
+.btn-primary:hover {
+    background-color: var(--agms-secondary) !important;
+    border-color: var(--agms-secondary) !important;
 }
 
 /* Form Styling */
@@ -149,8 +167,8 @@ h1, h2, h3, h4, h5, h6 {
 
 /* Update Cards and Containers */
 .card-header {
-    background-color: var(--agms-primary);
-    color: var(--agms-text-light);
+    background-color: var(--agms-primary) !important;
+    color: white !important;
     border-bottom: 2px solid var(--agms-accent);
 }
 
@@ -173,7 +191,6 @@ h1, h2, h3, h4, h5, h6 {
     color: var(--agms-text-light);
     border-bottom: 2px solid var(--agms-accent);
 }
-
 
 /* Status badges */
 .badge.bg-success {
@@ -298,21 +315,6 @@ h1, h2, h3, h4, h5, h6 {
     transition: transform 0.3s ease;
     background: linear-gradient(135deg, var(--agms-primary) 0%, var(--agms-secondary) 100%);
     border: 2px solid var(--agms-accent);
-}
-
-.feature-icon:hover {
-    transform: scale(1.1);
-}
-
-/* Card hover effects */
-.card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: none;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1) !important;
 }
 
 /* Remove bg-gradient class */

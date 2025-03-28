@@ -26,7 +26,7 @@
 /* Typography System */
 body {
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    color: var(--agms-text-primary);
+    background-color: #f8f9fa;
     line-height: 1.5;
 }
 

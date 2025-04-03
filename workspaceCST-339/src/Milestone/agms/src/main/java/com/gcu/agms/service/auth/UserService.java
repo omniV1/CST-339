@@ -31,7 +31,7 @@ public interface UserService {
      * @param password The password to verify
      * @return true if authentication successful, false otherwise
      */
-    boolean authenticate(String username, String password);
+    // boolean authenticate(String username, String password); // Removed - Handled by Spring Security
     
     /**
      * Retrieves all users in the system.

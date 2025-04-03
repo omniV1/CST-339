@@ -36,12 +36,13 @@ public class LoginService {
     public Optional<UserModel> authenticate(LoginModel loginModel) {
         logger.info("Attempting authentication for user: {}", loginModel.getUsername());
         
-        // Find user and verify credentials
+        // Find user by username. Password verification is now handled by Spring Security.
         return userService.findByUsername(loginModel.getUsername())
-            .filter(user -> userService.authenticate(loginModel.getUsername(), loginModel.getPassword()))
+            // .filter(user -> userService.authenticate(loginModel.getUsername(), loginModel.getPassword())) // Removed: Authentication check handled by Spring Security
             .map(user -> {
-                user.setLastLogin(LocalDateTime.now());
-                logger.info("Authentication successful for user: {}", loginModel.getUsername());
+                // Consider moving lastLogin update to a Spring Security success handler if needed
+                user.setLastLogin(LocalDateTime.now()); 
+                logger.info("User found: {}", loginModel.getUsername()); // Changed log message
                 return user;
             });
     }

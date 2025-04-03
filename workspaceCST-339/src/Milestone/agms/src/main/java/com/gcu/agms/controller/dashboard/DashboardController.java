@@ -1,53 +1,125 @@
 package com.gcu.agms.controller.dashboard;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import jakarta.servlet.http.HttpSession;
-
 /**
- * DashboardController handles routing to different dashboards based on the user's role.
+ * DashboardController handles routing to different role-specific dashboards.
  * 
- * <p>This controller maps the "/dashboard" endpoint and redirects users to their respective
- * dashboards based on their role stored in the session. If the user's role is not found in
- * the session, they are redirected to the login page.</p>
+ * This controller implements the Gateway pattern for the dashboard feature,
+ * acting as a central entry point that routes users to their appropriate
+ * dashboard based on their role. It's a key component in the application's
+ * role-based access control (RBAC) system.
  * 
- * <p>Role-based routing is handled using a modern switch expression for cleaner and more
- * readable code.</p>
+ * The controller maps the "/dashboard" endpoint, which is typically the default
+ * success URL after login. It examines the authenticated user's role (obtained from
+ * the Spring Security Authentication object) and redirects them to the appropriate
+ * role-specific dashboard controller.
  * 
- * <p>Roles and their corresponding redirects:
- * <ul>
- *   <li>ADMIN - Redirects to "/admin/dashboard"</li>
- *   <li>OPERATIONS_MANAGER - Redirects to "/operations/dashboard"</li>
- *   <li>GATE_MANAGER - Redirects to "/gates/dashboard"</li>
- *   <li>AIRLINE_STAFF - Redirects to "/airline/dashboard"</li>
- *   <li>Default - Redirects to the home page ("/")</li>
- * </ul>
- * </p>
+ * Role-based routing logic:
+ * - ROLE_ADMIN → AdminDashboardController (/admin/dashboard)
+ *   Full system access, user management, configuration
+ * 
+ * - ROLE_OPERATIONS_MANAGER → FlightOperationsController (/operations/dashboard)
+ *   Flight scheduling, gate assignments, overall airport operations
+ * 
+ * - ROLE_GATE_MANAGER → GateDashboardController (/gates/dashboard)
+ *   Gate management, maintenance scheduling, status updates
+ * 
+ * - ROLE_AIRLINE_STAFF → AirlineDashboardController (/airline/dashboard)
+ *   Airline-specific flight information, requests
+ * 
+ * - ROLE_PUBLIC/Others → Home page (/)
+ *   Public information only
+ * 
+ * This approach centralizes routing logic, simplifies security configuration,
+ * and provides a single point of modification if role-based dashboard access
+ * needs to change.
  */
 @Controller
 public class DashboardController {
     
     /**
-     * Handles routing to the appropriate dashboard based on the user's role.
+     * Logger for this class, used to record routing decisions and potential issues.
+     * Logging is especially important in role-based routing to track access patterns
+     * and troubleshoot authorization problems.
+     */
+    private static final Logger logger = LoggerFactory.getLogger(DashboardController.class);
+
+    /**
+     * Handles routing to the appropriate dashboard based on the authenticated user's role.
      * 
-     * @param model the model to be used in the view
-     * @param session the HTTP session containing user attributes
-     * @return the redirect URL based on the user's role
+     * This method:
+     * 1. Verifies that the user is authenticated
+     * 2. Extracts the user's role from their authorities
+     * 3. Redirects to the appropriate dashboard controller based on role
+     * 4. Logs the routing decision for auditing and troubleshooting
+     * 
+     * The routing logic uses the first authority found in the user's authentication.
+     * In a system where users might have multiple roles, this would need enhancement
+     * to determine the "highest" role for dashboard access.
+     * 
+     * @param authentication The Spring Security Authentication object containing
+     *                      the user's identity and granted authorities (roles)
+     * @return A redirect URL to the appropriate dashboard based on the user's role
      */
     @GetMapping("/dashboard")
-    public String showDashboard(Model model, HttpSession session) {
-        // Get the user's role from the session
-        String userRole = (String) session.getAttribute("userRole");
+    public String showDashboard(Authentication authentication) { 
         
-        // Using modern switch expression for cleaner role-based routing
-        return userRole == null ? "redirect:/login" : switch(userRole) {
-            case "ADMIN" -> "redirect:/admin/dashboard";
-            case "OPERATIONS_MANAGER" -> "redirect:/operations/dashboard";
-            case "GATE_MANAGER" -> "redirect:/gates/dashboard";
-            case "AIRLINE_STAFF" -> "redirect:/airline/dashboard";
-            default -> "redirect:/";
+        // Security check: ensure user is authenticated before proceeding
+        if (authentication == null || !authentication.isAuthenticated()) {
+            logger.warn("User is not authenticated, redirecting to login.");
+            return "redirect:/login";
+        }
+
+        // Log the routing attempt with username and authorities for audit trail
+        logger.info("Routing dashboard for user: {}, Authorities: {}", 
+            authentication.getName(), authentication.getAuthorities());
+
+        // Extract the user's authority (role) from the authentication object
+        // In this simple implementation, we take the first authority found
+        // This could be enhanced to handle multiple roles with priority logic
+        String authority = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .findFirst() // Simple approach: take the first role found
+                .orElse("NONE"); 
+
+        // Route to appropriate dashboard based on authority using switch expression
+        // Each case includes logging for audit purposes and troubleshooting
+        return switch(authority) {
+            case "ROLE_ADMIN" -> {
+                logger.info("Redirecting user {} to admin dashboard", authentication.getName());
+                yield "redirect:/admin/dashboard";
+            }
+            case "ROLE_OPERATIONS_MANAGER" -> {
+                logger.info("Redirecting user {} to operations dashboard", authentication.getName());
+                yield "redirect:/operations/dashboard";
+            }
+            case "ROLE_GATE_MANAGER" -> {
+                logger.info("Redirecting user {} to gate manager dashboard", authentication.getName());
+                yield "redirect:/gates/dashboard";
+            }
+            case "ROLE_AIRLINE_STAFF" -> {
+                 logger.info("Redirecting user {} to airline staff dashboard", authentication.getName());
+                 yield "redirect:/airline/dashboard";
+            }
+             case "ROLE_PUBLIC" -> { 
+                 // Public users are redirected to the general home page
+                 // which contains only publicly accessible information
+                 logger.info("Redirecting public user {} to home page", authentication.getName());
+                 yield "redirect:/";
+             }
+            default -> {
+                // Handle unexpected or custom roles with a default redirect
+                // This provides graceful degradation if role configuration changes
+                logger.warn("User {} has unrecognized authority '{}', redirecting to home page.", 
+                    authentication.getName(), authority);
+                yield "redirect:/"; // Default redirect for any other role or if no role found
+            }
         };
     }
 }

@@ -81,12 +81,14 @@ public class GateDashboardController {
      */
     @GetMapping("/dashboard")
     public String showDashboard(Model model, HttpSession session) {
-        // Verify gate manager role
+        // ---- REMOVED Manual Role Check - Handled by SecurityConfig ----
+        /*
         String userRole = (String) session.getAttribute("userRole");
         if (!"GATE_MANAGER".equals(userRole)) {
             logger.warn("Unauthorized access attempt to gate manager dashboard");
             return "redirect:/login";
         }
+        */
         
         logger.info("Loading gate manager dashboard");
         

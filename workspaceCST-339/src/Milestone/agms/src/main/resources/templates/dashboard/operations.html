@@ -64,8 +64,8 @@
                                 <h2 class="card-title mb-0" th:text="${statistics.get('availableAircraft')}">8</h2>
                                 <small class="text-primary">Ready for service</small>
                             </div>
-                            <div class="p-2 rounded" style="background-color: var(--agms-secondary);">
-                                <i class="fas fa-plane-departure" style="color: var(--agms-primary);"></i>
+                            <div class="p-2 bg-white rounded">
+                                <i class="fas fa-plane-departure text-primary fs-4"></i>
                             </div>
                         </div>
                     </div>
@@ -141,13 +141,27 @@
                                 <td th:text="${flight.origin}">LAX</td>
                                 <td th:text="${flight.destination}">JFK</td>
                                 <td th:text="${flight.aircraft}">B737-800</td>
-                                <td>
-                                    <span class="badge"
+                                <td class="flight-status-cell" 
+                                    th:data-flight-number="${flight.flightNumber}"
+                                    th:data-current-status="${flight.status.name()}">
+                                    <span class="flight-status-text badge"
                                           th:with="status=${flight.status}"
                                           th:classappend="${'bg-' + status.getCssClass()}"
                                           th:text="${status.getLabel()}">
                                         Status
                                     </span>
+                                    <select class="flight-status-select form-select form-select-sm d-none">
+                                        <option value="SCHEDULED">Scheduled</option>
+                                        <option value="BOARDING">Boarding</option>
+                                        <option value="DEPARTED">Departed</option>
+                                        <option value="EN_ROUTE">En Route</option>
+                                        <option value="APPROACHING">Approaching</option>
+                                        <option value="LANDED">Landed</option>
+                                        <option value="ARRIVED">Arrived</option>
+                                        <option value="DELAYED">Delayed</option>
+                                        <option value="CANCELLED">Cancelled</option>
+                                        <option value="DIVERTED">Diverted</option>
+                                    </select>
                                 </td>
                                 <td>
                                     <span th:text="${#temporals.format(flight.scheduledDeparture, 'HH:mm')}">10:30</span>
@@ -156,15 +170,10 @@
                                 </td>
                                 <td>
                                     <div class="btn-group btn-group-sm">
-                                        <button class="btn btn-outline-primary update-status-btn"
-                                                th:data-flight-number="${flight.flightNumber}">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
                                         <button class="btn btn-outline-info view-details-btn"
                                                 th:data-flight-number="${flight.flightNumber}">
                                             <i class="fas fa-info-circle"></i>
                                         </button>
-                                        <!-- Add delete button -->
                                         <button class="btn btn-outline-danger delete-flight-btn"
                                                 th:data-flight-number="${flight.flightNumber}">
                                             <i class="fas fa-trash"></i>
@@ -325,39 +334,6 @@
             </div>
         </div>
 
-        <!-- Flight Status Modal - Form for updating flight status -->
-        <div class="modal fade" id="flightStatusModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Update Flight Status</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="flightStatusForm">
-                            <input type="hidden" id="flightNumber" name="flightNumber">
-                            <div class="mb-3">
-                                <label class="form-label">New Status</label>
-                                <select class="form-control" name="status" required>
-                                    <option value="SCHEDULED">Scheduled</option>
-                                    <option value="BOARDING">Boarding</option>
-                                    <option value="DEPARTED">Departed</option>
-                                    <option value="EN_ROUTE">En Route</option>
-                                    <option value="APPROACHING">Approaching</option>
-                                    <option value="LANDED">Landed</option>
-                                    <option value="ARRIVED">Arrived</option>
-                                    <option value="DELAYED">Delayed</option>
-                                    <option value="CANCELLED">Cancelled</option>
-                                    <option value="DIVERTED">Diverted</option>
-                                </select>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Update Status</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Flight Details Modal - Detailed flight information display -->
         <div class="modal fade" id="flightDetailsModal" tabindex="-1">
             <div class="modal-dialog modal-lg">
@@ -505,41 +481,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
-
-<!-- Add this modal for status updates -->
-<div class="modal fade" id="updateStatusModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Update Flight Status</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form id="updateStatusForm">
-                <div class="modal-body">
-                    <input type="hidden" id="statusFlightNumber" name="flightNumber">
-                    <div class="mb-3">
-                        <label class="form-label">Status</label>
-                        <select name="status" class="form-select" required>
-                            <option value="SCHEDULED">Scheduled</option>
-                            <option value="BOARDING">Boarding</option>
-                            <option value="IN_FLIGHT">In Flight</option>
-                            <option value="LANDED">Landed</option>
-                            <option value="CANCELLED">Cancelled</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Location</label>
-                        <input type="text" name="location" class="form-control">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Update Status</button>
-                </div>
-            </form>
         </div>
     </div>
 </div>

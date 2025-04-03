@@ -1,4 +1,70 @@
 /**
+ * =====================================================================================
+ * AGMS - Airport Gate Management System - Flight Operations JavaScript Module
+ * =====================================================================================
+ * 
+ * This module provides the client-side functionality for the flight operations
+ * dashboard in the AGMS application. It handles real-time data updates, user
+ * interactions, and form processing for flight and aircraft management.
+ * 
+ * CORE FUNCTIONALITY:
+ * ------------------
+ * 1. Dashboard Initialization & Data Refresh
+ *    - Initializes the flight operations dashboard on page load
+ *    - Provides real-time data updates through AJAX
+ *    - Refreshes statistics and active flight information periodically
+ *
+ * 2. Flight Management
+ *    - Create, update, and delete flight records
+ *    - Manage flight status transitions (scheduled, boarding, departed, etc.)
+ *    - Display detailed flight information
+ *
+ * 3. Aircraft Management
+ *    - Update aircraft status and location
+ *    - Schedule and track maintenance activities
+ *    - View maintenance history
+ *
+ * 4. Gate Assignments
+ *    - Manage flight-to-gate assignments
+ *    - Handle assignment conflicts
+ *    - Update assignment status
+ *
+ * 5. UI Interaction
+ *    - Modal management for forms and details
+ *    - Form validation and submission
+ *    - Error handling and user feedback
+ *
+ * ORGANIZATION:
+ * ------------
+ * The code is organized into functional sections:
+ * - Initialization functions that run on page load
+ * - Event handlers for user interactions
+ * - AJAX data fetch and update functions
+ * - Data formatting and display utilities
+ * - Modal and UI management helpers
+ *
+ * KEY COMPONENTS:
+ * -------------
+ * - Event Listeners: Set up on DOM load to handle user interactions
+ * - Modal Handlers: Manage Bootstrap modals for forms and data display
+ * - Form Processors: Handle form submissions with validation
+ * - AJAX Methods: Communicate with server endpoints
+ * - Utility Functions: Format data, dates, and handle common tasks
+ *
+ * SECURITY:
+ * --------
+ * - CSRF protection for all AJAX requests
+ * - Input validation before submission
+ * - Error handling for failed requests
+ *
+ * DEPENDENCIES:
+ * -----------
+ * - Bootstrap 5.x for UI components (modals, forms, etc.)
+ * - Fetch API for AJAX communication
+ * - Server-side REST endpoints for data operations
+ */
+
+/**
  * Initialize the application when DOM is fully loaded
  * Sets up event listeners and initializes dashboard components
  */
@@ -16,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
             modal.show();
         });
     } else {
-        console.error('New flight button not found');
+        console.log('New flight button not found - this is expected if not on a page with flight creation.');
     }
 
     // Add maintenance date initialization
@@ -69,32 +135,16 @@ function showUpdateStatusModal(flightNumber) {
     modal.show();
 }
 
-// Handle status update form submission
-document.getElementById('updateStatusForm')?.addEventListener('submit', function(e) {
-    e.preventDefault();
-    const formData = new FormData(this);
+// --- REMOVE Simplest Body Click Listener ---
+/*
+document.body.addEventListener('click', function(e) {
+    console.log('[DEBUG] Body clicked. Target:', e.target);
+}, true); 
+*/
 
-    fetch('/operations/flights/status', {
-        method: 'POST',
-        body: new URLSearchParams(formData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            closeModalCompletely('updateStatusModal');
-            window.location.reload();
-        } else {
-            alert('Failed to update status: ' + data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error updating flight status');
-    });
-});
 /**
- * Central initialization function that sets up all dashboard components
- * Initializes forms, buttons, and event listeners for the operations dashboard
+ * Initialize the application when DOM is fully loaded
+ * Sets up event listeners and initializes dashboard components
  */
 function initializeDashboard() {
     try {
@@ -115,6 +165,16 @@ function initializeDashboard() {
     } catch (error) {
         console.error('Error during dashboard initialization:', error);
     }
+}
+
+/**
+ * Utility function to get CSRF token and header
+ * @returns {Object} Object containing token and header name
+ */
+function getCsrfTokenInfo() {
+    const token = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+    const header = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+    return { token, header };
 }
 
 /**
@@ -150,15 +210,24 @@ function initializeNewFlightForm() {
                 status: 'SCHEDULED'
             };
             
+            // Get CSRF token info
+            const { token, header } = getCsrfTokenInfo();
+            
             // Submit as JSON with proper modal cleanup
             fetch('/operations/flights/create', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    [header]: token // Add CSRF header
                 },
                 body: JSON.stringify(flightData)
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     // Properly close the modal
@@ -185,23 +254,26 @@ function initializeNewFlightForm() {
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Error creating flight');
+                alert('Error creating flight: ' + error.message);
             });
         });
     }
 }
 
-// Add event listener for modal hidden event
-document.getElementById('newFlightModal').addEventListener('hidden.bs.modal', function () {
-    // Clean up modal artifacts
-    document.body.classList.remove('modal-open');
-    const backdrops = document.getElementsByClassName('modal-backdrop');
-    while(backdrops.length > 0) {
-        backdrops[0].remove();
-    }
-    document.body.style.overflow = '';
-    document.body.style.paddingRight = '';
-});
+// Add event listener for modal hidden event - with null check
+const newFlightModal = document.getElementById('newFlightModal');
+if (newFlightModal) {
+    newFlightModal.addEventListener('hidden.bs.modal', function () {
+        // Clean up modal artifacts
+        document.body.classList.remove('modal-open');
+        const backdrops = document.getElementsByClassName('modal-backdrop');
+        while(backdrops.length > 0) {
+            backdrops[0].remove();
+        }
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+    });
+}
 
 /**
  * Handles the submission of a new flight form
@@ -263,7 +335,7 @@ function initializeStatusUpdates() {
     document.querySelectorAll('.update-status-btn').forEach(button => {
         button.addEventListener('click', function() {
             const flightNumber = this.dataset.flightNumber;
-            showFlightStatusModal(flightNumber);
+            showUpdateStatusModal(flightNumber);
         });
     });
 
@@ -334,6 +406,10 @@ function handleMaintenanceSubmit(e) {
         submitData.append('maintenanceType', formData.get('maintenanceType'));
         submitData.append('description', formData.get('description'));
 
+        // Get CSRF token
+        const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+
         // Close modal FIRST before making the API request
         forceCleanupModals();
 
@@ -346,6 +422,7 @@ function handleMaintenanceSubmit(e) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
+                [csrfHeader]: csrfToken // Add CSRF header
             },
             body: new URLSearchParams(submitData)
         })
@@ -535,10 +612,21 @@ function formatDateTime(dateString) {
  */
 function deleteFlight(flightNumber) {
     if (confirm('Are you sure you want to delete this flight?')) {
+        // Get CSRF token info
+        const { token, header } = getCsrfTokenInfo();
+        
         fetch(`/operations/flights/${flightNumber}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: {
+                [header]: token // Add CSRF header
+            }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.success) {
                 window.location.reload();
@@ -548,7 +636,7 @@ function deleteFlight(flightNumber) {
         })
         .catch(error => {
             console.error('Error deleting flight:', error);
-            alert('Error deleting flight');
+            alert('Error deleting flight: ' + error.message);
         });
     }
 }
@@ -558,14 +646,23 @@ function deleteFlight(flightNumber) {
  * @param {Object} flightData - Updated flight information
  */
 function updateFlight(flightData) {
+    // Get CSRF token info
+    const { token, header } = getCsrfTokenInfo();
+    
     fetch('/operations/flights/update', {
         method: 'PUT',
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            [header]: token // Add CSRF header
         },
         body: JSON.stringify(flightData)
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             closeModal('editFlightModal');
@@ -576,7 +673,7 @@ function updateFlight(flightData) {
     })
     .catch(error => {
         console.error('Error updating flight:', error);
-        alert('Error updating flight');
+        alert('Error updating flight: ' + error.message);
     });
 }
 
@@ -689,6 +786,10 @@ function handleAircraftStatusUpdate(e) {
     const form = e.target;
     const formData = new FormData(form);
     
+    // Get CSRF token
+    const csrfToken = document.querySelector('meta[name="_csrf"]')?.getAttribute('content');
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.getAttribute('content');
+    
     // Convert to URL parameters
     const params = new URLSearchParams(formData);
     
@@ -696,10 +797,16 @@ function handleAircraftStatusUpdate(e) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',
+            [csrfHeader]: csrfToken // Add CSRF header
         },
         body: params
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             closeModalCompletely('aircraftStatusModal');
@@ -875,124 +982,75 @@ function closeModalSafely(modalId) {
   }
 }
 
-// Add event listeners when the DOM is loaded
+// +++ RESTORE Event Delegation for Update Status Button Click +++
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('Setting up modal event handlers');
-  
-  // Event handler for modal close buttons
-  document.addEventListener('click', function(event) {
-    const target = event.target;
-    
-    // Check if the clicked element is a close button of any kind
-    if (target.classList.contains('btn-close') || 
-        target.hasAttribute('data-bs-dismiss') ||
-        target.closest('[data-bs-dismiss="modal"]')) {
-      
-      console.log('Modal close button clicked');
-      setTimeout(forceCleanupAllModals, 300);
-    }
-  });
-  
-  // Handle modal backdrop clicks
-  document.addEventListener('mousedown', function(event) {
-    if (event.target.classList.contains('modal')) {
-      console.log('Modal backdrop clicked');
-      setTimeout(forceCleanupAllModals, 300);
-    }
-  });
-  
-  // Handle Escape key press
-  document.addEventListener('keydown', function(event) {
-    if (event.key === 'Escape') {
-      console.log('ESC key pressed, cleaning up modals');
-      setTimeout(forceCleanupAllModals, 300);
-    }
-  });
-  
-  // Setup all maintenance form handlers with safety checks
-  const maintenanceForm = document.getElementById('maintenanceForm');
-  if (maintenanceForm) {
-    maintenanceForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      try {
-        // Get form data safely
-        const formData = new FormData(maintenanceForm);
+    document.body.addEventListener('click', function(e) {
+        // Check if the clicked element is the specific button we want
+        // Use closest() to handle clicks on icons inside the button if any
+        const updateButton = e.target.closest('#updateStatusModal .modal-footer .btn-primary');
         
-        // Close modal first
-        forceCleanupAllModals();
-        
-        // Then submit the data
-        fetch('/operations/aircraft/maintenance', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: new URLSearchParams(formData)
-        })
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            // Reload without animation
-            window.location.href = window.location.pathname;
-          } else {
-            alert('Failed to schedule maintenance: ' + data.message);
-          }
-        })
-        .catch(error => {
-          console.error('Error scheduling maintenance:', error);
-          alert('Error scheduling maintenance');
-        });
-      } catch (e) {
-        console.error('Error processing form:', e);
-        alert('An error occurred while submitting the form');
-      }
-    });
-  }
-  
-  // Add special handling for all ajax forms
-  document.querySelectorAll('form[data-ajax="true"]').forEach(form => {
-    form.addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      // Close any modals first
-      forceCleanupAllModals();
-      
-      // Then process form normally
-      const formData = new FormData(form);
-      const url = form.getAttribute('action') || window.location.pathname;
-      const method = form.getAttribute('method') || 'POST';
-      
-      fetch(url, {
-        method: method,
-        body: new URLSearchParams(formData)
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          window.location.href = window.location.pathname;
-        } else {
-          alert(data.message || 'Operation failed');
+        if (updateButton) {
+            e.preventDefault(); // Prevent default button/submit behavior
+            console.log("Update Status button click DETECTED via delegation."); // <-- Log 1
+
+            const form = document.getElementById('updateStatusForm');
+            if (!form) {
+                console.error('Could not find updateStatusForm!');
+                return;
+            }
+            const formData = new FormData(form);
+
+            // Log the form data
+            console.log("Form Data:"); // <-- Log 2
+            for (let [key, value] of formData.entries()) { 
+                console.log(key, value); // <-- Log 3
+            }
+
+            // Get CSRF token
+            const { token, header } = getCsrfTokenInfo();
+
+            console.log("Sending fetch request to /operations/flights/status"); // <-- Log 4
+
+            fetch('/operations/flights/status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    [header]: token // Add CSRF header
+                },
+                body: new URLSearchParams(formData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    closeModalCompletely('updateStatusModal'); // Use the safe close function
+                    window.location.reload();
+                } else {
+                    alert('Failed to update status: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating flight status: ' + error.message);
+            });
         }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred');
-      });
     });
-  });
-  
-  // Check for stuck modals on load
-  setTimeout(function() {
-    const backdrop = document.querySelector('.modal-backdrop');
-    if (backdrop && !document.querySelector('.modal.show')) {
-      console.log('Found stuck backdrop on page load, cleaning up');
-      forceCleanupAllModals();
-    }
-  }, 500);
 });
 
 // Replace all existing closeModal functions with our safe version
 window.closeModal = closeModalSafely;
 window.forceCleanupModal = forceCleanupAllModals;
 window.closeModalCompletely = closeModalSafely;
+
+/**
+ * Function to clean up all modals
+ * This ensures the forceCleanupModals function is defined
+ */
+function forceCleanupModals() {
+    console.log("Forcing cleanup of all modals");
+    forceCleanupAllModals();
+}

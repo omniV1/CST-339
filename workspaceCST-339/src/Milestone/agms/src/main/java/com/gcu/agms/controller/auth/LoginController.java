@@ -4,65 +4,94 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.gcu.agms.model.auth.LoginModel;
-import com.gcu.agms.service.auth.LoginService;
-
-import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 
 /**
  * Controller for handling user login operations.
- * Demonstrates proper use of dependency injection and separation of concerns
- * as required by Milestone 3.
+ * This controller is responsible for displaying the login form to users.
+ * Actual authentication processing is delegated to Spring Security framework.
+ * 
+ * The controller follows MVC architecture pattern where:
+ * - Model: LoginModel class
+ * - View: login.html template
+ * - Controller: This LoginController class
  */
 @Controller
-@RequestMapping({"/auth"}) // Handle both root and /auth paths
+// @RequestMapping({"/auth"}) // Removed - Now mapped directly
 public class LoginController {
+    /**
+     * Logger instance for this class, used to log different levels of information
+     * for debugging, error tracking, and application monitoring purposes.
+     */
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
-    private static final String LOGIN_REDIRECT = "redirect:/auth/login";
-    private static final String ERROR_ATTR = "error"; // Add this constant
-    private static final String SUCCESS_ATTR = "successMessage";
+    
+    // Previous code that was refactored out when moving to Spring Security
+    // private static final String LOGIN_REDIRECT = "redirect:/auth/login"; // No longer needed
+    // private static final String ERROR_ATTR = "error"; // No longer needed here
+    // private static final String SUCCESS_ATTR = "successMessage"; // No longer needed here
+    
+    /**
+     * Constant for the page title attribute name in the model
+     * Used to set the title of the login page displayed in browser
+     */
     private static final String PAGE_TITLE_ATTR = "pageTitle";
-    private static final String LOGIN_MODEL_ATTR = "loginModel";
-    
-    private final LoginService loginService;
     
     /**
-     * Constructor injection of LoginService.
-     * @param loginService Service handling login operations
+     * Constant for the login model attribute name in the model
+     * Used to bind form data from the view to the LoginModel object
      */
-    public LoginController(LoginService loginService) {
-        this.loginService = loginService;
-    }
+    private static final String LOGIN_MODEL_ATTR = "loginModel"; // Kept for consistency, though not strictly needed by Spring Security form
+    
+    // LoginService dependency injection was removed when switching to Spring Security
+    // private final LoginService loginService; 
     
     /**
-     * Displays the login page.
-     * @param model the model to be used in the view
-     * @return the login view name
+     * Constructor (can be removed if LoginService is not injected).
+     * No longer needed since authentication is handled by Spring Security.
      */
-    @GetMapping({"/login", ""}) // Handle /login and root path
+    // public LoginController(LoginService loginService) {
+    //    this.loginService = loginService;
+    // }
+    
+    /**
+     * Handles HTTP GET requests to /login endpoint.
+     * Displays the login page with an empty login form.
+     * 
+     * @param model The Spring MVC Model object used to pass attributes to the view
+     * @return The logical view name "login" which is resolved to login.html template
+     */
+    @GetMapping("/login") // Handle GET /login directly
     public String displayLogin(Model model) {
+        // Add an empty LoginModel to the model if not already present
+        // This is used to bind form data when the user submits the form
         if (!model.containsAttribute(LOGIN_MODEL_ATTR)) {
             model.addAttribute(LOGIN_MODEL_ATTR, new LoginModel());
         }
+        
+        // Set the page title attribute for the view
         model.addAttribute(PAGE_TITLE_ATTR, "Login - AGMS");
+        
+        // Log that we're displaying the login page for debugging purposes
+        logger.debug("Displaying login page.");
+        
+        // Return the logical view name to be resolved to the actual template
         return "login";
     }
     
     /**
-     * Processes the login request.
-     * @param loginModel the login form data
-     * @param bindingResult the result of form validation
-     * @param session the HTTP session
-     * @param redirectAttributes attributes for redirect scenarios
-     * @return the redirect URL based on the authentication result
+     * Previously handled login POST requests, now removed and replaced by Spring Security.
+     * 
+     * This method used to:
+     * 1. Validate login form input
+     * 2. Authenticate credentials against the database
+     * 3. Set up user session on successful login
+     * 4. Redirect to different dashboards based on user role
+     * 
+     * Now Spring Security handles all these operations through its filter chain.
      */
+    /* 
     @PostMapping("/login") // Maps to /auth/login 
     public String doLogin(@Valid LoginModel loginModel,
                          BindingResult bindingResult,
@@ -106,13 +135,18 @@ public class LoginController {
                 return LOGIN_REDIRECT;
             });
     }
+    */
     
     /**
-     * Processes the logout request.
-     * @param session the HTTP session
-     * @param redirectAttributes attributes for redirect scenarios
-     * @return the redirect URL to the login page
+     * Previously handled logout requests, now removed and replaced by Spring Security.
+     * 
+     * This method used to:
+     * 1. Invalidate the user's session
+     * 2. Redirect to login page with a success message
+     * 
+     * Now Spring Security provides a /logout endpoint that handles session invalidation.
      */
+    /*
     @GetMapping("/logout") // Maps to /auth/logout
     public String logout(HttpSession session, RedirectAttributes redirectAttributes) {
         logger.info("Processing logout request");
@@ -121,4 +155,5 @@ public class LoginController {
             "You have been successfully logged out");
         return LOGIN_REDIRECT;
     }
+    */
 }

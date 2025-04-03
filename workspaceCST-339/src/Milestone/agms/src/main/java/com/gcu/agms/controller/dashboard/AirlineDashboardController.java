@@ -62,12 +62,14 @@ public class AirlineDashboardController {
      */
     @GetMapping("/dashboard")
     public String showDashboard(Model model, HttpSession session) {
-        // Verify airline staff role
+        // ---- REMOVED Manual Role Check - Handled by SecurityConfig ----
+        /*
         String userRole = (String) session.getAttribute("userRole");
         if (!"AIRLINE_STAFF".equals(userRole)) {
             logger.warn("Unauthorized access attempt to airline staff dashboard");
             return LOGIN_REDIRECT;
         }
+        */
         
         logger.info("Loading airline staff dashboard");
         

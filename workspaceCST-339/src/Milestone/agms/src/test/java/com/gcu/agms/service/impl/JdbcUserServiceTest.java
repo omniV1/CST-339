@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.never;
@@ -65,20 +64,6 @@ class JdbcUserServiceTest {
         assertTrue(result.isPresent());
         assertEquals("testuser", result.get().getUsername());
         verify(userRepository, times(1)).findByUsername("testuser");
-    }
-    
-    @Test
-    void testAuthenticate() {
-        // Set up the mock repository
-        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
-        
-        // Call the service method
-        boolean authenticated = userService.authenticate("testuser", "Test123!");
-        
-        // Verify the result and repository interaction
-        assertTrue(authenticated);
-        verify(userRepository, times(1)).findByUsername("testuser");
-        verify(userRepository, times(1)).updateLastLogin(eq(1L), any(LocalDateTime.class));
     }
     
     @Test

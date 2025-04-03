@@ -1,29 +1,52 @@
 <!-- 
+======================================================================================
+AGMS - Airport Gate Management System - User Registration Template
+======================================================================================
 
-This HTML file is a Thymeleaf template for a user registration form. It includes the following key sections:
+This template provides the user registration form for the AGMS application.
+It allows users to create accounts with various roles, each with different
+permission levels in the system.
 
-1. JavaScript:
-    - A script that listens for changes to the role selection dropdown and toggles the visibility of the authorization code field based on the selected role.
-    - The script ensures that the authorization code field is required for specific roles (ADMIN and OPERATIONS_MANAGER).
+TEMPLATE STRUCTURE:
+------------------
+1. Layout Integration
+   - Uses the MainLayout template for consistent header/footer
+   - Injects content using Thymeleaf fragment mechanism
 
-2. Main Registration Form:
-    - A form that collects user information such as first name, last name, email, phone number, username, and password.
-    - The form includes validation error messages for each field.
-    - The password field includes a hint about the required password format.
+2. Client-Side Functionality
+   - JavaScript for dynamic form behavior (showing/hiding authorization fields)
+   - Validation for required fields
+   - Role-specific input requirements
 
-3. Role Selection:
-    - A dropdown menu for selecting the user's role.
-    - The dropdown includes options for public users, airline staff, gate managers, system administrators, and operations managers.
-    - The role selection triggers the JavaScript function to show or hide the authorization code field.
+3. Form Components
+   - Personal information fields (name, contact details)
+   - Authentication credentials (username, password)
+   - Role selection with appropriate authorization
+   - Validation feedback through Thymeleaf error display
 
-4. Authorization Code Section:
-    - A hidden section that becomes visible when specific roles are selected.
-    - This section includes an input field for the authorization code and a hint about contacting system administration for access.
+KEY FEATURES:
+-----------
+1. Role-Based Registration
+   - Different user types determine system access levels
+   - Administrative roles require authorization codes
+   - Dynamic form adapts based on selected role
 
-5. Submit Button:
-    - A button to submit the registration form.
+2. Field Validation
+   - Client-side required field validation
+   - Server-side validation with error feedback
+   - Password complexity requirements
 
-The template uses Thymeleaf attributes (e.g., th:field, th:if, th:errors) to bind form fields to a user model and display validation errors.
+3. User Experience
+   - Clear labeling and instructions
+   - Visual feedback for input errors
+   - Responsive design for all device sizes
+
+DEPENDENCIES:
+------------
+- Thymeleaf templating engine
+- Bootstrap 5 for form styling
+- Font Awesome for icons
+- AGMS user data models and validation
 -->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" th:replace="~{layouts/MainLayout :: layout(~{::div})}">
@@ -31,122 +54,192 @@ The template uses Thymeleaf attributes (e.g., th:field, th:if, th:errors) to bin
 <body>
     <div th:fragment="content">
 
+        <!-- 
+        Role-Based Authorization Code Display Script
+        -------------------------------------------
+        This script controls the dynamic visibility of the authorization code field
+        based on the selected user role. The authorization code is only required for
+        administrative roles (ADMIN and OPERATIONS_MANAGER).
+        
+        Key functionality:
+        1. Event listener for role dropdown changes
+        2. Toggle visibility of authorization code field
+        3. Dynamic required attribute management for validation
+        4. Initial state setup on page load
+        -->
         <script>
             document.addEventListener('DOMContentLoaded', function() {
+                // Get reference to the role selection dropdown
                 const roleSelect = document.getElementById('role');
                 
+                /**
+                 * Toggles the visibility of the authorization code field
+                 * based on the selected role value.
+                 * 
+                 * For ADMIN and OPERATIONS_MANAGER roles, the field is shown and required.
+                 * For all other roles, the field is hidden and not required.
+                 */
                 function toggleAuthCodeField() {
                     const authCodeSection = document.getElementById('authCodeSection');
                     const selectedRole = roleSelect.value;
                     
-                    // Debug the selected value
+                    // Debug log to track role selection
                     console.log('Selected role:', selectedRole);
                     
-                    // Match the exact enum values from UserRole
+                    // Check if selected role requires authorization
+                    // These values must match the exact enum names in UserRole.java
                     if (selectedRole === 'ADMIN' || selectedRole === 'OPERATIONS_MANAGER') {
+                        // Show the authorization code field
                         authCodeSection.style.display = 'block';
-                        // Add a required attribute to the auth code input when it's visible
+                        // Make the field required when visible
                         document.getElementById('authCode').required = true;
                         console.log('Showing auth code field');
                     } else {
+                        // Hide the authorization code field
                         authCodeSection.style.display = 'none';
-                        // Remove the required attribute when hidden
+                        // Remove required validation when hidden
                         document.getElementById('authCode').required = false;
                         console.log('Hiding auth code field');
                     }
                 }
                 
-                // Add event listener for role select changes
+                // Register event listener for role selection changes
                 roleSelect.addEventListener('change', toggleAuthCodeField);
                 
-                // Initial check
+                // Set initial state on page load
                 toggleAuthCodeField();
             });
         </script>
 
+        <!-- 
+        Main Registration Container
+        -------------------------- 
+        Uses Bootstrap's grid system for responsive layout:
+        - Container provides proper margins and responsive width
+        - Row/column structure for centering the form
+        - Card component for visual grouping of form elements
+        -->
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-md-6">
-                    <!-- Main Registration Card -->
+                    <!-- Registration Form Card -->
                     <div class="card">
+                        <!-- Card Header with Title -->
                         <div class="card-header">
                             <h2>Register</h2>
                         </div>
+                        <!-- Card Body containing the registration form -->
                         <div class="card-body">
-                            <!-- Error Message Display -->
+                            <!-- 
+                            Error Message Display
+                            ---------------------
+                            Shows error messages passed from the controller via flash attributes
+                            Used for displaying server-side validation or processing errors
+                            -->
                             <div th:if="${error}" class="alert alert-danger">
                                 <p th:text="${error}">Error message here</p>
                             </div>
 
-                            <!-- Registration Form -->
+                            <!-- 
+                            Registration Form
+                            -----------------
+                            Uses Thymeleaf's form binding to map form fields to the UserModel object
+                            POST request sent to /auth/register for processing
+                            -->
                             <form th:action="@{/auth/register}" th:object="${userModel}" method="post">
-                                <!-- First Name Field -->
+                                <!-- 
+                                Personal Information Section
+                                ---------------------------- 
+                                Core user identity and contact information
+                                -->
+                                
+                                <!-- First Name Field with validation -->
                                 <div class="mb-3">
                                     <label for="firstName" class="form-label">First Name</label>
                                     <input type="text" class="form-control" id="firstName" th:field="*{firstName}"
                                         required>
+                                    <!-- Thymeleaf validation error display -->
                                     <div class="text-danger" th:if="${#fields.hasErrors('firstName')}"
                                         th:errors="*{firstName}">
                                     </div>
                                 </div>
 
-                                <!-- Last Name Field -->
+                                <!-- Last Name Field with validation -->
                                 <div class="mb-3">
                                     <label for="lastName" class="form-label">Last Name</label>
                                     <input type="text" class="form-control" id="lastName" th:field="*{lastName}"
                                         required>
+                                    <!-- Thymeleaf validation error display -->
                                     <div class="text-danger" th:if="${#fields.hasErrors('lastName')}"
                                         th:errors="*{lastName}">
                                     </div>
                                 </div>
 
-                                <!-- Email Field -->
+                                <!-- Email Field with validation -->
                                 <div class="mb-3">
                                     <label for="email" class="form-label">Email</label>
                                     <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                                    <!-- Thymeleaf validation error display -->
                                     <div class="text-danger" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">
                                     </div>
                                 </div>
 
-                                <!-- Phone Number Field -->
+                                <!-- Phone Number Field with validation -->
                                 <div class="mb-3">
                                     <label for="phoneNumber" class="form-label">Phone Number</label>
                                     <input type="tel" class="form-control" id="phoneNumber" th:field="*{phoneNumber}"
                                         required>
+                                    <!-- Thymeleaf validation error display -->
                                     <div class="text-danger" th:if="${#fields.hasErrors('phoneNumber')}"
                                         th:errors="*{phoneNumber}">
                                     </div>
                                 </div>
 
-                                <!-- Username Field -->
+                                <!-- 
+                                Authentication Information Section
+                                ---------------------------------- 
+                                Account credentials for system access
+                                -->
+                                
+                                <!-- Username Field with validation -->
                                 <div class="mb-3">
                                     <label for="username" class="form-label">Username</label>
                                     <input type="text" class="form-control" id="username" th:field="*{username}"
                                         required>
+                                    <!-- Thymeleaf validation error display -->
                                     <div class="text-danger" th:if="${#fields.hasErrors('username')}"
                                         th:errors="*{username}">
                                     </div>
                                 </div>
 
-                                <!-- Password Field -->
+                                <!-- Password Field with validation and help text -->
                                 <div class="mb-3">
                                     <label for="password" class="form-label">Password</label>
                                     <input type="password" class="form-control" id="password" th:field="*{password}"
                                         required>
+                                    <!-- Thymeleaf validation error display -->
                                     <div class="text-danger" th:if="${#fields.hasErrors('password')}"
                                         th:errors="*{password}">
                                     </div>
+                                    <!-- Password requirements helper text -->
                                     <small class="form-text text-muted">
                                         Password must contain at least 8 characters, including uppercase,
                                         lowercase, numbers, and special characters.
                                     </small>
                                 </div>
 
-                                <!-- Role Selection -->
+                                <!-- 
+                                Role Selection Section
+                                ----------------------
+                                Determines user access level in the system
+                                Uses optgroups to categorize different role types
+                                Bound to UserRole enum using Thymeleaf's T() operator
+                                -->
                                 <div class="mb-3">
                                     <label for="role" class="form-label">Account Type</label>
                                     <select class="form-select" id="role" th:field="*{role}"
                                         onchange="toggleAuthCodeField()" required>
+                                        <!-- Default empty option -->
                                         <option value="" selected>Select your role</option>
 
                                         <!-- Public/Customer Role -->
@@ -154,7 +247,7 @@ The template uses Thymeleaf attributes (e.g., th:field, th:if, th:errors) to bin
                                             Customer/Public User
                                         </option>
 
-                                        <!-- Standard Staff Roles -->
+                                        <!-- Standard Staff Roles Group -->
                                         <optgroup label="Airport Staff">
                                             <option th:value="${T(com.gcu.agms.model.auth.UserRole).AIRLINE_STAFF}">
                                                 Airline Staff
@@ -164,7 +257,7 @@ The template uses Thymeleaf attributes (e.g., th:field, th:if, th:errors) to bin
                                             </option>
                                         </optgroup>
 
-                                        <!-- Administrative Roles -->
+                                        <!-- Administrative Roles Group -->
                                         <optgroup label="Administrative Roles">
                                             <option th:value="${T(com.gcu.agms.model.auth.UserRole).ADMIN}">
                                                 System Administrator
@@ -174,18 +267,27 @@ The template uses Thymeleaf attributes (e.g., th:field, th:if, th:errors) to bin
                                             </option>
                                         </optgroup>
                                     </select>
+                                    <!-- Thymeleaf validation error display -->
                                     <div class="text-danger" th:if="${#fields.hasErrors('role')}" th:errors="*{role}">
                                     </div>
+                                    <!-- Role selection helper text -->
                                     <small class="form-text text-muted">
                                         Select the type of account that best matches your role.
                                         Administrative roles require special authorization.
                                     </small>
                                 </div>
 
-                                <!-- Authorization Code Section -->
+                                <!-- 
+                                Authorization Code Section
+                                -------------------------
+                                Only visible for administrative roles
+                                Initially hidden via CSS (display: none)
+                                Visibility controlled by JavaScript function toggleAuthCodeField()
+                                -->
                                 <div class="mb-3" id="authCodeSection" style="display: none;">
                                     <label for="authCode" class="form-label">Authorization Code</label>
                                     <input type="text" class="form-control" id="authCode" th:field="*{authCode}">
+                                    <!-- Authorization code helper text -->
                                     <div class="form-text">
                                         <i class="fas fa-info-circle"></i>
                                         Administrative roles require an authorization code.
@@ -193,13 +295,13 @@ The template uses Thymeleaf attributes (e.g., th:field, th:if, th:errors) to bin
                                     </div>
                                 </div>
 
-                                <!-- Submit Button -->
+                                <!-- Form Submission Button -->
                                 <div class="d-grid">
                                     <button type="submit" class="btn btn-primary">Register</button>
                                 </div>
                             </form>
 
-                            <!-- Login Link -->
+                            <!-- Login Link for Existing Users -->
                             <div class="text-center mt-3">
                                 <p>Already have an account? <a th:href="@{/auth/login}">Login here</a></p>
                             </div>

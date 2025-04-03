@@ -48,25 +48,25 @@ Dependencies:
                             <h2 class="h4 mb-0">Login</h2>
                         </div>
                         <div class="card-body">
-                            <!-- Show any error messages -->
-                            <div th:if="${error}" class="alert alert-danger" role="alert">
-                                <span th:text="${error}">Error message here</span>
+                            <!-- Show login error message -->
+                            <div th:if="${param.error}" class="alert alert-danger" role="alert">
+                                Invalid username or password.
                             </div>
                             
-                            <!-- Show any success messages -->
-                            <div th:if="${successMessage}" class="alert alert-success" role="alert">
-                                <span th:text="${successMessage}">Success message here</span>
+                            <!-- Show logout success message -->
+                            <div th:if="${param.logout}" class="alert alert-success" role="alert">
+                                You have been logged out.
                             </div>
 
                             <!-- Login Form -->
-                            <form th:action="@{/auth/login}" th:object="${loginModel}" method="post">
+                            <form th:action="@{/perform_login}" method="post">
                                 <!-- Username Field -->
                                 <div class="mb-3">
                                     <label for="username" class="form-label">Username</label>
                                     <input type="text" 
                                            class="form-control" 
                                            id="username" 
-                                           th:field="*{username}"
+                                           name="username"
                                            required>
                                 </div>
 
@@ -76,7 +76,7 @@ Dependencies:
                                     <input type="password" 
                                            class="form-control" 
                                            id="password" 
-                                           th:field="*{password}"
+                                           name="password"
                                            required>
                                 </div>
 
@@ -88,7 +88,7 @@ Dependencies:
 
                             <!-- Registration Link -->
                             <div class="text-center mt-3">
-                                <p>Don't have an account? <a th:href="@{/auth/register}">Register here</a></p>
+                                <p>Don't have an account? <a th:href="@{/register}">Register here</a></p>
                             </div>
                         </div>
                     </div>

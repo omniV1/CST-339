@@ -1,9 +1,9 @@
 
 # Airport Gate Management System (AGMS)
-## Design Report - Milestone 4
+## Design Report - Milestone 6
 ### CST-339: Java Enterprise Application Development
 
-**Date:** March 23, 2025  
+**Date:** April, 06 2025  
 **Version:** 5.0  
 **Author:** Owen Lindsey  
 **Course:** CST-339 - Java Programming III  
@@ -90,7 +90,6 @@ This milestone represents a significant advancement in our Airport Gate Manageme
 | Task | Status | Start Date | Completion Date | Owner |
 |------|--------|------------|-----------------|-------|
 | Database schema design | Completed | Feb 24, 2025 | Feb 26, 2025 | Owen Lindsey |
-| DDL Script creation | Completed | Feb 25, 2025 | Feb 27, 2025 | Owen Lindsey |
 | Database configuration | Completed | Feb 27, 2025 | Feb 28, 2025 | Owen Lindsey |
 | User repository implementation | Completed | Feb 28, 2025 | Mar 1, 2025 | Owen Lindsey |
 | Flight repository implementation | Completed | Mar 1, 2025 | Mar 2, 2025 | Owen Lindsey |
@@ -98,13 +97,13 @@ This milestone represents a significant advancement in our Airport Gate Manageme
 | Assignment repository implementation | Completed | Mar 3, 2025 | Mar 4, 2025 | Owen Lindsey |
 | Maintenance repository implementation | Completed | Mar 4, 2025 | Mar 5, 2025 | Owen Lindsey |
 | Authorization repository implementation | Completed | Mar 5, 2025 | Mar 6, 2025 | Owen Lindsey |
-| Spring Security implementation | Completed | Mar 7, 2025 | Mar 9, 2025 | Owen Lindsey |
-| Database authentication integration | Completed | Mar 9, 2025 | Mar 10, 2025 | Owen Lindsey |
-| Page security configuration | Completed | Mar 10, 2025 | Mar 11, 2025 | Owen Lindsey |
-| CSRF protection implementation | Completed | Mar 11, 2025 | Mar 12, 2025 | Owen Lindsey |
-| Service layer refactoring | Completed | Mar 20, 2025 | Mar 20, 2025 | Owen Lindsey |
-| Integration testing | Completed | Mar 20, 2025 | Mar 20, 2025 | Owen Lindsey |
-| Documentation updates | Completed | Mar 20, 2025 | Mar 20, 2025 | Owen Lindsey |
+| Spring Security implementation | Completed | March 30, 2025 | April 1, 2025 | Owen Lindsey |
+| Database authentication integration | Completed | March 30, 2025 | April 1, 2025 | Owen Lindsey |
+| Page security configuration | Completed | March 30, 2025 | April 1, 2025 | Owen Lindsey |
+| CSRF protection implementation | Completed |March 31, 2025| April 2, 2025 | Owen Lindsey |
+| Service layer refactoring | Completed | March 31, 2025 | April 2, 2025 | Owen Lindsey |
+| Integration testing | Completed | March 31, 2025 | April 3, 2025 | Owen Lindsey |
+| Documentation updates | Completed | April 02, 2025 | April 3, 2025 | Owen Lindsey |
 
 ## Design Documentation
 
@@ -112,7 +111,7 @@ This milestone represents a significant advancement in our Airport Gate Manageme
 
 ### General Technical Approach
 
-For Milestone 5, our technical approach built upon the robust data persistence foundation established in Milestone 4, extending our system with advanced features and optimizations. Our continued use of Spring Data JDBC offers several advantages over both pure JDBC and JPA/Hibernate:
+For Milestone 6, our technical approach built upon the robust data persistence foundation established in Milestone 5, extending our system with advanced features and optimizations. Our continued use of Spring Data JDBC offers several advantages over both pure JDBC and JPA/Hibernate:
 
 1. **Simplicity**: Spring Data JDBC provides a clean, straightforward approach to database access without the complexity of an ORM like Hibernate.
 

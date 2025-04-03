@@ -33,7 +33,7 @@ public class SecurityConfig {
      * with our application's user database and authentication logic.
      */
     @Autowired
-    AppUserDetailsService userDetailsService; // Autowire the service we created
+    AppUserDetailsService userDetailsService;
 
     /**
      * Configures the security filter chain that processes all HTTP requests.
@@ -57,31 +57,31 @@ public class SecurityConfig {
                 .requestMatchers("/", "/login", "/register", "/images/**", "/css/**", "/js/**").permitAll()
                 
                 // Role-specific access restrictions
-                .requestMatchers("/admin/**").hasRole("ADMIN")               // Admin-only pages
-                .requestMatchers("/operations/**").hasRole("OPERATIONS_MANAGER") // Operations manager pages
-                .requestMatchers("/gates/**").hasRole("GATE_MANAGER")        // Gate manager pages
-                .requestMatchers("/airline/**").hasRole("AIRLINE_STAFF")     // Airline staff pages
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers("/operations/**").hasRole("OPERATIONS_MANAGER")
+                .requestMatchers("/gates/**").hasRole("GATE_MANAGER")
+                .requestMatchers("/airline/**").hasRole("AIRLINE_STAFF")
                 
-                // All other URLs require authentication (user must be logged in)
+                // All other URLs require authentication
                 .anyRequest().authenticated()
             )
             
             // Configure custom login form
             .formLogin(form -> form
-                .loginPage("/login")                      // Custom login page URL
-                .loginProcessingUrl("/perform_login")     // Form submission endpoint
-                .defaultSuccessUrl("/dashboard", true)    // Redirect after successful login
-                .failureUrl("/login?error=true")          // Redirect after failed login
-                .permitAll()                              // Allow access to login page for everyone
+                .loginPage("/login")
+                .loginProcessingUrl("/perform_login")
+                .defaultSuccessUrl("/dashboard", true)
+                .failureUrl("/login?error=true")
+                .permitAll()
             )
             
             // Configure logout behavior
             .logout(logout -> logout
-                .logoutUrl("/logout")                     // Logout endpoint URL
-                .logoutSuccessUrl("/login?logout=true")   // Redirect after successful logout
-                .invalidateHttpSession(true)              // Invalidate HTTP session
-                .deleteCookies("JSESSIONID")              // Delete session cookies
-                .permitAll()                              // Allow logout for everyone
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login?logout=true")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
+                .permitAll()
             )
             
             // Use our custom user details service for authentication
@@ -101,7 +101,6 @@ public class SecurityConfig {
      */
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // Use BCrypt for strong password hashing
-        return new BCryptPasswordEncoder(); 
+        return new BCryptPasswordEncoder();
     }
 } 

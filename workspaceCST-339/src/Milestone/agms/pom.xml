@@ -159,7 +159,6 @@
                             <directory>target</directory>
                             <followSymlinks>false</followSymlinks>
                             <useDefaultExcludes>true</useDefaultExcludes>
-                            <force>true</force>
                         </fileset>
                     </filesets>
                 </configuration>

@@ -12,7 +12,7 @@
  * 1. Dashboard Initialization & Data Refresh
  *    - Initializes the flight operations dashboard on page load
  *    - Provides real-time data updates through AJAX
- *    - Refreshes statistics and active flight information periodically
+ *    - Refreshes statistics and active flight information
  *
  * 2. Flight Management
  *    - Create, update, and delete flight records
@@ -24,49 +24,17 @@
  *    - Schedule and track maintenance activities
  *    - View maintenance history
  *
- * 4. Gate Assignments
- *    - Manage flight-to-gate assignments
- *    - Handle assignment conflicts
- *    - Update assignment status
- *
- * 5. UI Interaction
+ * 4. UI Interaction
  *    - Modal management for forms and details
  *    - Form validation and submission
  *    - Error handling and user feedback
  *
- * ORGANIZATION:
- * ------------
- * The code is organized into functional sections:
- * - Initialization functions that run on page load
- * - Event handlers for user interactions
- * - AJAX data fetch and update functions
- * - Data formatting and display utilities
- * - Modal and UI management helpers
- *
- * KEY COMPONENTS:
- * -------------
- * - Event Listeners: Set up on DOM load to handle user interactions
- * - Modal Handlers: Manage Bootstrap modals for forms and data display
- * - Form Processors: Handle form submissions with validation
- * - AJAX Methods: Communicate with server endpoints
- * - Utility Functions: Format data, dates, and handle common tasks
- *
- * SECURITY:
- * --------
- * - CSRF protection for all AJAX requests
- * - Input validation before submission
- * - Error handling for failed requests
- *
- * DEPENDENCIES:
- * -----------
- * - Bootstrap 5.x for UI components (modals, forms, etc.)
- * - Fetch API for AJAX communication
- * - Server-side REST endpoints for data operations
+ * 5. Security
+ *    - CSRF protection for all AJAX requests
  */
 
 /**
  * Initialize the application when DOM is fully loaded
- * Sets up event listeners and initializes dashboard components
  */
 document.addEventListener('DOMContentLoaded', function() {
     console.log('DOM Content Loaded');
@@ -134,13 +102,6 @@ function showUpdateStatusModal(flightNumber) {
     const modal = new bootstrap.Modal(document.getElementById('updateStatusModal'));
     modal.show();
 }
-
-// --- REMOVE Simplest Body Click Listener ---
-/*
-document.body.addEventListener('click', function(e) {
-    console.log('[DEBUG] Body clicked. Target:', e.target);
-}, true); 
-*/
 
 /**
  * Initialize the application when DOM is fully loaded
@@ -982,7 +943,7 @@ function closeModalSafely(modalId) {
   }
 }
 
-// +++ RESTORE Event Delegation for Update Status Button Click +++
+// Event Delegation for Update Status Button Click
 document.addEventListener('DOMContentLoaded', function() {
     document.body.addEventListener('click', function(e) {
         // Check if the clicked element is the specific button we want

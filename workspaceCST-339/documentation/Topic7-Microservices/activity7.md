@@ -43,11 +43,11 @@ The **Web Application** provides the user interface, utilizing Thymeleaf for pre
 
 | Description                  | Screenshot                               |
 | :--------------------------- | :--------------------------------------- |
-| Users Data Displayed via Web | ![Users Table](docs/Users8081.png)       |
-| Orders Data Displayed via Web | ![Orders Table](docs/Orders8081.png)     |
+| Users Data Displayed via Web | ![[Users Table](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/src/Topic7-Microservices/activity-62/docs/Users8081.png)       |
+| Orders Data Displayed via Web | ![Orders Table](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/src/Topic7-Microservices/activity-62/docs/Orders8081.png)     |
 
 ---
-
+https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/src/Topic7-Microservices/activity-62/docs/Users8081.png
 ## Part 2: Integrating Dynamic Service Discovery with Eureka
 
 **Objective:** To improve the system's design by introducing a service registry (Netflix Eureka) that allows services to find each other automatically without relying on fixed addresses.
@@ -67,9 +67,9 @@ The existing Users Service, Orders Service, and Web Application were then update
 
 | Description                               | Screenshot                                 |
 | :---------------------------------------- | :----------------------------------------- |
-| Eureka Server Dashboard (Showing Services) | ![Eureka Dashboard](docs/Eureka.png)       |
-| Users Data via Eureka Discovery           | ![Users with Eureka](docs/Users8083.png)   |
-| Orders Data via Eureka Discovery          | ![Orders with Eureka](docs/Orders8083.png) |
+| Eureka Server Dashboard (Showing Services) | ![Eureka Dashboard](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/src/Topic7-Microservices/activity-62/docs/Eureka.png)       |
+| Users Data via Eureka Discovery           | ![[Users with Eureka](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/src/Topic7-Microservices/activity-62/docs/Orders8083.png)   |
+| Orders Data via Eureka Discovery          | [![Orders with Eureka](https://github.com/omniV1/CST-339/blob/main/workspaceCST-339/src/Topic7-Microservices/activity-62/docs/Users8083.png) |
 
 ---
 

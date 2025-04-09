@@ -2,7 +2,6 @@ package com.gcu.api;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,9 +15,9 @@ import com.gcu.model.OrderModel;
 @RequestMapping("/service")
 public class OrdersRestService {
     
-    private OrdersBusinessService service;
+    private final OrdersBusinessService service;
     
-    @Autowired
+    
     public OrdersRestService(OrdersBusinessService service) {
         this.service = service;
     }

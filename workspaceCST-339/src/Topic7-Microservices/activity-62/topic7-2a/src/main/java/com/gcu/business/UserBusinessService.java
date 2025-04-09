@@ -3,7 +3,7 @@ package com.gcu.business;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
 import com.gcu.data.entity.UserEntity;
@@ -13,9 +13,9 @@ import com.gcu.model.UserModel;
 @Service
 public class UserBusinessService {
     
-    private UsersRepository usersRepository;
+    private final UsersRepository usersRepository;
     
-    @Autowired
+   
     public UserBusinessService(UsersRepository usersRepository) {
         this.usersRepository = usersRepository;
     }

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="layouts/defaultLayout">
+<head>
+    <title>Orders</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <h2 th:text="${title}">Default Title</h2>
+        <div class="container">
+            <a href="/app/" class="btn btn-secondary mb-3">Back to Home</a>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Order No</th>
+                        <th>Product Name</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="order : ${orders}">
+                        <td th:text="${order.id}">ID</td>
+                        <td th:text="${order.orderNo}">Order No</td>
+                        <td th:text="${order.productName}">Product Name</td>
+                        <td th:text="${order.price}">Price</td>
+                        <td th:text="${order.quantity}">Quantity</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html> 

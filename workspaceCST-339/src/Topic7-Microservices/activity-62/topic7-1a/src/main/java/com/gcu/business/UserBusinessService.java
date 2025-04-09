@@ -13,7 +13,7 @@ import com.gcu.model.UserModel;
 @Service
 public class UserBusinessService {
     
-    private UsersRepository usersRepository;
+    private final UsersRepository usersRepository;
     
     @Autowired
     public UserBusinessService(UsersRepository usersRepository) {
@@ -25,7 +25,7 @@ public class UserBusinessService {
         List<UserEntity> usersEntity = usersRepository.findAll();
         
         // Convert UserEntity list to UserModel list
-        List<UserModel> usersDomain = new ArrayList<UserModel>();
+        List<UserModel> usersDomain = new ArrayList<>();
         for (UserEntity entity : usersEntity) {
             usersDomain.add(new UserModel(entity.getId(), entity.getUsername(), entity.getPassword()));
         }

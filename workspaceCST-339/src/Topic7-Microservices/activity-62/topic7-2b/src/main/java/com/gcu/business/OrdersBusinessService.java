@@ -3,7 +3,6 @@ package com.gcu.business;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import org.springframework.stereotype.Service;
 
 import com.gcu.data.entity.OrderEntity;
@@ -25,7 +24,7 @@ public class OrdersBusinessService {
         List<OrderEntity> ordersEntity = ordersRepository.findAll();
         
         // Convert OrderEntity list to OrderModel list
-        List<OrderModel> ordersDomain = new ArrayList<OrderModel>();
+        List<OrderModel> ordersDomain = new ArrayList<>();
         for (OrderEntity entity : ordersEntity) {
             ordersDomain.add(new OrderModel(entity.getId(), entity.getOrderNo(), entity.getProductName(),
                     entity.getPrice(), entity.getQuantity()));

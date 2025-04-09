@@ -3,7 +3,6 @@ package com.gcu.business;
 import java.util.ArrayList;
 import java.util.List;
 
-
 import org.springframework.stereotype.Service;
 
 import com.gcu.data.entity.UserEntity;
@@ -25,7 +24,7 @@ public class UserBusinessService {
         List<UserEntity> usersEntity = usersRepository.findAll();
         
         // Convert UserEntity list to UserModel list
-        List<UserModel> usersDomain = new ArrayList<UserModel>();
+        List<UserModel> usersDomain = new ArrayList<>();
         for (UserEntity entity : usersEntity) {
             usersDomain.add(new UserModel(entity.getId(), entity.getUsername(), entity.getPassword()));
         }

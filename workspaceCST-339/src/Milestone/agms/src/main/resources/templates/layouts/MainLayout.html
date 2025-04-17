@@ -24,6 +24,10 @@ Sections:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSRF Tokens -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    
     <title th:text="${pageTitle}">AGMS</title>
     
     <!-- Move Bootstrap CSS here -->
@@ -56,8 +60,8 @@ Sections:
                 </ul>
                 
                 <div class="navbar-nav ms-auto">
-                    <a class="nav-link" th:href="@{/auth/login}">Login</a>
-                    <a class="nav-link" th:href="@{/auth/register}">Register</a>
+                    <a class="nav-link" th:href="@{/login}">Login</a>
+                    <a class="nav-link" th:href="@{/register}">Register</a>
                 </div>
             </div>
         </div>

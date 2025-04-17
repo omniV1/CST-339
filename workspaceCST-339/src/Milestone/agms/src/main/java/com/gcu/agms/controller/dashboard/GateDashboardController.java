@@ -30,6 +30,13 @@ import com.gcu.agms.service.flight.AssignmentService;
 import com.gcu.agms.service.gate.GateManagementService;
 import com.gcu.agms.service.gate.GateOperationsService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 import jakarta.servlet.http.HttpSession;
 
 /**
@@ -41,6 +48,8 @@ import jakarta.servlet.http.HttpSession;
  */
 @Controller
 @RequestMapping("/gates")
+@Tag(name = "Gate Management", description = "Endpoints for managing airport gates, maintenance, and assignments")
+@SecurityRequirement(name = "bearerAuth")
 public class GateDashboardController {
     private static final Logger logger = LoggerFactory.getLogger(GateDashboardController.class);
     
@@ -74,11 +83,14 @@ public class GateDashboardController {
             assignmentService.getClass().getSimpleName());
     }
     
-    /**
-     * Displays the gate manager's dashboard showing gate statuses and maintenance information.
-     * This view focuses on the day-to-day operational aspects of gate management rather
-     * than system-wide configuration.
-     */
+    @Operation(
+        summary = "Get gate management dashboard",
+        description = "Displays the gate manager's dashboard showing gate statuses, maintenance information, and assignments"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Dashboard loaded successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions")
+    })
     @GetMapping("/dashboard")
     public String showDashboard(Model model, HttpSession session) {
         // ---- REMOVED Manual Role Check - Handled by SecurityConfig ----
@@ -122,13 +134,20 @@ public class GateDashboardController {
         return "dashboard/gate";
     }
     
-    /**
-     * Displays detailed information about a specific gate.
-     * Gate managers can view comprehensive information about individual gates,
-     * including maintenance history and current status.
-     */
+    @Operation(
+        summary = "Get gate details",
+        description = "Displays detailed information about a specific gate including maintenance history and current status"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Gate details retrieved successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "Gate not found")
+    })
     @GetMapping("/details/{gateId}")
-    public String showGateDetails(@PathVariable String gateId, Model model) {
+    public String showGateDetails(
+            @Parameter(description = "Gate identifier", required = true)
+            @PathVariable String gateId, 
+            Model model) {
         logger.info("Accessing details for gate: {}", gateId);
         
         Optional<GateModel> gate = gateManagementService.getGateById(gateId);
@@ -142,14 +161,21 @@ public class GateDashboardController {
         return DASHBOARD_REDIRECT;
     }
     
-    /**
-     * Updates the operational status of a gate.
-     * Gate managers can change gate status to reflect current operational conditions,
-     * such as marking a gate for maintenance or returning it to service.
-     */
+    @Operation(
+        summary = "Update gate status",
+        description = "Updates the operational status of a gate (e.g., active, maintenance, closed)"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Gate status updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid status"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "Gate not found")
+    })
     @PostMapping("/status/{gateId}")
     public String updateGateStatus(
+            @Parameter(description = "Gate identifier", required = true)
             @PathVariable String gateId,
+            @Parameter(description = "New gate status", required = true)
             @RequestParam GateOperationsService.GateStatus newStatus,
             RedirectAttributes redirectAttributes) {
         logger.info("Updating status for gate {} to {}", gateId, newStatus);
@@ -162,12 +188,20 @@ public class GateDashboardController {
         return "redirect:/gates/details/" + gateId;
     }
     
-    /**
-     * Displays the maintenance scheduling interface for a specific gate.
-     * Allows gate managers to schedule and track maintenance activities.
-     */
+    @Operation(
+        summary = "Get gate maintenance schedule",
+        description = "Displays the maintenance scheduling interface for a specific gate"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Maintenance schedule retrieved successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "Gate not found")
+    })
     @GetMapping("/maintenance/{gateId}")
-    public String showMaintenanceSchedule(@PathVariable String gateId, Model model) {
+    public String showMaintenanceSchedule(
+            @Parameter(description = "Gate identifier", required = true)
+            @PathVariable String gateId, 
+            Model model) {
         logger.info("Accessing maintenance schedule for gate: {}", gateId);
         
         Optional<GateModel> gate = gateManagementService.getGateById(gateId);
@@ -181,13 +215,21 @@ public class GateDashboardController {
         return DASHBOARD_REDIRECT;
     }
     
-    /**
-     * Reports an issue with a specific gate.
-     * Allows gate managers to document and report problems that require attention.
-     */
+    @Operation(
+        summary = "Report gate issue",
+        description = "Reports a problem or issue with a specific gate that requires attention"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Issue reported successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid issue description"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "Gate not found")
+    })
     @PostMapping("/report-issue/{gateId}")
     public String reportIssue(
+            @Parameter(description = "Gate identifier", required = true)
             @PathVariable String gateId,
+            @Parameter(description = "Description of the issue", required = true)
             @RequestParam String issueDescription,
             RedirectAttributes redirectAttributes) {
         logger.info("Reporting issue for gate {}: {}", gateId, issueDescription);
@@ -200,9 +242,21 @@ public class GateDashboardController {
         return "redirect:/gates/details/" + gateId;
     }
 
+    @Operation(
+        summary = "Create gate assignment",
+        description = "Creates a new assignment for a gate"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Assignment created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid assignment data"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions"),
+        @ApiResponse(responseCode = "409", description = "Assignment time conflict")
+    })
     @PostMapping("/assignments/create")
-    public String createAssignment(@ModelAttribute AssignmentModel assignment,
-                                   RedirectAttributes redirectAttributes) {
+    public String createAssignment(
+            @Parameter(description = "Assignment details", required = true)
+            @ModelAttribute AssignmentModel assignment,
+            RedirectAttributes redirectAttributes) {
         logger.info("Creating new assignment for gate: {}", assignment.getGateId());
         
         // Set the Admin username explicitly
@@ -226,10 +280,22 @@ public class GateDashboardController {
         return "redirect:/gates/dashboard";
     }
 
+    @Operation(
+        summary = "Delete gate assignment",
+        description = "Removes an existing gate assignment"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Assignment deleted successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "Assignment not found")
+    })
     @PostMapping("/assignments/delete/{id}")
-    public String deleteAssignment(@PathVariable Long id, 
-                                 @RequestParam String gateId,
-                                 RedirectAttributes redirectAttributes) {
+    public String deleteAssignment(
+            @Parameter(description = "Assignment ID", required = true)
+            @PathVariable Long id,
+            @Parameter(description = "Gate identifier", required = true)
+            @RequestParam String gateId,
+            RedirectAttributes redirectAttributes) {
         logger.info("Deleting assignment {} from gate {}", id, gateId);
         
         boolean deleted = assignmentService.deleteAssignment(gateId, id);
@@ -244,6 +310,14 @@ public class GateDashboardController {
         return DASHBOARD_REDIRECT;
     }
 
+    @Operation(
+        summary = "Print gate schedule",
+        description = "Generates a printable schedule of gate assignments"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Schedule generated successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions")
+    })
     @GetMapping("/assignments/print")
     public ResponseEntity<Resource> printSchedule() {
         logger.info("Generating gate schedule printout");
@@ -279,8 +353,20 @@ public class GateDashboardController {
         return content.toString();
     }
 
+    @Operation(
+        summary = "Get gate schedule",
+        description = "Displays the schedule for a specific gate"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Schedule retrieved successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "Gate not found")
+    })
     @GetMapping("/details/{gateId}/schedule")
-    public String showSchedule(@PathVariable String gateId, Model model) {
+    public String showSchedule(
+            @Parameter(description = "Gate identifier", required = true)
+            @PathVariable String gateId, 
+            Model model) {
         logger.info("Viewing schedule for gate: {}", gateId);
 
         Optional<GateModel> gate = gateManagementService.getGateById(gateId);

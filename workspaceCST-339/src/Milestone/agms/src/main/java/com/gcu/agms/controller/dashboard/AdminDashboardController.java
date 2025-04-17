@@ -17,6 +17,13 @@ import com.gcu.agms.service.auth.UserService;
 import com.gcu.agms.service.gate.GateManagementService;
 import com.gcu.agms.service.gate.GateOperationsService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
@@ -51,6 +58,8 @@ import jakarta.validation.Valid;
  */
 @Controller
 @RequestMapping("/admin")
+@Tag(name = "Admin Dashboard", description = "Administrative endpoints for managing users, gates, and system configuration")
+@SecurityRequirement(name = "bearerAuth")
 public class AdminDashboardController {
     /**
      * Logger for this controller class.
@@ -125,23 +134,15 @@ public class AdminDashboardController {
         this.gateManagementService = gateManagementService;
     }
     
-    /**
-     * Displays the main administrative dashboard with comprehensive system overview.
-     * 
-     * This method aggregates data from multiple services to provide administrators
-     * with a holistic view of the system status including:
-     * - User statistics and management access
-     * - Gate status distribution across all terminals
-     * - Operational statistics for monitoring
-     * - Terminal-specific gate information
-     * 
-     * The dashboard serves as the central hub for administrators to monitor
-     * system health and access various management functions.
-     * 
-     * @param model Spring MVC Model for passing data to the view
-     * @param session HTTP session for user context
-     * @return View name for the admin dashboard template
-     */
+    @Operation(
+        summary = "Get admin dashboard",
+        description = "Displays the main administrative dashboard with comprehensive system overview including " +
+                     "user statistics, gate statuses, operational metrics, and terminal-specific information"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Dashboard loaded successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions")
+    })
     @GetMapping("/dashboard")
     public String showDashboard(Model model, HttpSession session) {
         logger.info("Loading admin dashboard");
@@ -176,18 +177,15 @@ public class AdminDashboardController {
         return DASHBOARD_VIEW;
     }
     
-    /**
-     * Displays the system-wide gate management interface.
-     * 
-     * This page provides administrators with a comprehensive view of all gates
-     * in the system and tools to manage them. It shows:
-     * - All gates across all terminals
-     * - Current status of each gate
-     * - Options to create, edit, or manage gates
-     * 
-     * @param model Spring MVC Model for passing data to the view
-     * @return View name for the gate management template
-     */
+    @Operation(
+        summary = "Get gate management view",
+        description = "Displays the system-wide gate management interface showing all gates across terminals, " +
+                     "their current status, and management options"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Gate management view loaded successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions")
+    })
     @GetMapping("/gates")
     public String showGateManagement(Model model) {
         logger.info("Loading gate management view");
@@ -199,18 +197,15 @@ public class AdminDashboardController {
         return GATES_VIEW;
     }
     
-    /**
-     * Displays the form for creating a new gate in the system.
-     * 
-     * This endpoint presents a form with all fields required to define
-     * a new gate including:
-     * - Gate ID and terminal information
-     * - Gate type and size configurations
-     * - Equipment and feature settings
-     * 
-     * @param model Spring MVC Model for passing data to the view
-     * @return View name for the gate creation form template
-     */
+    @Operation(
+        summary = "Show gate creation form",
+        description = "Displays the form for creating a new gate with fields for gate ID, terminal information, " +
+                     "type, size configurations, and equipment settings"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Gate creation form loaded successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions")
+    })
     @GetMapping("/gates/create")
     public String showCreateGateForm(Model model) {
         logger.info("Displaying gate creation form");
@@ -222,24 +217,22 @@ public class AdminDashboardController {
         return GATE_FORM_VIEW;
     }
     
-    /**
-     * Processes the gate creation form submission.
-     * 
-     * This method:
-     * 1. Validates the gate data using JSR-303 annotations
-     * 2. Attempts to create the gate through the GateManagementService
-     * 3. Handles success or failure with appropriate feedback messages
-     * 4. Redirects to prevent form resubmission on refresh
-     * 
-     * @param gateModel The gate data submitted from the form
-     * @param result Validation results for the gate model
-     * @param redirectAttributes Used to pass flash attributes through redirect
-     * @return Redirect URL or form view depending on the result
-     */
+    @Operation(
+        summary = "Create new gate",
+        description = "Processes the gate creation form submission and creates a new gate in the system"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "302", description = "Gate created successfully - Redirected to gate list"),
+        @ApiResponse(responseCode = "400", description = "Invalid gate data"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions"),
+        @ApiResponse(responseCode = "409", description = "Gate ID already exists")
+    })
     @PostMapping("/gates/create")
-    public String createGate(@Valid GateModel gateModel, 
-                           BindingResult result,
-                           RedirectAttributes redirectAttributes) {
+    public String createGate(
+            @Parameter(description = "Gate details", required = true)
+            @Valid GateModel gateModel, 
+            BindingResult result,
+            RedirectAttributes redirectAttributes) {
         logger.info("Processing gate creation request for ID: {}", gateModel.getGateId());
         
         // If validation errors exist, return to form with error messages
@@ -265,18 +258,15 @@ public class AdminDashboardController {
         }
     }
     
-    /**
-     * Displays the form for adding a new user to the system.
-     * 
-     * This endpoint presents a form with all fields required to create
-     * a new user account including:
-     * - User credentials (username, password)
-     * - Personal information (name, email, phone)
-     * - Role and permissions settings
-     * 
-     * @param model Spring MVC Model for passing data to the view
-     * @return View name for the user creation form template
-     */
+    @Operation(
+        summary = "Show user creation form",
+        description = "Displays the form for adding a new user with fields for credentials, " +
+                     "personal information, and role settings"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "User creation form loaded successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions")
+    })
     @GetMapping("/users/add")
     public String showAddUserForm(Model model) {
         // Set page title and add empty user model for form binding
@@ -286,24 +276,22 @@ public class AdminDashboardController {
         return USER_FORM_VIEW;
     }
 
-    /**
-     * Processes the user creation form submission.
-     * 
-     * This method:
-     * 1. Validates the user data using JSR-303 annotations
-     * 2. Attempts to register the user through the UserService
-     * 3. Handles success or failure with appropriate feedback messages
-     * 4. Redirects to prevent form resubmission on refresh
-     * 
-     * @param userModel The user data submitted from the form
-     * @param result Validation results for the user model
-     * @param redirectAttributes Used to pass flash attributes through redirect
-     * @return Redirect URL or form view depending on the result
-     */
+    @Operation(
+        summary = "Create new user",
+        description = "Processes the user creation form submission and registers a new user in the system"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "302", description = "User created successfully - Redirected to dashboard"),
+        @ApiResponse(responseCode = "400", description = "Invalid user data"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions"),
+        @ApiResponse(responseCode = "409", description = "Username already exists")
+    })
     @PostMapping("/users/add")
-    public String addUser(@Valid UserModel userModel, 
-                         BindingResult result,
-                         RedirectAttributes redirectAttributes) {
+    public String addUser(
+            @Parameter(description = "User details", required = true)
+            @Valid UserModel userModel, 
+            BindingResult result,
+            RedirectAttributes redirectAttributes) {
         // If validation errors exist, return to form with error messages
         if (result.hasErrors()) {
             return USER_FORM_VIEW;
@@ -325,18 +313,15 @@ public class AdminDashboardController {
         }
     }
     
-    /**
-     * Displays the user management interface with a list of all users.
-     * 
-     * This page provides administrators with a comprehensive view of all users
-     * in the system and tools to manage them. It shows:
-     * - All users with their roles and status
-     * - Options to edit or delete users
-     * - Access to add new users
-     * 
-     * @param model Spring MVC Model for passing data to the view
-     * @return View name for the user management template
-     */
+    @Operation(
+        summary = "Get user management view",
+        description = "Displays the user management interface showing all system users, their roles, " +
+                     "status, and management options"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "User management view loaded successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions")
+    })
     @GetMapping("/users")
     public String showUsers(Model model) {
         // Set page title and add all users to the model
@@ -346,20 +331,15 @@ public class AdminDashboardController {
         return USERS_VIEW;
     }
     
-    /**
-     * Displays system health and monitoring information.
-     * 
-     * This page provides comprehensive system status information including:
-     * - System performance metrics
-     * - Database connection status
-     * - Gate operational statistics
-     * - Application health indicators
-     * 
-     * It serves as a central monitoring dashboard for system administrators.
-     * 
-     * @param model Spring MVC Model for passing data to the view
-     * @return View name for the system health template
-     */
+    @Operation(
+        summary = "Get system health view",
+        description = "Displays system health and monitoring information including performance metrics, " +
+                     "database status, and operational statistics"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "System health view loaded successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions")
+    })
     @GetMapping("/system-health")
     public String showSystemHealth(Model model) {
         logger.info("Loading system health view");
@@ -374,21 +354,20 @@ public class AdminDashboardController {
         return SYSTEM_HEALTH_VIEW;
     }
 
-    /**
-     * Handles the deletion of a user from the system.
-     * 
-     * This method:
-     * 1. Attempts to delete the user with the specified ID
-     * 2. Logs the deletion attempt for audit purposes
-     * 3. Provides feedback on success or failure
-     * 4. Handles exceptions that may occur during deletion
-     * 
-     * @param id The database ID of the user to delete
-     * @param redirectAttributes Used to pass flash attributes through redirect
-     * @return Redirect URL to the dashboard
-     */
+    @Operation(
+        summary = "Delete user",
+        description = "Removes a user from the system based on their ID"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "302", description = "User deleted successfully - Redirected to dashboard"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "User not found")
+    })
     @PostMapping("/users/delete/{id}")
-    public String deleteUser(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String deleteUser(
+            @Parameter(description = "User ID", required = true)
+            @PathVariable Long id, 
+            RedirectAttributes redirectAttributes) {
         logger.info("Processing user deletion request for ID: {}", id);
         
         try {
@@ -412,20 +391,20 @@ public class AdminDashboardController {
         return DASHBOARD_REDIRECT;
     }
 
-    /**
-     * Displays the form for editing an existing user.
-     * 
-     * This method:
-     * 1. Retrieves the user with the specified ID
-     * 2. Populates the form with the user's current data
-     * 3. Allows modifications to user information
-     * 
-     * @param id The database ID of the user to edit
-     * @param model Spring MVC Model for passing data to the view
-     * @return View name for the user edit form or redirect if user not found
-     */
+    @Operation(
+        summary = "Show user edit form",
+        description = "Displays the form for editing an existing user's information"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "User edit form loaded successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "User not found")
+    })
     @GetMapping("/users/edit/{id}")
-    public String showEditUserForm(@PathVariable Long id, Model model) {
+    public String showEditUserForm(
+            @Parameter(description = "User ID", required = true)
+            @PathVariable Long id, 
+            Model model) {
         logger.info("Showing edit form for user ID: {}", id);
         
         // Retrieve the user by ID
@@ -443,27 +422,24 @@ public class AdminDashboardController {
         return USER_FORM_VIEW;
     }
 
-    /**
-     * Processes the user update form submission.
-     * 
-     * This method:
-     * 1. Validates the updated user data
-     * 2. Attempts to update the user through the UserService
-     * 3. Handles validation errors by returning to the form
-     * 4. Provides feedback on success or failure
-     * 5. Handles exceptions during the update process
-     * 
-     * @param id The database ID of the user to update
-     * @param userModel The updated user data submitted from the form
-     * @param result Validation results for the user model
-     * @param redirectAttributes Used to pass flash attributes through redirect
-     * @return Redirect URL or form view depending on the result
-     */
+    @Operation(
+        summary = "Update user",
+        description = "Processes the user update form submission and updates the user's information"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "302", description = "User updated successfully - Redirected to dashboard"),
+        @ApiResponse(responseCode = "400", description = "Invalid user data"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "User not found")
+    })
     @PostMapping("/users/update/{id}")
-    public String updateUser(@PathVariable Long id, 
-                           @Valid UserModel userModel,
-                           BindingResult result,
-                           RedirectAttributes redirectAttributes) {
+    public String updateUser(
+            @Parameter(description = "User ID", required = true)
+            @PathVariable Long id, 
+            @Parameter(description = "Updated user details", required = true)
+            @Valid UserModel userModel,
+            BindingResult result,
+            RedirectAttributes redirectAttributes) {
         logger.info("Processing user update request for ID: {}", id);
         
         // If validation errors exist, return to form with error messages

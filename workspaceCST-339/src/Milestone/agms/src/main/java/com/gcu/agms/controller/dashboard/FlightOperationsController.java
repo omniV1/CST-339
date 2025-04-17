@@ -34,6 +34,13 @@ import com.gcu.agms.service.maintenance.MaintenanceRecordService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 /**
  * Flight Operations Controller for the Airport Gate Management System.
  * 
@@ -65,6 +72,8 @@ import jakarta.validation.Valid;
  */
 @Controller
 @RequestMapping("/operations")
+@Tag(name = "Flight Operations", description = "Endpoints for managing flight operations, aircraft, and gate assignments")
+@SecurityRequirement(name = "bearerAuth")
 public class FlightOperationsController {
     /**
      * Logger for this controller class.
@@ -119,23 +128,10 @@ public class FlightOperationsController {
         logger.info("Initialized FlightOperationsController with services");
     }
 
-    /**
-     * Displays the main operations dashboard view.
-     * 
-     * This endpoint renders the primary interface for operations managers, providing
-     * a comprehensive overview of:
-     * - Active flights currently in the system
-     * - Operational statistics (flights by status, on-time performance, etc.)
-     * - Aircraft status and availability
-     * - Real-time gate assignment information
-     * 
-     * The dashboard serves as the central hub for monitoring and managing all
-     * flight operations activities.
-     * 
-     * @param model Spring MVC Model for passing data to the view template
-     * @param session HTTP session for user context and role verification
-     * @return The logical view name for the operations dashboard template
-     */
+    @Operation(
+        summary = "Get operations dashboard view",
+        description = "Displays the main operations dashboard with active flights, statistics, and aircraft status"
+    )
     @GetMapping("/dashboard")
     public String showDashboard(Model model, HttpSession session) {
         logger.info("Loading operations dashboard view");
@@ -154,24 +150,16 @@ public class FlightOperationsController {
         return "dashboard/operations";
     }
 
-    /**
-     * Provides real-time dashboard data for AJAX updates.
-     * 
-     * This endpoint returns JSON data for asynchronous updates to the dashboard
-     * without requiring a full page reload. It's used by JavaScript in the dashboard
-     * to periodically refresh the displayed information with the latest data.
-     * 
-     * The returned data includes:
-     * - Current operational statistics
-     * - Active flight information
-     * - Aircraft status updates
-     * 
-     * This supports a responsive, real-time monitoring experience for operations managers.
-     * 
-     * @return ResponseEntity with a map containing dashboard data in JSON format
-     */
+    @Operation(
+        summary = "Get real-time dashboard data",
+        description = "Provides real-time updates for the dashboard including operational statistics, active flights, and aircraft status"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved dashboard data"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions")
+    })
     @GetMapping("/dashboard/data")
-    @ResponseBody  // This endpoint returns JSON data for AJAX
+    @ResponseBody
     public ResponseEntity<Map<String, Object>> getDashboardData() {
         logger.debug("Fetching real-time dashboard data for AJAX update");
         
@@ -185,26 +173,23 @@ public class FlightOperationsController {
         return ResponseEntity.ok(dashboardData);
     }
 
-    /**
-     * Updates the operational status of an aircraft.
-     * 
-     * This endpoint allows operations managers to change an aircraft's status
-     * (e.g., IN_SERVICE, MAINTENANCE, OUT_OF_SERVICE) and update its current
-     * location. These updates are critical for:
-     * - Tracking aircraft availability for flight assignments
-     * - Monitoring fleet operational status
-     * - Ensuring accurate location data for operational planning
-     * 
-     * @param registrationNumber Unique identifier for the aircraft
-     * @param status New operational status to set
-     * @param location Current physical location of the aircraft
-     * @return ResponseEntity with success/failure information in JSON format
-     */
+    @Operation(
+        summary = "Update aircraft status",
+        description = "Updates the operational status and location of an aircraft"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Aircraft status updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid request parameters"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions")
+    })
     @PostMapping("/aircraft/update")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> updateAircraftStatus(
+            @Parameter(description = "Aircraft registration number", required = true)
             @RequestParam String registrationNumber,
+            @Parameter(description = "New operational status", required = true)
             @RequestParam AircraftModel.AircraftStatus status,
+            @Parameter(description = "Current physical location of the aircraft", required = true)
             @RequestParam String location) {
         
         logger.info("Updating aircraft status - Registration: {}, New Status: {}, Location: {}", 
@@ -225,26 +210,20 @@ public class FlightOperationsController {
                             "Failed to update aircraft status");
     }
 
-    /**
-     * Creates a new flight in the system.
-     * 
-     * This endpoint processes flight creation requests, enabling operations managers
-     * to add new flights to the system. It handles:
-     * - Validation of required flight information
-     * - Creation of the flight record in the database
-     * - Association with assigned aircraft if specified
-     * - Initial status setting (typically SCHEDULED)
-     * 
-     * Flight creation is a fundamental operation that initiates the flight lifecycle
-     * in the system, making it available for gate assignments and operational tracking.
-     * 
-     * @param flight Flight details from request body including flight number, airline,
-     *              origin/destination, and scheduling information
-     * @return ResponseEntity with creation status, messages, and the flight identifier
-     */
+    @Operation(
+        summary = "Create new flight",
+        description = "Creates a new flight in the system with the provided details"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Flight created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid flight data"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions")
+    })
     @PostMapping("/flights/create")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> createFlight(@RequestBody @Valid FlightModel flight) {
+    public ResponseEntity<Map<String, Object>> createFlight(
+            @Parameter(description = "Flight details", required = true)
+            @RequestBody @Valid FlightModel flight) {
         logger.info("Received request to create new flight with details: flightNumber={}, airlineCode={}, origin={}, destination={}, assignedAircraft={}", 
             flight.getFlightNumber(),
             flight.getAirlineCode(),
@@ -295,27 +274,23 @@ public class FlightOperationsController {
         }
     }
 
-    /**
-     * Updates the status of an existing flight.
-     * 
-     * This endpoint enables operations managers to transition flights through their
-     * lifecycle by updating their operational status. Status changes include:
-     * - SCHEDULED → BOARDING → DEPARTED → EN_ROUTE → APPROACHING → LANDED → ARRIVED
-     * - Status changes to DELAYED, CANCELLED, or DIVERTED for irregular operations
-     * 
-     * Status updates trigger various operational workflows and notifications in the system.
-     * For active flights, the location parameter can be used to track the flight's position.
-     * 
-     * @param flightNumber The flight identifier (airline code + flight number)
-     * @param status The new status to set for the flight
-     * @param location Optional current location of the flight (for active flights)
-     * @return ResponseEntity with update status and result message
-     */
+    @Operation(
+        summary = "Update flight status",
+        description = "Updates the operational status of a flight and optionally its location"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Flight status updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid status or flight not found"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions")
+    })
     @PostMapping("/flights/status")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> updateFlightStatus(
+            @Parameter(description = "Flight number", required = true)
             @RequestParam String flightNumber,
+            @Parameter(description = "New flight status", required = true)
             @RequestParam String status,
+            @Parameter(description = "Current location of the flight", required = false)
             @RequestParam(required = false) String location) {
         
         logger.info("Updating status for flight {} to {}", flightNumber, status);
@@ -348,25 +323,21 @@ public class FlightOperationsController {
         }
     }
 
-    /**
-     * Updates existing flight details.
-     * 
-     * This endpoint allows comprehensive updates to flight information including:
-     * - Schedule changes (departure/arrival times)
-     * - Aircraft reassignments
-     * - Route modifications
-     * - Passenger count updates
-     * 
-     * Unlike the status update endpoint, this allows changing multiple flight
-     * attributes in a single operation. It's typically used for schedule changes,
-     * aircraft swaps, and other significant modifications to flight details.
-     * 
-     * @param flight Updated flight information with complete flight details
-     * @return ResponseEntity with update status and result message
-     */
+    @Operation(
+        summary = "Update flight details",
+        description = "Updates multiple attributes of an existing flight"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Flight updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid flight data"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "Flight not found")
+    })
     @PutMapping("/flights/update")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> updateFlight(@RequestBody @Valid FlightModel flight) {
+    public ResponseEntity<Map<String, Object>> updateFlight(
+            @Parameter(description = "Updated flight information", required = true)
+            @RequestBody @Valid FlightModel flight) {
         logger.info("Received request to update flight: {}", flight.getFlightNumber());
         Map<String, Object> response = new HashMap<>();
         
@@ -392,26 +363,20 @@ public class FlightOperationsController {
         }
     }
 
-    /**
-     * Retrieves detailed information about a specific flight.
-     * 
-     * This endpoint provides comprehensive information about a flight including:
-     * - Basic flight details (airline, flight number, origin/destination)
-     * - Schedule information (departure/arrival times)
-     * - Current status and location
-     * - Assigned aircraft details
-     * - Gate assignments
-     * - Passenger information
-     * 
-     * It's used by the UI to display flight details and by other system
-     * components that need complete flight information.
-     * 
-     * @param flightNumber The flight identifier to retrieve details for
-     * @return ResponseEntity with detailed flight information
-     */
+    @Operation(
+        summary = "Get flight details",
+        description = "Retrieves detailed information about a specific flight"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Flight details retrieved successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "Flight not found")
+    })
     @GetMapping("/flights/{flightNumber}")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getFlightDetails(@PathVariable String flightNumber) {
+    public ResponseEntity<Map<String, Object>> getFlightDetails(
+            @Parameter(description = "Flight number", required = true)
+            @PathVariable String flightNumber) {
         logger.info("Retrieving details for flight: {}", flightNumber);
         
         // Get comprehensive flight details from the service
@@ -426,15 +391,20 @@ public class FlightOperationsController {
         return ResponseEntity.ok(details);
     }
 
-    /**
-     * Deletes a flight from the system
-     * 
-     * @param flightNumber Flight to delete
-     * @return Response indicating deletion success or failure
-     */
+    @Operation(
+        summary = "Delete flight",
+        description = "Removes a flight from the system"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Flight deleted successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "Flight not found")
+    })
     @DeleteMapping("/flights/{flightNumber}")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> deleteFlight(@PathVariable String flightNumber) {
+    public ResponseEntity<Map<String, Object>> deleteFlight(
+            @Parameter(description = "Flight number", required = true)
+            @PathVariable String flightNumber) {
         logger.info("Received request to delete flight: {}", flightNumber);
         Map<String, Object> response = new HashMap<>();
         
@@ -449,21 +419,25 @@ public class FlightOperationsController {
         }
     }
 
-    /**
-     * Schedules maintenance for an aircraft
-     * 
-     * @param registrationNumber Aircraft registration number
-     * @param maintenanceDate Scheduled maintenance date
-     * @param maintenanceType Type of maintenance to perform
-     * @param description Maintenance description
-     * @return Response indicating scheduling success or failure
-     */
+    @Operation(
+        summary = "Schedule aircraft maintenance",
+        description = "Schedules maintenance for an aircraft at a specified date"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Maintenance scheduled successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid request parameters"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions")
+    })
     @PostMapping("/aircraft/maintenance")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> scheduleMaintenance(
+            @Parameter(description = "Aircraft registration number", required = true)
             @RequestParam String registrationNumber,
+            @Parameter(description = "Scheduled maintenance date (format: yyyy-MM-dd HH:mm:ss)", required = true)
             @RequestParam String maintenanceDate,
+            @Parameter(description = "Type of maintenance to perform", required = true)
             @RequestParam String maintenanceType,
+            @Parameter(description = "Detailed description of maintenance work", required = true)
             @RequestParam String description) {
         
         logger.info("Scheduling maintenance - Registration: {}, Date: {}, Type: {}", 
@@ -497,15 +471,20 @@ public class FlightOperationsController {
         }
     }
 
-    /**
-     * Retrieves detailed information about a specific aircraft
-     * 
-     * @param registrationNumber Aircraft registration number
-     * @return Aircraft details or 404 if not found
-     */
+    @Operation(
+        summary = "Get aircraft details",
+        description = "Retrieves detailed information about a specific aircraft"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Aircraft details retrieved successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "Aircraft not found")
+    })
     @GetMapping("/aircraft/{registrationNumber}")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getAircraftDetails(@PathVariable String registrationNumber) {
+    public ResponseEntity<Map<String, Object>> getAircraftDetails(
+            @Parameter(description = "Aircraft registration number", required = true)
+            @PathVariable String registrationNumber) {
         return flightOperationsService.getAircraft(registrationNumber)
             .map(aircraft -> {
                 Map<String, Object> response = new HashMap<>();
@@ -516,14 +495,20 @@ public class FlightOperationsController {
             .orElse(ResponseEntity.notFound().build());
     }
 
-    /**
-     * Retrieves maintenance history for an aircraft
-     * @param registrationNumber The registration number of the aircraft
-     * @return ResponseEntity containing list of maintenance records or 404 if not found
-     */
+    @Operation(
+        summary = "Get aircraft maintenance history",
+        description = "Retrieves the maintenance history for a specific aircraft"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Maintenance history retrieved successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "Aircraft not found")
+    })
     @GetMapping("/aircraft/{registrationNumber}/maintenance")
     @ResponseBody
-    public ResponseEntity<List<MaintenanceRecord>> getMaintenanceHistory(@PathVariable String registrationNumber) {
+    public ResponseEntity<List<MaintenanceRecord>> getMaintenanceHistory(
+            @Parameter(description = "Aircraft registration number", required = true)
+            @PathVariable String registrationNumber) {
         logger.info("Retrieving maintenance history for aircraft: {}", registrationNumber);
         
         try {
@@ -542,17 +527,22 @@ public class FlightOperationsController {
         }
     }
     
-    /**
-     * Updates the status of a maintenance record
-     * 
-     * @param recordId The record ID of the maintenance record
-     * @param status The new status
-     * @return Response indicating update success or failure
-     */
+    @Operation(
+        summary = "Update maintenance record status",
+        description = "Updates the status of an existing maintenance record"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Maintenance status updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid status"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "Maintenance record not found")
+    })
     @PostMapping("/maintenance/{recordId}/status")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> updateMaintenanceStatus(
+            @Parameter(description = "Maintenance record ID", required = true)
             @PathVariable String recordId,
+            @Parameter(description = "New maintenance status", required = true)
             @RequestParam String status) {
         
         logger.info("Updating maintenance record status - Record ID: {}, Status: {}", recordId, status);
@@ -577,17 +567,21 @@ public class FlightOperationsController {
         }
     }
     
-    /**
-     * Completes a maintenance record
-     * 
-     * @param recordId The record ID of the maintenance record
-     * @param notes Optional notes about the completion
-     * @return Response indicating completion success or failure
-     */
+    @Operation(
+        summary = "Complete maintenance record",
+        description = "Marks a maintenance record as completed with optional completion notes"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Maintenance record completed successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "Maintenance record not found")
+    })
     @PostMapping("/maintenance/{recordId}/complete")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> completeMaintenanceRecord(
+            @Parameter(description = "Maintenance record ID", required = true)
             @PathVariable String recordId,
+            @Parameter(description = "Completion notes", required = false)
             @RequestParam(required = false) String notes) {
         
         logger.info("Completing maintenance record - Record ID: {}", recordId);
@@ -608,15 +602,20 @@ public class FlightOperationsController {
         }
     }
 
-    /**
-     * Retrieves all assignments for a gate.
-     * 
-     * @param gateId The gate ID to get assignments for
-     * @return Response containing the list of assignments
-     */
+    @Operation(
+        summary = "Get gate assignments",
+        description = "Retrieves all assignments for a specific gate"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Gate assignments retrieved successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "Gate not found")
+    })
     @GetMapping("/gates/{gateId}/assignments")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> getGateAssignments(@PathVariable String gateId) {
+    public ResponseEntity<Map<String, Object>> getGateAssignments(
+            @Parameter(description = "Gate ID", required = true)
+            @PathVariable String gateId) {
         logger.info("Retrieving assignments for gate: {}", gateId);
         
         Map<String, Object> response = new HashMap<>();
@@ -625,15 +624,20 @@ public class FlightOperationsController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Creates a new gate assignment.
-     * 
-     * @param assignment The assignment data
-     * @return Response indicating success or failure
-     */
+    @Operation(
+        summary = "Create gate assignment",
+        description = "Creates a new gate assignment for a flight"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Gate assignment created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid assignment data or time conflict"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions")
+    })
     @PostMapping("/gates/assignments/create")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> createAssignment(@RequestBody @Valid AssignmentModel assignment) {
+    public ResponseEntity<Map<String, Object>> createAssignment(
+            @Parameter(description = "Gate assignment details", required = true)
+            @RequestBody @Valid AssignmentModel assignment) {
         logger.info("Creating new assignment for gate: {}", assignment.getGateId());
         
         Map<String, Object> response = new HashMap<>();
@@ -650,19 +654,24 @@ public class FlightOperationsController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Updates an existing gate assignment.
-     * 
-     * @param gateId The gate ID containing the assignment
-     * @param assignmentId The ID of the assignment to update
-     * @param updated The updated assignment data
-     * @return Response indicating success or failure
-     */
+    @Operation(
+        summary = "Update gate assignment",
+        description = "Updates an existing gate assignment"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Gate assignment updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid assignment data or time conflict"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "Assignment not found")
+    })
     @PutMapping("/gates/{gateId}/assignments/{assignmentId}")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> updateAssignment(
+            @Parameter(description = "Gate ID", required = true)
             @PathVariable String gateId,
+            @Parameter(description = "Assignment ID", required = true)
             @PathVariable Long assignmentId,
+            @Parameter(description = "Updated assignment details", required = true)
             @RequestBody @Valid AssignmentModel updated) {
         logger.info("Updating assignment {} for gate {}", assignmentId, gateId);
         
@@ -680,17 +689,21 @@ public class FlightOperationsController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Deletes a gate assignment.
-     * 
-     * @param gateId The gate ID containing the assignment
-     * @param assignmentId The ID of the assignment to delete
-     * @return Response indicating success or failure
-     */
+    @Operation(
+        summary = "Delete gate assignment",
+        description = "Removes a gate assignment"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Gate assignment deleted successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "Assignment not found")
+    })
     @DeleteMapping("/gates/{gateId}/assignments/{assignmentId}")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> deleteAssignment(
+            @Parameter(description = "Gate ID", required = true)
             @PathVariable String gateId,
+            @Parameter(description = "Assignment ID", required = true)
             @PathVariable Long assignmentId) {
         logger.info("Deleting assignment {} from gate {}", assignmentId, gateId);
         
@@ -708,19 +721,24 @@ public class FlightOperationsController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Updates the status of a gate assignment.
-     * 
-     * @param gateId The gate ID containing the assignment
-     * @param assignmentId The ID of the assignment to update
-     * @param status The new status
-     * @return Response indicating success or failure
-     */
+    @Operation(
+        summary = "Update gate assignment status",
+        description = "Updates the status of an existing gate assignment"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Assignment status updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid status"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "Assignment not found")
+    })
     @PutMapping("/gates/{gateId}/assignments/{assignmentId}/status/{status}")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> updateAssignmentStatus(
+            @Parameter(description = "Gate ID", required = true)
             @PathVariable String gateId,
+            @Parameter(description = "Assignment ID", required = true)
             @PathVariable Long assignmentId,
+            @Parameter(description = "New assignment status", required = true)
             @PathVariable String status) {
         logger.info("Updating status of assignment {} to {}", assignmentId, status);
         
@@ -750,11 +768,14 @@ public class FlightOperationsController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Gets current assignments for all gates.
-     * 
-     * @return Response containing current assignments for all gates
-     */
+    @Operation(
+        summary = "Get current gate assignments",
+        description = "Retrieves current assignments for all gates"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Current assignments retrieved successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions")
+    })
     @GetMapping("/gates/assignments/current")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> getCurrentAssignments() {

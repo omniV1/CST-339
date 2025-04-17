@@ -2,10 +2,12 @@ package com.gcu.agms.model.gate;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
-
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Represents a gate assignment in the Airport Gate Management System.
@@ -13,13 +15,16 @@ import lombok.Data;
  * tracks the status of each assignment.
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AssignmentModel {
     private Long id;
 
-    @NotEmpty(message = "Gate ID is required")
+    @NotBlank(message = "Gate ID is required")
     private String gateId;
 
-    @NotEmpty(message = "Flight number is required")
+    @NotBlank(message = "Flight number is required")
     private String flightNumber;
 
     @NotNull(message = "Start time is required")
@@ -29,13 +34,18 @@ public class AssignmentModel {
     private LocalDateTime endTime;
 
     @NotNull(message = "Assignment status is required")
+    @Builder.Default
     private AssignmentStatus status = AssignmentStatus.SCHEDULED;
 
     private String assignedBy;
     private LocalDateTime createdAt;
     private String createdBy;
     private LocalDateTime updatedAt;
+    
+    @Builder.Default
     private boolean cancelled = false;
+    
+    @Builder.Default
     private Clock clock = Clock.systemDefaultZone();
 
     /**

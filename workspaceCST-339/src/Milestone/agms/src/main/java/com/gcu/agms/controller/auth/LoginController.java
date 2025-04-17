@@ -2,11 +2,26 @@ package com.gcu.agms.controller.auth;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.gcu.agms.model.auth.LoginModel;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Controller for handling user login operations.
@@ -19,6 +34,7 @@ import com.gcu.agms.model.auth.LoginModel;
  * - Controller: This LoginController class
  */
 @Controller
+@Tag(name = "Authentication", description = "Authentication endpoints for user login and registration")
 // @RequestMapping({"/auth"}) // Removed - Now mapped directly
 public class LoginController {
     /**
@@ -56,86 +72,60 @@ public class LoginController {
     // }
     
     /**
-     * Handles HTTP GET requests to /login endpoint.
-     * Displays the login page with an empty login form.
-     * 
-     * @param model The Spring MVC Model object used to pass attributes to the view
-     * @return The logical view name "login" which is resolved to login.html template
+     * Returns login page information and form structure
      */
-    @GetMapping("/login") // Handle GET /login directly
-    public String displayLogin(Model model) {
-        // Add an empty LoginModel to the model if not already present
-        // This is used to bind form data when the user submits the form
-        if (!model.containsAttribute(LOGIN_MODEL_ATTR)) {
-            model.addAttribute(LOGIN_MODEL_ATTR, new LoginModel());
-        }
-        
-        // Set the page title attribute for the view
-        model.addAttribute(PAGE_TITLE_ATTR, "Login - AGMS");
-        
-        // Log that we're displaying the login page for debugging purposes
-        logger.debug("Displaying login page.");
-        
-        // Return the logical view name to be resolved to the actual template
-        return "login";
+    @GetMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @Operation(
+        summary = "Get login page information",
+        description = "Returns the login page structure and any required form fields"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Successfully retrieved login page information",
+            content = @Content(mediaType = "application/json")
+        )
+    })
+    public Map<String, Object> getLoginInfo() {
+        Map<String, Object> loginInfo = new HashMap<>();
+        loginInfo.put(PAGE_TITLE_ATTR, "Login - AGMS");
+        loginInfo.put("formFields", new String[]{"username", "password"});
+        loginInfo.put("method", "POST");
+        loginInfo.put("action", "/login");
+        return loginInfo;
     }
     
     /**
-     * Previously handled login POST requests, now removed and replaced by Spring Security.
-     * 
-     * This method used to:
-     * 1. Validate login form input
-     * 2. Authenticate credentials against the database
-     * 3. Set up user session on successful login
-     * 4. Redirect to different dashboards based on user role
-     * 
-     * Now Spring Security handles all these operations through its filter chain.
+     * Processes login requests (handled by Spring Security)
      */
-    /* 
-    @PostMapping("/login") // Maps to /auth/login 
-    public String doLogin(@Valid LoginModel loginModel,
-                         BindingResult bindingResult,
-                         HttpSession session,
-                         RedirectAttributes redirectAttributes) {
-        
-        logger.info("Processing login request for user: {}", loginModel.getUsername());
-        
-        // Validate form data
-        if (bindingResult.hasErrors()) {
-            logger.warn("Login form validation failed");
-            redirectAttributes.addFlashAttribute(ERROR_ATTR, "Please fill in all required fields");
-            return LOGIN_REDIRECT;
-        }
-        
-        // Validate credential format
-        if (!loginService.validateCredentials(loginModel)) {
-            redirectAttributes.addFlashAttribute(ERROR_ATTR, "Invalid username or password format");
-            return LOGIN_REDIRECT;
-        }
-        
-        // Attempt authentication
-        return loginService.authenticate(loginModel)
-            .map(user -> {
-                // Set session attributes
-                session.setAttribute("user", user);
-                session.setAttribute("userRole", user.getRole().name());
-                logger.info("User {} successfully logged in", user.getUsername());
-                
-                // Redirect based on role
-                return switch(user.getRole()) {
-                    case ADMIN -> "redirect:/admin/dashboard";
-                    case OPERATIONS_MANAGER -> "redirect:/operations/dashboard";
-                    case GATE_MANAGER -> "redirect:/gates/dashboard";
-                    case AIRLINE_STAFF -> "redirect:/airline/dashboard";
-                    case PUBLIC -> "redirect:/dashboard";
-                };
-            })
-            .orElseGet(() -> {
-                redirectAttributes.addFlashAttribute(ERROR_ATTR, "Invalid username or password");
-                return LOGIN_REDIRECT;
-            });
+    @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @Operation(
+        summary = "Process login request",
+        description = "Authenticates user credentials and establishes a session"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Successfully authenticated",
+            content = @Content(mediaType = "application/json")
+        ),
+        @ApiResponse(
+            responseCode = "401",
+            description = "Invalid credentials",
+            content = @Content(mediaType = "application/json")
+        )
+    })
+    public Map<String, Object> processLogin(
+            @Parameter(description = "Login credentials", required = true)
+            @RequestBody LoginModel loginModel) {
+        // This endpoint is actually handled by Spring Security
+        // This is just for documentation purposes
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "This endpoint is handled by Spring Security");
+        return response;
     }
-    */
     
     /**
      * Previously handled logout requests, now removed and replaced by Spring Security.

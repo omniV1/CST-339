@@ -17,6 +17,13 @@ import com.gcu.agms.service.flight.FlightOperationsService;
 import com.gcu.agms.service.gate.GateManagementService;
 import com.gcu.agms.service.gate.GateOperationsService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 import jakarta.servlet.http.HttpSession;
 
 /**
@@ -28,6 +35,8 @@ import jakarta.servlet.http.HttpSession;
  */
 @Controller
 @RequestMapping("/airline")
+@Tag(name = "Airline Operations", description = "Endpoints for airline staff to monitor flights and gate assignments")
+@SecurityRequirement(name = "bearerAuth")
 public class AirlineDashboardController {
     private static final Logger logger = LoggerFactory.getLogger(AirlineDashboardController.class);
     
@@ -55,11 +64,14 @@ public class AirlineDashboardController {
         this.flightOperationsService = flightOperationsService;
     }
     
-    /**
-     * Displays the airline staff dashboard showing flight schedules and gate assignments.
-     * This view focuses on information relevant to airline operations rather than
-     * system-wide gate management.
-     */
+    @Operation(
+        summary = "Get airline staff dashboard",
+        description = "Displays the airline staff dashboard showing flight schedules, gate assignments, and operational metrics"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Dashboard loaded successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions")
+    })
     @GetMapping("/dashboard")
     public String showDashboard(Model model, HttpSession session) {
         // ---- REMOVED Manual Role Check - Handled by SecurityConfig ----
@@ -88,12 +100,20 @@ public class AirlineDashboardController {
         return DASHBOARD_VIEW;
     }
     
-    /**
-     * Displays flight schedule information for a specific gate.
-     * Allows airline staff to view detailed scheduling information for their flights.
-     */
+    @Operation(
+        summary = "View gate schedule",
+        description = "Displays flight schedule information for a specific gate"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Gate schedule retrieved successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "Gate not found")
+    })
     @GetMapping("/schedule/{gateId}")
-    public String viewGateSchedule(@PathVariable String gateId, Model model) {
+    public String viewGateSchedule(
+            @Parameter(description = "Gate identifier", required = true)
+            @PathVariable String gateId, 
+            Model model) {
         logger.info("Viewing schedule for gate: {}", gateId);
         
         model.addAttribute(PAGE_TITLE_ATTR, "Gate Schedule - AGMS");
@@ -106,14 +126,23 @@ public class AirlineDashboardController {
         return "airline/schedule";
     }
     
-    /**
-     * Submits a gate change request for a flight.
-     * Allows airline staff to request gate reassignments when needed.
-     */
+    @Operation(
+        summary = "Request gate change",
+        description = "Submits a request to change a flight's assigned gate"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Gate change request submitted successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid request parameters"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "Gate not found")
+    })
     @PostMapping("/request-change")
     public String requestGateChange(
+            @Parameter(description = "Current gate identifier", required = true)
             @RequestParam String currentGateId,
+            @Parameter(description = "Requested gate identifier", required = true)
             @RequestParam String requestedGateId,
+            @Parameter(description = "Reason for the change request", required = true)
             @RequestParam String reason,
             RedirectAttributes redirectAttributes) {
         logger.info("Gate change request from {} to {} - Reason: {}", 
@@ -127,10 +156,14 @@ public class AirlineDashboardController {
         return "redirect:/airline/schedule/" + currentGateId;
     }
     
-    /**
-     * Views operational alerts and notifications.
-     * Provides airline staff with updates about gate and flight operations.
-     */
+    @Operation(
+        summary = "View operational alerts",
+        description = "Displays alerts and notifications about gate and flight operations"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Alerts retrieved successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions")
+    })
     @GetMapping("/alerts")
     public String viewAlerts(Model model) {
         logger.info("Accessing airline staff alerts");
@@ -143,10 +176,14 @@ public class AirlineDashboardController {
         return "airline/alerts";
     }
     
-    /**
-     * Displays performance metrics for gates used by the airline.
-     * Provides insights into gate utilization and on-time performance.
-     */
+    @Operation(
+        summary = "View performance metrics",
+        description = "Displays performance metrics for gates used by the airline"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Performance metrics retrieved successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions")
+    })
     @GetMapping("/performance")
     public String viewPerformance(Model model) {
         logger.info("Accessing airline performance metrics");
@@ -160,10 +197,23 @@ public class AirlineDashboardController {
         return "airline/performance";
     }
 
+    @Operation(
+        summary = "Update flight status",
+        description = "Updates the status and location of a specific flight"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Flight status updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid status or location"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "Flight not found")
+    })
     @PostMapping("/flights/{flightNumber}/status")
     public String updateFlightStatus(
+            @Parameter(description = "Flight number", required = true)
             @PathVariable String flightNumber,
+            @Parameter(description = "New flight status", required = true)
             @RequestParam String newStatus,
+            @Parameter(description = "Current location of the flight", required = true)
             @RequestParam String location,
             RedirectAttributes redirectAttributes) {
         
@@ -184,8 +234,20 @@ public class AirlineDashboardController {
         return "redirect:/airline/dashboard";
     }
 
+    @Operation(
+        summary = "Get flight details",
+        description = "Displays detailed information about a specific flight"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Flight details retrieved successfully"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions"),
+        @ApiResponse(responseCode = "404", description = "Flight not found")
+    })
     @GetMapping("/flights/{flightNumber}")
-    public String showFlightDetails(@PathVariable String flightNumber, Model model) {
+    public String showFlightDetails(
+            @Parameter(description = "Flight number", required = true)
+            @PathVariable String flightNumber, 
+            Model model) {
         logger.info("Viewing details for flight: {}", flightNumber);
         
         Map<String, Object> flightDetails = flightOperationsService.getFlightDetails(flightNumber);

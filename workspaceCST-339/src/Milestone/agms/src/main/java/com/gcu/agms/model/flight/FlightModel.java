@@ -2,11 +2,13 @@ package com.gcu.agms.model.flight;
 
 import java.time.LocalDateTime;
 
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
+import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
 /**
@@ -26,9 +28,10 @@ import lombok.ToString;
  * This model is central to the gate assignment functionality, as gates
  * are assigned to specific flights during specific time periods.
  */
-@Getter
-@Setter
+@Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString
 public class FlightModel {
     /**
@@ -40,28 +43,32 @@ public class FlightModel {
      * Flight number (typically numeric part without airline code)
      * Required field for flight identification
      */
-    @NotEmpty(message = "Flight number is required")
+    @NotBlank(message = "Flight number is required")
+    @Pattern(regexp = "^[A-Z0-9]{2,8}$", message = "Invalid flight number format")
     private String flightNumber;
 
     /**
      * IATA/ICAO airline code (e.g., UA for United Airlines)
      * Required field for airline identification
      */
-    @NotEmpty(message = "Airline code is required")
+    @NotBlank(message = "Airline code is required")
+    @Pattern(regexp = "^[A-Z]{2,3}$", message = "Invalid airline code format")
     private String airlineCode;
 
     /**
      * Origin airport code (IATA/ICAO)
      * Required field indicating departure airport
      */
-    @NotEmpty(message = "Origin is required")
+    @NotBlank(message = "Origin is required")
+    @Pattern(regexp = "^[A-Z]{3}$", message = "Invalid origin airport code")
     private String origin;
 
     /**
      * Destination airport code (IATA/ICAO)
      * Required field indicating arrival airport
      */
-    @NotEmpty(message = "Destination is required")
+    @NotBlank(message = "Destination is required")
+    @Pattern(regexp = "^[A-Z]{3}$", message = "Invalid destination airport code")
     private String destination;
 
     /**
@@ -93,7 +100,8 @@ public class FlightModel {
     /**
      * Registration number of the aircraft assigned to this flight
      */
-    private String assignedAircraft;    // Registration number of assigned aircraft
+    @Builder.Default
+    private String assignedAircraft = null;
     
     /**
      * Current location or position of the flight
@@ -105,6 +113,7 @@ public class FlightModel {
      * Current status of the flight (e.g., SCHEDULED, BOARDING, EN_ROUTE)
      * Defaults to SCHEDULED for new flights
      */
+    @Builder.Default
     private FlightStatus status = FlightStatus.SCHEDULED;
 
     /**
@@ -128,17 +137,17 @@ public class FlightModel {
      * from scheduling to completion, and to display appropriate visual indicators.
      */
     public enum FlightStatus {
-        SCHEDULED("Scheduled", FlightCssClasses.INFO, "Flight is scheduled"),
-        BOARDING("Boarding", FlightCssClasses.PRIMARY, "Boarding in progress"),
-        DEPARTED("Departed", FlightCssClasses.SUCCESS, "Flight has departed"),
-        EN_ROUTE("En Route", FlightCssClasses.PRIMARY, "Flight is in the air"),
-        APPROACHING("Approaching", FlightCssClasses.WARNING, "Approaching destination"),
-        LANDED("Landed", FlightCssClasses.SUCCESS, "Flight has landed"),
-        ARRIVED("Arrived", FlightCssClasses.SUCCESS, "Flight has arrived at gate"),
-        DELAYED("Delayed", FlightCssClasses.WARNING, "Flight is delayed"),
-        CANCELLED("Cancelled", FlightCssClasses.DANGER, "Flight is cancelled"),
-        DIVERTED("Diverted", FlightCssClasses.DANGER, "Flight has been diverted"),
-        COMPLETED("Completed", FlightCssClasses.SUCCESS, "Flight has completed");
+        SCHEDULED("Scheduled", "info", "Flight is scheduled"),
+        BOARDING("Boarding", "primary", "Boarding in progress"),
+        DEPARTED("Departed", "success", "Flight has departed"),
+        EN_ROUTE("En Route", "primary", "Flight is in the air"),
+        APPROACHING("Approaching", "warning", "Approaching destination"),
+        LANDED("Landed", "success", "Flight has landed"),
+        ARRIVED("Arrived", "success", "Flight has arrived at gate"),
+        DELAYED("Delayed", "warning", "Flight is delayed"),
+        CANCELLED("Cancelled", "danger", "Flight is cancelled"),
+        DIVERTED("Diverted", "danger", "Flight has been diverted"),
+        COMPLETED("Completed", "success", "Flight has completed");
 
         private final String label;        // User-friendly display name
         private final String cssClass;     // CSS class for styling in UI

@@ -2,21 +2,34 @@ package com.gcu.agms.controller.auth;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.gcu.agms.model.auth.UserModel;
 import com.gcu.agms.model.auth.UserRole;
 import com.gcu.agms.service.auth.AuthorizationCodeService;
 import com.gcu.agms.service.auth.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.validation.Valid;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * RegisterController handles the registration process for new users in the Airport Gate Management System.
@@ -43,6 +56,7 @@ import jakarta.validation.Valid;
  */
 @Controller
 @RequestMapping({"/", "/auth"}) // Handle both root and /auth paths for flexibility in URL structure
+@Tag(name = "Authentication", description = "Authentication endpoints for user login and registration")
 public class RegisterController {
     /**
      * Logger instance for this class, used to record application events
@@ -87,142 +101,102 @@ public class RegisterController {
     }
     
     /**
-     * Handles GET requests to the /register endpoint.
-     * Displays the registration form page to the user.
-     * 
-     * This method:
-     * 1. Creates an empty UserModel if one doesn't exist in the model
-     * 2. Sets the page title for the view
-     * 3. Returns the logical view name to be resolved to register.html
-     * 
-     * @param model Spring MVC Model object to pass data to the view
-     * @return String representing the logical view name
+     * Returns registration form information and structure
      */
-    @GetMapping("/register")
-    public String showRegisterPage(Model model) {
-        // Initialize empty user model for the form if not already present
-        if (!model.containsAttribute(USER_MODEL_ATTR)) {
-            model.addAttribute(USER_MODEL_ATTR, new UserModel());
-        }
-        
-        // Set page title for the browser tab
-        model.addAttribute(PAGE_TITLE_ATTR, "Register - AGMS");
-        
-        // Return the view name to be resolved to the template
-        return REGISTER_VIEW;
+    @GetMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @Operation(
+        summary = "Get registration form information",
+        description = "Returns the registration form structure and required fields"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Successfully retrieved registration form information",
+            content = @Content(mediaType = "application/json")
+        )
+    })
+    public Map<String, Object> getRegistrationInfo() {
+        Map<String, Object> registrationInfo = new HashMap<>();
+        registrationInfo.put("pageTitle", "Register - AGMS");
+        registrationInfo.put("formFields", new String[]{
+            "username",
+            "password",
+            "confirmPassword",
+            "firstName",
+            "lastName",
+            "email",
+            "role",
+            "authCode"
+        });
+        registrationInfo.put("availableRoles", UserRole.values());
+        registrationInfo.put("method", "POST");
+        registrationInfo.put("action", "/register");
+        return registrationInfo;
     }
     
     /**
-     * Handles POST requests to the /register endpoint.
-     * Processes the user registration form submission.
-     * 
-     * This method:
-     * 1. Validates the form data (through @Valid annotation)
-     * 2. Validates authorization codes for special roles
-     * 3. Sets a default role if none selected
-     * 4. Attempts to register the user via UserService
-     * 5. Handles success or failure with appropriate redirects and messages
-     * 
-     * @param userModel Form data bound to UserModel object (validated by @Valid)
-     * @param bindingResult Contains validation errors if any occur
-     * @param redirectAttributes Used to pass attributes through redirects
-     * @return String representing the redirect URL based on operation result
+     * Processes user registration
      */
-    @PostMapping("/register") // Changed from /doRegister to /register for consistency
-    public String processRegistration(
-            @Valid @ModelAttribute(USER_MODEL_ATTR) UserModel userModel,
-            BindingResult bindingResult,
-            RedirectAttributes redirectAttributes) {
+    @PostMapping(value = "/register", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @Operation(
+        summary = "Register a new user",
+        description = "Creates a new user account with the provided information"
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "Successfully registered user",
+            content = @Content(mediaType = "application/json")
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "Invalid registration data or authorization code",
+            content = @Content(mediaType = "application/json")
+        )
+    })
+    public ResponseEntity<Map<String, Object>> processRegistration(
+            @Parameter(description = "User registration details", required = true)
+            @Valid @RequestBody UserModel userModel) {
         
-        // Log the registration attempt with username for audit trail
         logger.info("Processing registration request for user: {}", userModel.getUsername());
         
-        /**
-         * Role authorization validation
-         * 
-         * Special roles (Admin, Operations Manager) require valid authorization codes.
-         * This prevents unauthorized users from registering with elevated privileges.
-         */
+        // Validate authorization code for special roles
         if ((userModel.getRole() == UserRole.ADMIN || 
              userModel.getRole() == UserRole.OPERATIONS_MANAGER) &&
             !authCodeService.isValidAuthCode(userModel.getAuthCode(), userModel.getRole())) {
             
-            // Add field-specific error for invalid authorization code
-            bindingResult.rejectValue("authCode", "invalid.authCode", 
-                "Invalid authorization code for the selected role.");
-            return REGISTER_VIEW;
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("error", "Invalid authorization code for the selected role");
+            return ResponseEntity.badRequest().body(response);
         }
-        
-        /**
-         * Form validation check
-         * 
-         * If the @Valid annotation found any constraint violations,
-         * return to the registration form with validation errors.
-         */
-        if (bindingResult.hasErrors()) {
-            logger.warn("Validation errors found during registration");
-            return REGISTER_VIEW;
-        }
-        
-        /**
-         * Default role assignment
-         * 
-         * If no role was selected, default to PUBLIC role.
-         * This ensures every user has an assigned role.
-         */
+
+        // Set default role if none provided
         userModel.setRole(userModel.getRole() == null ? UserRole.PUBLIC : userModel.getRole());
-        logger.info("Role set to: {}", userModel.getRole());
-        logger.info("Attempting to register user...");
         
-        /**
-         * User registration attempt
-         * 
-         * Call UserService to attempt registration.
-         * This will typically:
-         * 1. Check if username already exists
-         * 2. Hash the password for secure storage
-         * 3. Persist the user data to the database
-         */
+        // Attempt registration
         boolean registrationSuccess = userService.registerUser(userModel);
         
-        /**
-         * Handle registration result
-         * 
-         * On success: Redirect to login page with role-specific success message
-         * On failure: Redirect back to registration form with error message
-         */
+        Map<String, Object> response = new HashMap<>();
         if (registrationSuccess) {
-            logger.info("Registration successful for user: {}", userModel.getUsername());
-            
-            // Create role-specific success messages for better user experience
             String successMessage = switch(userModel.getRole()) {
-                case ADMIN -> 
-                    "Administrator account created successfully. You now have full system access.";
-                case OPERATIONS_MANAGER -> 
-                    "Operations Manager account created successfully. You can now manage airport operations.";
-                case GATE_MANAGER -> 
-                    "Gate Manager account created successfully. Please log in to access your dashboard.";
-                case AIRLINE_STAFF -> 
-                    "Airline Staff account created successfully. Please log in to access your dashboard.";
-                default -> 
-                    "Registration successful! Please login with your credentials.";
+                case ADMIN -> "Administrator account created successfully. You now have full system access.";
+                case OPERATIONS_MANAGER -> "Operations Manager account created. You can now manage flight operations.";
+                case GATE_MANAGER -> "Gate Manager account created. You can now manage gate assignments.";
+                case AIRLINE_STAFF -> "Airline Staff account created. You can now view flight information.";
+                case PUBLIC -> "Account created successfully. Welcome to AGMS!";
             };
             
-            // Add success message to be displayed after redirect
-            redirectAttributes.addFlashAttribute(SUCCESS_ATTR, successMessage);
-            
-            // Redirect to login page so user can immediately log in
-            return LOGIN_REDIRECT;
+            response.put("success", true);
+            response.put("message", successMessage);
+            response.put("redirectUrl", "/login");
+            return ResponseEntity.ok(response);
         } else {
-            // Log registration failure
-            logger.warn("Registration failed: Username already exists");
-            
-            // Add error message to be displayed after redirect
-            redirectAttributes.addFlashAttribute(ERROR_ATTR,
-                "Username already exists. Please choose a different username.");
-            
-            // Redirect back to registration form to try again
-            return REGISTER_REDIRECT;
+            response.put("success", false);
+            response.put("error", "Registration failed. Please try again.");
+            return ResponseEntity.badRequest().body(response);
         }
     }
 }

@@ -7,6 +7,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 /**
  * DashboardController handles routing to different role-specific dashboards.
  * 
@@ -41,6 +48,8 @@ import org.springframework.web.bind.annotation.GetMapping;
  * needs to change.
  */
 @Controller
+@Tag(name = "Dashboard Routing", description = "Central routing endpoint that directs users to their role-specific dashboards")
+@SecurityRequirement(name = "bearerAuth")
 public class DashboardController {
     
     /**
@@ -67,8 +76,22 @@ public class DashboardController {
      *                      the user's identity and granted authorities (roles)
      * @return A redirect URL to the appropriate dashboard based on the user's role
      */
+    @Operation(
+        summary = "Route to role-specific dashboard",
+        description = "Routes authenticated users to their appropriate dashboard based on their role. " +
+                     "Admins go to admin dashboard, operations managers to operations dashboard, " +
+                     "gate managers to gate dashboard, airline staff to airline dashboard, " +
+                     "and public users to the home page."
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "302", description = "Successfully redirected to role-specific dashboard"),
+        @ApiResponse(responseCode = "401", description = "User is not authenticated"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions")
+    })
     @GetMapping("/dashboard")
-    public String showDashboard(Authentication authentication) { 
+    public String showDashboard(
+            @Parameter(description = "Spring Security Authentication object containing user details and roles", required = true)
+            Authentication authentication) { 
         
         // Security check: ensure user is authenticated before proceeding
         if (authentication == null || !authentication.isAuthenticated()) {

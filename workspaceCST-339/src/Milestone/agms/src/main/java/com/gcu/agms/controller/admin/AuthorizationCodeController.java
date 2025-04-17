@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,12 +15,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.gcu.agms.model.auth.AuthorizationCodeModel;
 import com.gcu.agms.model.auth.UserRole;
 import com.gcu.agms.service.auth.AuthorizationCodeService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpSession;
 
 /**
@@ -31,6 +36,7 @@ import jakarta.servlet.http.HttpSession;
  */
 @Controller
 @RequestMapping("/admin/auth-codes")
+@Tag(name = "Authorization Code Management", description = "APIs for managing authorization codes")
 public class AuthorizationCodeController {
     private static final Logger logger = LoggerFactory.getLogger(AuthorizationCodeController.class);
     
@@ -47,25 +53,19 @@ public class AuthorizationCodeController {
     
     /**
      * Displays the list of authorization codes.
-     * 
-     * @param model Model for the view
-     * @param session HTTP session for user role verification
-     * @return The view name
      */
-    @GetMapping
-    public String showAuthCodes(Model model, HttpSession session) {
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @Operation(summary = "Get all authorization codes", description = "Retrieves a list of all authorization codes in the system")
+    public List<AuthorizationCodeModel> getAuthCodes(HttpSession session) {
         // Verify admin role
         String userRole = (String) session.getAttribute("userRole");
         if (!"ADMIN".equals(userRole)) {
             logger.warn("Unauthorized access attempt to auth code management");
-            return "redirect:/login";
+            throw new SecurityException("Unauthorized access");
         }
         
-        List<AuthorizationCodeModel> authCodes = authCodeService.getAllAuthCodes();
-        model.addAttribute("authCodes", authCodes);
-        model.addAttribute("pageTitle", "Authorization Codes - AGMS");
-        
-        return "admin/auth-codes";
+        return authCodeService.getAllAuthCodes();
     }
     
     /**
@@ -92,117 +92,70 @@ public class AuthorizationCodeController {
     }
     
     /**
-     * Processes the creation of a new authorization code.
-     * 
-     * @param authCode The authorization code model from the form
-     * @param expiresAt Optional expiration date
-     * @param redirectAttributes Redirect attributes for flash messages
-     * @param session HTTP session for user role verification
-     * @return Redirect URL
+     * Creates a new authorization code.
      */
-    @PostMapping("/create")
-    public String createAuthCode(
-            @ModelAttribute AuthorizationCodeModel authCode,
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime expiresAt,
-            RedirectAttributes redirectAttributes,
+    @PostMapping(value = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @Operation(summary = "Create a new authorization code", description = "Generates a new authorization code with specified parameters")
+    public AuthorizationCodeModel createAuthCode(
+            @Parameter(description = "Authorization code details") @ModelAttribute AuthorizationCodeModel authCode,
+            @Parameter(description = "Expiration date and time") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime expiresAt,
             HttpSession session) {
         
         // Verify admin role
         String userRole = (String) session.getAttribute("userRole");
         if (!"ADMIN".equals(userRole)) {
             logger.warn("Unauthorized access attempt to auth code creation");
-            return "redirect:/login";
+            throw new SecurityException("Unauthorized access");
         }
         
-        try {
-            String code = authCodeService.generateNewCode(
-                authCode.getRole(),
-                authCode.getDescription(),
-                expiresAt
-            );
-            
-            redirectAttributes.addFlashAttribute("success",
-                "Authorization code created successfully: " + code);
-        } catch (Exception e) {
-            logger.error("Error creating authorization code", e);
-            redirectAttributes.addFlashAttribute("error",
-                "Failed to create authorization code: " + e.getMessage());
-        }
+        String code = authCodeService.generateNewCode(
+            authCode.getRole(),
+            authCode.getDescription(),
+            expiresAt
+        );
         
-        return "redirect:/admin/auth-codes";
+        authCode.setCode(code);
+        return authCode;
     }
     
     /**
      * Deactivates an authorization code.
-     * 
-     * @param id The ID of the code to deactivate
-     * @param redirectAttributes Redirect attributes for flash messages
-     * @param session HTTP session for user role verification
-     * @return Redirect URL
      */
-    @PostMapping("/{id}/deactivate")
-    public String deactivateAuthCode(
-            @PathVariable Long id,
-            RedirectAttributes redirectAttributes,
+    @PostMapping(value = "/{id}/deactivate", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @Operation(summary = "Deactivate an authorization code", description = "Deactivates an existing authorization code")
+    public boolean deactivateAuthCode(
+            @Parameter(description = "ID of the authorization code") @PathVariable Long id,
             HttpSession session) {
         
         // Verify admin role
         String userRole = (String) session.getAttribute("userRole");
         if (!"ADMIN".equals(userRole)) {
             logger.warn("Unauthorized access attempt to auth code deactivation");
-            return "redirect:/login";
+            throw new SecurityException("Unauthorized access");
         }
         
-        try {
-            boolean deactivated = authCodeService.deactivateAuthCode(id);
-            
-            if (deactivated) {
-                redirectAttributes.addFlashAttribute("success",
-                    "Authorization code deactivated successfully");
-            } else {
-                redirectAttributes.addFlashAttribute("error",
-                    "Authorization code not found");
-            }
-        } catch (Exception e) {
-            logger.error("Error deactivating authorization code", e);
-            redirectAttributes.addFlashAttribute("error",
-                "Failed to deactivate authorization code: " + e.getMessage());
-        }
-        
-        return "redirect:/admin/auth-codes";
+        return authCodeService.deactivateAuthCode(id);
     }
     
     /**
      * Deletes an authorization code.
-     * 
-     * @param id The ID of the code to delete
-     * @param redirectAttributes Redirect attributes for flash messages
-     * @param session HTTP session for user role verification
-     * @return Redirect URL
      */
-    @PostMapping("/{id}/delete")
-    public String deleteAuthCode(
-            @PathVariable Long id,
-            RedirectAttributes redirectAttributes,
+    @PostMapping(value = "/{id}/delete", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    @Operation(summary = "Delete an authorization code", description = "Permanently removes an authorization code from the system")
+    public void deleteAuthCode(
+            @Parameter(description = "ID of the authorization code") @PathVariable Long id,
             HttpSession session) {
         
         // Verify admin role
         String userRole = (String) session.getAttribute("userRole");
         if (!"ADMIN".equals(userRole)) {
             logger.warn("Unauthorized access attempt to auth code deletion");
-            return "redirect:/login";
+            throw new SecurityException("Unauthorized access");
         }
         
-        try {
-            authCodeService.deleteAuthCode(id);
-            redirectAttributes.addFlashAttribute("success",
-                "Authorization code deleted successfully");
-        } catch (Exception e) {
-            logger.error("Error deleting authorization code", e);
-            redirectAttributes.addFlashAttribute("error",
-                "Failed to delete authorization code: " + e.getMessage());
-        }
-        
-        return "redirect:/admin/auth-codes";
+        authCodeService.deleteAuthCode(id);
     }
 }

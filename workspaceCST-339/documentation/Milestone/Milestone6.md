@@ -1,10 +1,10 @@
 
 # Airport Gate Management System (AGMS)
-## Design Report - Milestone 6
+## Design Report - Milestone 7
 ### CST-339: Java Enterprise Application Development
 
 **Date:** April, 06 2025  
-**Version:** 5.0  
+**Version:** 7.0  
 **Author:** Owen Lindsey  
 **Course:** CST-339 - Java Programming III  
 **Professor:** Professor Robert Estey
@@ -13,8 +13,7 @@
 
 ## Executive Summary
 
-This milestone represents a significant advancement in our Airport Gate Management System (AGMS) project, focusing on the implementation of Spring Data JDBC for robust data persistence. We've successfully transitioned from in-memory data storage to a fully relational database model, enabling reliable data storage, complex queries, and improved system resilience. The application now features a comprehensive data layer with clean separation of concerns, well-defined repositories, and optimized data access patterns. Additionally, we've implemented Spring Security to ensure proper authentication and authorization throughout the application.
-
+This milestone represents a significant advancement in our Airport Gate Management System (AGMS) project, focusing on the implementation of Spring Data JDBC for robust data persistence and the integration of OpenAPI documentation. We've successfully transitioned from in-memory data storage to a fully relational database model, enabling reliable data storage, complex queries, and improved system resilience. The application now features a comprehensive data layer with clean separation of concerns, well-defined repositories, and optimized data access patterns. Additionally, we've implemented Spring Security to ensure proper authentication and authorization throughout the application, and enhanced the system with comprehensive API documentation using SpringDoc OpenAPI.
 
 ## Project Links
 - [GitHub Repository](https://github.com/omniV1/CST-339/tree/main/workspaceCST-339/src/Milestone)
@@ -54,6 +53,8 @@ This milestone represents a significant advancement in our Airport Gate Manageme
 - ✅ Enhanced security with database-backed authentication
 - ✅ Created data-driven authorization
 - ✅ Implemented audit logging for data changes
+- ✅ Added comprehensive OpenAPI documentation for all endpoints
+- ✅ Integrated Swagger UI for API exploration and testing
 
 ### Security Implementation
 - ✅ Refactored login module to use Spring Security
@@ -83,6 +84,16 @@ This milestone represents a significant advancement in our Airport Gate Manageme
 - ✅ Added performance monitoring for database operations
 - ✅ Created database documentation
 
+
+### API Documentation Implementation
+- ✅ Configured SpringDoc OpenAPI integration
+- ✅ Added detailed API documentation for all controllers
+- ✅ Implemented proper response documentation
+- ✅ Added security scheme documentation
+- ✅ Created comprehensive parameter descriptions
+- ✅ Added example request/response documentation
+- ✅ Integrated Swagger UI for interactive API testing
+
 ## Planning Documentation
 
 ### Task Schedule & Timeline
@@ -109,344 +120,215 @@ This milestone represents a significant advancement in our Airport Gate Manageme
 
 ### General Technical Approach
 
-### General Technical Approach
+For Milestone 7, our technical approach built upon the robust data persistence foundation established in Milestone 5, extending our system with advanced features, optimizations, and comprehensive API documentation. Our continued use of Spring Data JDBC offers several advantages over both pure JDBC and JPA/Hibernate, while our integration of SpringDoc OpenAPI provides clear and interactive documentation for all API endpoints.
 
-For Milestone 6, our technical approach built upon the robust data persistence foundation established in Milestone 5, extending our system with advanced features and optimizations. Our continued use of Spring Data JDBC offers several advantages over both pure JDBC and JPA/Hibernate:
+Key technical decisions and implementations include:
 
-1. **Simplicity**: Spring Data JDBC provides a clean, straightforward approach to database access without the complexity of an ORM like Hibernate.
+1. **API Documentation Strategy**
+   - Integrated SpringDoc OpenAPI for automated API documentation
+   - Added detailed annotations for all controller endpoints
+   - Implemented security scheme documentation
+   - Created comprehensive parameter and response documentation
+   - Added example request/response documentation
+   - Integrated Swagger UI for interactive API testing
 
-2. **Performance**: By avoiding the overhead of complex object-relational mapping, we achieve better performance for our data-intensive operations.
+2. **Controller Documentation**
+   - Added `@Tag` annotations for logical grouping of endpoints
+   - Implemented `@Operation` descriptions for each endpoint
+   - Added `@Parameter` documentation for all method parameters
+   - Created `@ApiResponse` documentation for possible responses
+   - Integrated `@SecurityRequirement` annotations for authentication
 
-3. **Control**: We maintain precise control over SQL operations while still benefiting from Spring's infrastructure support.
+3. **OpenAPI Configuration**
+   ```java
+   @Configuration
+   public class OpenApiConfig {
+       @Bean
+       public OpenAPI openAPI() {
+           return new OpenAPI()
+                   .info(new Info()
+                           .title("AGMS API Documentation")
+                           .description("API documentation for the AGMS (Application Management System)")
+                           .version("v1.0.0")
+                           .contact(new Contact()
+                                   .name("GCU")
+                                   .email("support@gcu.edu")
+                                   .url("https://www.gcu.edu"))
+                           .license(new License()
+                                   .name("Apache 2.0")
+                                   .url("https://www.apache.org/licenses/LICENSE-2.0")));
+       }
+   }
+   ```
 
-4. **Testability**: The repository pattern makes our data access layer more testable with clear boundaries.
+4. **Controller Documentation Example**
+   ```java
+   @Controller
+   @RequestMapping("/operations")
+   @Tag(name = "Flight Operations", description = "Endpoints for managing flight operations, aircraft, and gate assignments")
+   @SecurityRequirement(name = "bearerAuth")
+   public class FlightOperationsController {
+       @Operation(
+           summary = "Create new flight",
+           description = "Creates a new flight in the system with the provided details"
+       )
+       @ApiResponses({
+           @ApiResponse(responseCode = "200", description = "Flight created successfully"),
+           @ApiResponse(responseCode = "400", description = "Invalid flight data"),
+           @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions")
+       })
+       @PostMapping("/flights/create")
+       @ResponseBody
+       public ResponseEntity<Map<String, Object>> createFlight(
+               @Parameter(description = "Flight details", required = true)
+               @RequestBody @Valid FlightModel flight) {
+           // Implementation
+       }
+   }
+   ```
 
-Our implementation continued to follow these core principles:
+## API Documentation
 
-1. **Repository Pattern**: Each entity has a dedicated repository interface with standard CRUD operations and specialized queries.
+### OpenAPI Integration
 
-2. **RowMapper Implementation**: Custom RowMappers handle the conversion between database records and domain objects, maintaining clean separation of concerns.
+The integration of SpringDoc OpenAPI has significantly enhanced our API documentation and testing capabilities. This section details the implementation and features of our API documentation system.
 
-3. **Transaction Management**: Spring's declarative transaction management ensures data integrity across operations.
+### API Documentation Implementation
+- ✅ Configured SpringDoc OpenAPI integration
+- ✅ Added detailed API documentation for all controllers
+- ✅ Implemented proper response documentation
+- ✅ Added security scheme documentation
+- ✅ Created comprehensive parameter descriptions
+- ✅ Added example request/response documentation
+- ✅ Integrated Swagger UI for interactive API testing
 
-4. **Connection Pooling**: HikariCP connection pooling provides efficient database connection management.
+### Controller Documentation Examples
 
-5. **Environment Configuration**: Database connection details are externalized through environment variables for security and deployment flexibility.
+#### Flight Operations Controller
+```java
+@Controller
+@RequestMapping("/operations")
+@Tag(name = "Flight Operations", description = "Endpoints for managing flight operations, aircraft, and gate assignments")
+@SecurityRequirement(name = "bearerAuth")
+public class FlightOperationsController {
+    @Operation(
+        summary = "Create new flight",
+        description = "Creates a new flight in the system with the provided details"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Flight created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid flight data"),
+        @ApiResponse(responseCode = "403", description = "Access denied - Insufficient permissions")
+    })
+    @PostMapping("/flights/create")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> createFlight(
+            @Parameter(description = "Flight details", required = true)
+            @RequestBody @Valid FlightModel flight) {
+        // Implementation
+    }
+}
+```
 
-This approach has allowed us to build a data layer that is robust, performant, and maintainable, providing a solid foundation for the system's business logic.
+#### Gate Dashboard Controller
+```java
+@Controller
+@RequestMapping("/gates")
+@Tag(name = "Gate Management", description = "Endpoints for managing gate operations and assignments")
+@SecurityRequirement(name = "bearerAuth")
+public class GateDashboardController {
+    @Operation(
+        summary = "Get gate details",
+        description = "Retrieves detailed information about a specific gate"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Gate details retrieved successfully"),
+        @ApiResponse(responseCode = "404", description = "Gate not found"),
+        @ApiResponse(responseCode = "403", description = "Access denied")
+    })
+    @GetMapping("/{gateId}")
+    @ResponseBody
+    public ResponseEntity<GateModel> getGateDetails(
+            @Parameter(description = "Gate identifier", required = true)
+            @PathVariable String gateId) {
+        // Implementation
+    }
+}
+```
 
-### Security Implementation
+#### Airline Dashboard Controller
+```java
+@Controller
+@RequestMapping("/airline")
+@Tag(name = "Airline Operations", description = "Endpoints for airline staff to manage flight operations")
+@SecurityRequirement(name = "bearerAuth")
+public class AirlineDashboardController {
+    @Operation(
+        summary = "Submit gate change request",
+        description = "Allows airline staff to submit a request for gate reassignment"
+    )
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Request submitted successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid request data"),
+        @ApiResponse(responseCode = "403", description = "Access denied")
+    })
+    @PostMapping("/gate-change-request")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> submitGateChangeRequest(
+            @Parameter(description = "Gate change request details", required = true)
+            @RequestBody @Valid GateChangeRequestModel request) {
+        // Implementation
+    }
+}
+```
 
-We implemented a comprehensive security solution using Spring Security framework, which provides several key benefits:
-
-1. **Centralized Authentication**: Spring Security provides a centralized authentication mechanism that works seamlessly with our database.
-
-2. **Declarative Security**: Security rules are defined declaratively, making them easier to understand and maintain.
-
-3. **Role-Based Access Control**: Granular access control based on user roles ensures appropriate access levels.
-
-4. **CSRF Protection**: Built-in Cross-Site Request Forgery protection secures all form submissions and AJAX requests.
-
-5. **Session Management**: Secure session handling with proper timeout and invalidation policies.
-
-The security implementation follows this architecture:
-
+### OpenAPI Configuration
 ```java
 @Configuration
-@EnableWebSecurity
-public class SecurityConfig {
-
-    @Autowired
-    private AppUserDetailsService userDetailsService;
-    
+public class OpenApiConfig {
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            .authorizeHttpRequests(authorize -> authorize
-                // Public resources accessible to everyone
-                .requestMatchers("/css/**", "/js/**", "/images/**", "/docs/**").permitAll()
-                // Public pages accessible without authentication
-                .requestMatchers("/", "/about", "/contact", "/error").permitAll()
-                // Authentication endpoints accessible to everyone
-                .requestMatchers("/auth/**", "/login", "/register", "/perform_login").permitAll()
-                // Role-specific access restrictions
-                .requestMatchers("/admin/**").hasAuthority("ADMIN")
-                .requestMatchers("/operations/**").hasAnyAuthority("ADMIN", "OPERATIONS_MANAGER")
-                .requestMatchers("/gates/**").hasAnyAuthority("ADMIN", "GATE_MANAGER", "OPERATIONS_MANAGER")
-                .requestMatchers("/airline/**").hasAnyAuthority("ADMIN", "AIRLINE_STAFF", "OPERATIONS_MANAGER")
-                // All other pages require authentication
-                .anyRequest().authenticated()
-            )
-            // Form login configuration
-            .formLogin(form -> form
-                .loginPage("/login")
-                .loginProcessingUrl("/perform_login")
-                .defaultSuccessUrl("/dashboard", true)
-                .permitAll()
-            )
-            // Logout configuration
-            .logout(logout -> logout
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login?logout")
-                .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID")
-                .permitAll()
-            )
-            // CSRF protection enabled
-            .csrf(csrf -> csrf.disable());
-            
-        return http.build();
-    }
-    
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    public OpenAPI openAPI() {
+        return new OpenAPI()
+                .info(new Info()
+                        .title("AGMS API Documentation")
+                        .description("API documentation for the Airport Gate Management System")
+                        .version("v1.0.0")
+                        .contact(new Contact()
+                                .name("GCU")
+                                .email("support@gcu.edu")
+                                .url("https://www.gcu.edu"))
+                        .license(new License()
+                                .name("Apache 2.0")
+                                .url("https://www.apache.org/licenses/LICENSE-2.0")))
+                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
+                .components(new Components()
+                        .addSecuritySchemes("bearerAuth",
+                                new SecurityScheme()
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")));
     }
 }
 ```
 
-### Database Authentication
+### API Documentation Benefits
 
-To integrate Spring Security with our database, we implemented a custom `UserDetailsService`:
+The integration of OpenAPI documentation provides several key benefits:
 
-```java
-@Service
-public class AppUserDetailsService implements UserDetailsService {
+1. **Interactive Documentation**: Swagger UI provides an interactive interface for exploring and testing APIs.
+2. **Standardized Documentation**: OpenAPI specifications ensure consistent documentation across all endpoints.
+3. **Security Documentation**: Clear documentation of authentication and authorization requirements.
+4. **Developer Experience**: Improved onboarding and integration experience for developers.
+5. **API Testing**: Built-in testing capabilities through Swagger UI.
+6. **Code-First Approach**: Documentation is generated from code annotations, ensuring accuracy.
 
-    @Autowired
-    private UserRepository userRepository;
-    
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserModel user = userRepository.findByUsername(username)
-            .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
-        
-        // Create authorities based on user's role
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(user.getRole().toString()));
-        
-        // Return Spring Security's User object with username, password, and authorities
-        return new User(
-            user.getUsername(),
-            user.getPassword(),
-            authorities
-        );
-    }
-}
-```
+### API Documentation Access
 
-This service bridges Spring Security's authentication system with our custom user database, allowing for:
-- Username/password verification against database records
-- Role-based authorization using database-stored roles
-- Secure password handling with BCrypt encryption
+The API documentation can be accessed at the following endpoints:
 
-### Key Technical Decisions
+- OpenAPI Documentation: `/v3/api-docs`
+- Swagger UI: `/swagger-ui.html`
 
-#### Repository Implementation Strategy
-
-We chose to implement our repositories using Spring JDBC over JPA/Hibernate for several reasons:
-
-1. **Architectural Clarity**: JDBC provides a closer mapping to the relational model, making it easier to reason about the data layer.
-
-2. **Performance Considerations**: For our read-heavy application with complex queries, the overhead of ORM can be significant.
-
-3. **SQL Control**: Direct SQL gives us precise control over query optimization and index usage.
-
-4. **Learning Opportunity**: Implementing JDBC repositories provides valuable insight into the database layer that higher-level abstractions might obscure.
-
-Each repository follows a consistent pattern:
-
-```java
-public interface EntityRepository {
-    // Standard CRUD operations
-    List<Entity> findAll();
-    Optional<Entity> findById(Long id);
-    Entity save(Entity entity);
-    void deleteById(Long id);
-    
-    // Specialized queries
-    List<Entity> findBySpecificCriteria(String criteria);
-}
-```
-
-The implementation classes leverage Spring's JdbcTemplate for consistent error handling, connection management, and query execution:
-
-```java
-@Repository
-public class JdbcEntityRepository implements EntityRepository {
-    private final JdbcTemplate jdbcTemplate;
-    
-    // Constructor injection
-    public JdbcEntityRepository(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
-    
-    // Implementation details...
-}
-```
-
-#### Data Model Design
-
-Our database design prioritizes normalization while maintaining query performance:
-
-1. **Third Normal Form**: All tables adhere to 3NF to minimize redundancy and anomalies.
-
-2. **Foreign Key Constraints**: Referential integrity is enforced through foreign keys.
-
-3. **Indexing Strategy**: Carefully chosen indexes balance lookup performance with write overhead.
-
-4. **Audit Columns**: All tables include created_at, updated_at, and created_by columns for traceability.
-
-5. **Soft Deletes**: Where appropriate, entities use is_active flags rather than physical deletion.
-
-This approach gives us a robust, scalable database design that supports our current needs while allowing for future growth.
-
-#### Transaction Management
-
-We implemented declarative transaction management using Spring's `@Transactional` annotation:
-
-```java
-@Service
-public class JdbcEntityService implements EntityService {
-    private final EntityRepository repository;
-    
-    // Constructor injection
-    public JdbcEntityService(EntityRepository repository) {
-        this.repository = repository;
-    }
-    
-    @Transactional
-    public Entity createEntity(Entity entity) {
-        // Business logic and validation
-        return repository.save(entity);
-    }
-}
-```
-
-This approach ensures that:
-
-1. Database transactions span logical business operations
-2. Transactions roll back automatically on exceptions
-3. The service layer controls transaction boundaries
-4. The repository layer focuses on data access without transaction concerns
-
-#### RowMapper Implementation
-
-Our custom RowMappers handle the mapping between database rows and domain objects:
-
-```java
-private static class EntityRowMapper implements RowMapper<Entity> {
-    @Override
-    public Entity mapRow(ResultSet rs, int rowNum) throws SQLException {
-        Entity entity = new Entity();
-        entity.setId(rs.getLong("id"));
-        entity.setName(rs.getString("name"));
-        
-        // Map other properties
-        
-        return entity;
-    }
-}
-```
-
-This approach:
-
-1. Encapsulates database mapping details
-2. Handles SQL-specific behaviors like NULL values
-3. Manages type conversions consistently
-4. Isolates domain objects from database concerns
-
-### Installation & Configuration Instructions
-
-#### Prerequisites
-
-- Java 17 or higher
-- Maven 3.8.x or higher
-- MySQL 8.0 or higher
-- Docker and Docker Compose (optional)
-
-#### Database Setup
-
-1. **Create the database**:
-
-```sql
-CREATE DATABASE agms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'agms_user'@'localhost' IDENTIFIED BY 'your_password';
-GRANT ALL PRIVILEGES ON agms.* TO 'agms_user'@'localhost';
-FLUSH PRIVILEGES;
-```
-
-2. **Run the DDL scripts** (found in `src/main/resources/db/schema.sql`)
-
-#### Application Configuration
-
-1. **Environment Variables**:
-
-Create a `.env` file in the project root with the following configuration:
-
-```
-# Database Configuration
-SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/agms
-SPRING_DATASOURCE_USERNAME=agms_user
-SPRING_DATASOURCE_PASSWORD=your_password
-
-# Application Configuration
-SERVER_PORT=8080
-```
-
-2. **Application Properties**:
-
-The `application.properties` file is already configured to use the environment variables:
-
-```properties
-# Database Configuration
-spring.datasource.url=${SPRING_DATASOURCE_URL}
-spring.datasource.username=${SPRING_DATASOURCE_USERNAME}
-spring.datasource.password=${SPRING_DATASOURCE_PASSWORD}
-spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
-
-# HikariCP Configuration
-spring.datasource.hikari.maximum-pool-size=10
-spring.datasource.hikari.minimum-idle=5
-spring.datasource.hikari.idle-timeout=300000
-spring.datasource.hikari.connection-timeout=20000
-
-# Server Configuration
-server.port=${SERVER_PORT:8080}
-```
-
-#### Running the Application
-
-1. **Using Maven**:
-
-```bash
-mvn clean package
-java -jar target/agms-0.0.1-SNAPSHOT.jar
-```
-
-2. **Using Docker**:
-
-```bash
-docker-compose up -d
-```
-
-3. **Application Access**:
-
-Once running, the application will be available at `http://localhost:8080`
-
-### Known Issues & Risks
-
-#### Known Issues
-
-1. **Database Migration**: No automated migration system is in place yet. Schema changes require manual updates.
-
-2. **Connection Pooling**: Default HikariCP settings may need tuning for production environments.
-
-3. **Error Handling**: Some repository methods could use more robust error handling, particularly for constraint violations.
-
-4. **Test Coverage**: While unit tests exist, integration tests for repositories are still being developed.
-
-5. **Transaction Isolation**: Default isolation level may not be optimal for all scenarios.
 
 #### Risks
 
@@ -1458,9 +1340,9 @@ graph TD
 
 ## Conclusion
 
-Milestone 4 represents a significant advancement in our Airport Gate Management System, transitioning from in-memory data structures to a robust database implementation using Spring Data JDBC with enhanced security features using Spring Security. The application now features a complete data persistence layer with clean repository interfaces, effective transaction management, and comprehensive error handling.
+Milestone 7 represents a significant advancement in our Airport Gate Management System, transitioning from in-memory data structures to a robust database implementation using Spring Data JDBC with enhanced security features using Spring Security. The application now features a complete data persistence layer with clean repository interfaces, effective transaction management, and comprehensive error handling. Additionally, the integration of SpringDoc OpenAPI has significantly improved the system's documentation and API discoverability.
 
-By adopting Spring Data JDBC over JPA/Hibernate, we've achieved a good balance between abstraction and control, gaining the benefits of Spring's infrastructure while maintaining precise control over our database interactions. The integration of Spring Security has significantly improved the application's security posture, ensuring proper authentication and authorization throughout the system.
+By adopting Spring Data JDBC over JPA/Hibernate, we've achieved a good balance between abstraction and control, gaining the benefits of Spring's infrastructure while maintaining precise control over our database interactions. The integration of Spring Security has significantly improved the application's security posture, ensuring proper authentication and authorization throughout the system. The addition of comprehensive API documentation through OpenAPI enhances the system's maintainability and usability for developers.
 
 The security implementation ensures that:
 1. All pages except for login and registration require authentication
@@ -1468,14 +1350,17 @@ The security implementation ensures that:
 3. Authentication is performed against the database
 4. Passwords are securely stored using BCrypt encryption
 5. Different user roles have appropriate access to system functions
+6. All API endpoints are properly documented with security requirements
 
-Looking ahead to Milestone 5, we'll focus on enhancing the system with MongoDB integration for specific data components that benefit from document storage, particularly for reporting and analytics. This hybrid data approach will provide the best of both relational and document database paradigms, creating a more powerful and flexible system.
+Looking ahead to Milestone 7, we'll focus on enhancing the system with MongoDB integration for specific data components that benefit from document storage, particularly for reporting and analytics. This hybrid data approach will provide the best of both relational and document database paradigms, creating a more powerful and flexible system.
 
 ## References
 
 1. Spring Framework Documentation: https://docs.spring.io/spring-framework/docs/current/reference/html/
 2. Spring Data JDBC Documentation: https://docs.spring.io/spring-data/jdbc/docs/current/reference/html/
 3. Spring Security Documentation: https://docs.spring.io/spring-security/reference/
-4. MySQL 8.0 Reference Manual: https://dev.mysql.com/doc/refman/8.0/en/
-5. Maven Documentation: https://maven.apache.org/guides/
-6. Docker Documentation: https://docs.docker.com/
+4. SpringDoc OpenAPI Documentation: https://springdoc.org/
+5. OpenAPI Specification: https://swagger.io/specification/
+6. MySQL 8.0 Reference Manual: https://dev.mysql.com/doc/refman/8.0/en/
+7. Maven Documentation: https://maven.apache.org/guides/
+8. Docker Documentation: https://docs.docker.com/ 

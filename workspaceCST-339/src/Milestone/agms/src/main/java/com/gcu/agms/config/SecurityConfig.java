@@ -54,7 +54,7 @@ public class SecurityConfig {
             // Configure URL-based authorization rules
             .authorizeHttpRequests(authorize -> authorize
                 // Public resources accessible without authentication
-                .requestMatchers("/", "/login", "/register", "/images/**", "/css/**", "/js/**").permitAll()
+                .requestMatchers("/", "/about", "/login", "/register", "/images/**", "/css/**", "/js/**").permitAll()
                 
                 // Role-specific access restrictions
                 .requestMatchers("/admin/**").hasRole("ADMIN")

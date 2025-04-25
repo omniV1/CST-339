@@ -8,6 +8,15 @@
 **Course:** CST-339 - Java Programming III  
 **Professor:** Professor Robert Estey
 
+
+
+## Project Links
+
+- [GitHub Repository](https://github.com/omniV1/CST-339/tree/main/workspaceCST-339/src/Milestone)
+
+- [Screencast Demo](https://www.youtube.com/watch?v=46uzL9FG6i4)
+
+- [JavaDoc](https://github.com/omniV1/CST-339/tree/main/workspaceCST-339/src/Milestone/agms/docs/apidocs)
 ---
 
 # Milestone 1 (Version 1.0) — January 11, 2025

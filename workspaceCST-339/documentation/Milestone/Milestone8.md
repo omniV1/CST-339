@@ -1,5 +1,5 @@
 # Airport Gate Management System (AGMS)
-## Design Report - Milestone 7
+## Design Report - Milestone 8
 ### CST-339: Java Enterprise Application Development
 
 **Date:** April 06, 2025  

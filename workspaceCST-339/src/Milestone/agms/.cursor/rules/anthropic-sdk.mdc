@@ -1,0 +1,158 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Anthropic Java SDK - Maven Integration Guide
+
+## Prerequisites
+- Java 8 or later
+- Maven project setup
+- Anthropic API key (required for authentication)
+
+## Integration Steps
+
+### 1. Add Maven Dependency
+
+Add the following dependency to your project's `pom.xml`:
+
+```xml
+<dependency>
+  <groupId>com.anthropic</groupId>
+  <artifactId>anthropic-java</artifactId>
+  <version>1.2.0</version>
+</dependency>
+```
+
+### 2. Configure Authentication
+
+Choose one of these authentication methods:
+
+#### Option A: Environment Variables (Recommended)
+Set the following environment variable:
+```bash
+export ANTHROPIC_API_KEY=your-api-key-here
+```
+
+#### Option B: Programmatic Configuration
+Configure the client directly in your code:
+```java
+AnthropicClient client = AnthropicOkHttpClient.builder()
+    .apiKey("your-api-key-here")
+    .build();
+```
+
+### 3. Basic Implementation
+
+Add these imports to your Java class:
+```java
+import com.anthropic.client.AnthropicClient;
+import com.anthropic.client.okhttp.AnthropicOkHttpClient;
+import com.anthropic.models.messages.Message;
+import com.anthropic.models.messages.MessageCreateParams;
+import com.anthropic.models.messages.Model;
+```
+
+Create a basic message request:
+```java
+// Initialize client using environment variables
+AnthropicClient client = AnthropicOkHttpClient.fromEnv();
+
+// Create message parameters
+MessageCreateParams params = MessageCreateParams.builder()
+    .maxTokens(1024L)
+    .addUserMessage("Hello, Claude")
+    .model(Model.CLAUDE_3_7_SONNET_LATEST)
+    .build();
+
+// Send request
+Message message = client.messages().create(params);
+```
+
+### 4. Advanced Configuration Options
+
+#### Timeouts
+Set custom timeout for requests:
+```java
+AnthropicClient client = AnthropicOkHttpClient.builder()
+    .fromEnv()
+    .timeout(Duration.ofSeconds(30))
+    .build();
+```
+
+#### Retries
+Configure retry attempts:
+```java
+AnthropicClient client = AnthropicOkHttpClient.builder()
+    .fromEnv()
+    .maxRetries(4)
+    .build();
+```
+
+#### Streaming Support
+For handling streaming responses:
+```java
+try (StreamResponse<RawMessageStreamEvent> streamResponse = 
+        client.messages().createStreaming(params)) {
+    streamResponse.stream().forEach(chunk -> {
+        System.out.println(chunk);
+    });
+}
+```
+
+### 5. Error Handling
+
+Implement error handling for common scenarios:
+```java
+try {
+    Message message = client.messages().create(params);
+} catch (UnauthorizedException e) {
+    // Handle authentication errors
+} catch (RateLimitException e) {
+    // Handle rate limiting
+} catch (AnthropicServiceException e) {
+    // Handle other API errors
+} catch (AnthropicException e) {
+    // Handle general errors
+}
+```
+
+## Best Practices
+
+1. **Client Reuse**: Create only one client instance and reuse it throughout your application
+2. **Resource Management**: Always close streaming responses using try-with-resources
+3. **Error Handling**: Implement comprehensive error handling for production use
+4. **Timeout Configuration**: Set appropriate timeouts based on your use case
+5. **Environment Variables**: Use environment variables for sensitive configuration in production
+
+## Common Issues and Solutions
+
+### Connection Timeouts
+- Default timeout is 10 minutes
+- For long-running requests, use streaming or configure custom timeouts
+- Consider network conditions when setting timeouts
+
+### Authentication Errors
+- Verify API key is correctly set
+- Check environment variables are properly configured
+- Ensure API key has necessary permissions
+
+### Rate Limiting
+- Implement exponential backoff
+- Handle RateLimitException appropriately
+- Consider implementing request queuing for high-volume applications
+
+## Next Steps
+
+1. Review the [Anthropic API documentation](https://docs.anthropic.com/claude/reference/)
+2. Implement proper error handling
+3. Set up logging for debugging
+4. Configure appropriate timeouts and retries
+5. Test your integration thoroughly
+
+## Additional Resources
+
+- [Anthropic API Documentation](https://docs.anthropic.com/claude/reference/)
+- [Java SDK GitHub Repository](https://github.com/anthropics/anthropic-sdk-java)
+
+- [Maven Central Repository](https://central.sonatype.com/artifact/com.anthropic/anthropic-java)

@@ -1,0 +1,243 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# AGMS LLM Integration Rules & Codebase Indexing Guide
+
+## 1. Gate Data Integration Rules
+
+### Rule 1: Single-Turn Query Structure
+Define exactly what data the LLM needs to process from your gate system:
+
+```java
+class GateQueryContext {
+    String gateId;          // e.g., "A12"
+    String terminal;        // e.g., "Terminal A"
+    String status;         // e.g., "OCCUPIED", "AVAILABLE", "MAINTENANCE"
+    List<Assignment> currentAssignments;  // Current flight assignments
+    LocalDateTime lastStatusUpdate;  // When status was last updated
+}
+```
+
+### Rule 2: Data Mapping Requirements
+Map gate information to structured prompts:
+
+```java
+private String createSystemPrompt(List<GateQueryContext> gateData) {
+    return String.format("""
+        You are an airport gate management assistant. Here is the current gate status:
+        Total Gates: %d
+        Last Update: %s
+        
+        Gate Status Summary:
+        %s
+        
+        Please answer queries about gate availability, status, and assignments.
+        Format responses in clear, concise language suitable for airport staff.
+        """,
+        gateData.size(),
+        LocalDateTime.now(),
+        formatGateStatuses(gateData)
+    );
+}
+```
+
+## 2. Codebase Indexing Rules
+
+### Rule 1: Package Structure Mapping
+Define the codebase structure to index:
+
+```plaintext
+/src/main/java/com/gcu/agms/
+    ├── controller/
+    │   └── GateDashboardController.java   # Main integration point
+    ├── model/
+    │   ├── gate/
+    │   │   ├── GateModel.java
+    │   │   └── AssignmentModel.java
+    │   └── ai/
+    │       └── GateQueryContext.java      # New class for LLM context
+    ├── service/
+    │   ├── gate/
+    │   │   ├── GateManagementService.java
+    │   │   └── GateOperationsService.java
+    │   └── ai/
+    │       └── AnthropicGateService.java  # New service for LLM integration
+    └── config/
+        └── AnthropicConfig.java          # Configuration class
+```
+
+### Rule 2: Class Responsibility Index
+Map each class's specific role in the integration:
+
+1. GateDashboardController:
+   - Entry point for HTTP requests
+   - Routes queries to AnthropicGateService
+   - Handles response formatting
+
+2. AnthropicGateService:
+   - Manages Anthropic client lifecycle
+   - Builds gate context for LLM
+   - Processes LLM responses
+
+3. GateQueryContext:
+   - Data structure for LLM input
+   - Standardizes gate information format
+
+## 3. Integration Implementation Rules
+
+### Rule 1: Service Layer Integration
+```java
+@Service
+public class AnthropicGateService {
+    private final AnthropicClient client;
+    private final GateManagementService gateService;
+    
+    // Single point of LLM interaction
+    public String processGateQuery(String query) {
+        List<GateQueryContext> context = buildGateContext();
+        return sendToLLM(query, context);
+    }
+}
+```
+
+### Rule 2: Context Building
+```java
+private List<GateQueryContext> buildGateContext() {
+    return gateService.getAllGates().stream()
+        .map(this::convertToQueryContext)
+        .collect(Collectors.toList());
+}
+```
+
+### Rule 3: Response Processing
+```java
+private String sendToLLM(String query, List<GateQueryContext> context) {
+    MessageCreateParams params = MessageCreateParams.builder()
+        .model(Model.CLAUDE_3_5_SONNET_LATEST)
+        .maxTokens(1024L)
+        .system(createSystemPrompt(context))
+        .addUserMessage(query)
+        .build();
+        
+    return client.messages().create(params)
+        .content().get(0).text().get(0).text();
+}
+```
+
+## 4. Query Capability Rules
+
+Define exactly what queries the LLM can handle:
+
+1. Gate Status Queries:
+```plaintext
+Input: "What is the status of Gate A12?"
+Context Needed: GateQueryContext for A12
+Expected Output: Status with last update time
+```
+
+2. Availability Queries:
+```plaintext
+Input: "Which gates are available in Terminal B?"
+Context Needed: All GateQueryContext objects for Terminal B
+Expected Output: List of available gates with timeframes
+```
+
+3. Assignment Queries:
+```plaintext
+Input: "When will Gate C15 be free?"
+Context Needed: GateQueryContext for C15 with assignments
+Expected Output: Next available time slot
+```
+
+## 5. Testing & Validation Rules
+
+### Rule 1: Unit Test Structure
+```java
+@Test
+public void testGateQueryProcessing() {
+    // Given
+    String query = "Status of Gate A12";
+    GateQueryContext mockContext = createMockContext();
+    
+    // When
+    String response = service.processGateQuery(query);
+    
+    // Then
+    assertThat(response).contains("Gate A12");
+    assertThat(response).contains("status");
+}
+```
+
+### Rule 2: Integration Test Requirements
+```java
+@SpringBootTest
+public class AnthropicGateIntegrationTest {
+    @Test
+    public void testEndToEndQuery() {
+        // Test complete flow from HTTP request to LLM response
+    }
+}
+```
+
+## 6. Error Handling Rules
+
+Define explicit error cases and handling:
+
+```java
+@ExceptionHandler(AnthropicServiceException.class)
+public ResponseEntity<ErrorResponse> handleAnthropicError(AnthropicServiceException e) {
+    ErrorResponse error = new ErrorResponse(
+        "LLM_PROCESSING_ERROR",
+        "Failed to process gate query",
+        e.getMessage()
+    );
+    return ResponseEntity.status(500).body(error);
+}
+```
+
+## 7. Monitoring Rules
+
+Implement specific monitoring points:
+
+```java
+@Aspect
+@Component
+public class LLMQueryMonitor {
+    @Around("execution(* com.gcu.agms.service.ai.AnthropicGateService.processGateQuery(..))")
+    public Object monitorQuery(ProceedingJoinPoint joinPoint) {
+        long startTime = System.currentTimeMillis();
+        Object result = joinPoint.proceed();
+        long duration = System.currentTimeMillis() - startTime;
+        
+        // Log metrics
+        log.info("LLM Query processed in {}ms", duration);
+        return result;
+    }
+}
+```
+
+## 8. Documentation Rules
+
+Each class must include:
+1. Purpose documentation
+2. Input/output specifications
+3. Example usage
+4. Error scenarios
+5. Performance considerations
+
+Example:
+```java
+/**
+ * Processes gate queries using Anthropic's Claude LLM.
+ * 
+ * @param query Natural language query about gate status
+ * @return Formatted response for airport staff
+ * @throws AnthropicServiceException if LLM processing fails
+ * 
+ * Example:
+ * String response = processGateQuery("Status of Gate A12");
+ */
+
+```
